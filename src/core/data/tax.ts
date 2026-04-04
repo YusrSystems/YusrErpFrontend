@@ -13,7 +13,7 @@ export class Tax extends BaseEntity
   }
 }
 
-export class CityFilterColumns
+export class TaxFilterColumns
 {
   public static columnsNames: ColumnName[] = [{ label: "اسم الضريبة", value: "Name" }];
 }

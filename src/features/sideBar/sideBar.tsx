@@ -19,6 +19,8 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
 {
   const authState = useAppSelector((state) => state.auth);
   const permissions: string[] = authState.loggedInUser?.role?.permissions || [];
+  console.log(permissions);
+  
   const dispatch = useAppDispatch();
 
   const logoConfig = {

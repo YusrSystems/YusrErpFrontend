@@ -1,5 +1,6 @@
 import { ProtectedRoute, Skeleton, ThemeProvider, Toaster, TooltipProvider } from "@yusr_systems/ui";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import AppLayout from "./appLayout";
 import useAppInitialization from "./core/hooks/useAppInitialization";
 import { useAppSelector } from "./core/state/store";
 import DashboardPage from "./features/dashboard/dashboardPage";
@@ -7,8 +8,9 @@ import LandingPage from "./features/landing/landingPage";
 import LoginPage from "./features/login/loginPage";
 import NotFoundPage from "./features/notFound/notFoundPage";
 import SettingPage from "./features/setting/settingPage";
+import TaxesPage from "./features/taxes/presentation/taxesPage";
 import UsersPage from "./features/users/presentation/usersPage";
-import AppLayout from "./appLayout";
+import BranchesPage from "./features/branches/presentation/branchesPage";
 
 function App()
 {
@@ -60,6 +62,8 @@ function AppRoutes()
             <Route path="/dashboard" element={ <DashboardPage /> } />
             <Route path="/users" element={ <UsersPage /> } />
             <Route path="/settings" element={ <SettingPage /> } />
+            <Route path="/taxes" element={ <TaxesPage /> } />
+            <Route path="/branches" element={ <BranchesPage /> } />
           </Route>
         </Route>
 

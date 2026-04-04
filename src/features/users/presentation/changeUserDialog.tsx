@@ -4,7 +4,7 @@ import { ChangeDialog, FieldGroup, FormField, PasswordField, SearchableSelect, S
 import { useEffect, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "../../../core/state/store";
 import { filterRoles } from "../../../core/state/shared/roleSlice";
-import { filterBranches } from "../../../core/state/shared/branchSlice";
+import { filterBranches } from "../../branches/logic/branchSlice";
 
 export default function ChangeUserDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<User>)
 {
