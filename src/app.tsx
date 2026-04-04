@@ -11,6 +11,7 @@ import SettingPage from "./features/setting/settingPage";
 import TaxesPage from "./features/taxes/presentation/taxesPage";
 import UsersPage from "./features/users/presentation/usersPage";
 import BranchesPage from "./features/branches/presentation/branchesPage";
+import RolesPage from "./features/roles/presentation/rolesPage";
 
 function App()
 {
@@ -64,6 +65,7 @@ function AppRoutes()
             <Route path="/settings" element={ <SettingPage /> } />
             <Route path="/taxes" element={ <TaxesPage /> } />
             <Route path="/branches" element={ <BranchesPage /> } />
+            <Route path="/roles" element={ <RolesPage /> } />
           </Route>
         </Route>
 

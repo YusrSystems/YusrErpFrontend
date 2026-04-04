@@ -2,17 +2,18 @@ import { configureStore } from "@reduxjs/toolkit";
 import { createAuthSlice, User } from "@yusr_systems/core";
 import { setupAuthListeners } from "@yusr_systems/ui";
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import branchDialogReducer from "../../features/branches/logic/branchDialogSlice";
+import branchReducer from "../../features/branches/logic/branchSlice";
+import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
+import roleReducer from "../../features/roles/logic/roleSlice";
 import taxDialogReducer from "../../features/taxes/logic/taxDialogSlice";
 import taxReducer from "../../features/taxes/logic/taxSlice";
 import userDialogReducer from "../../features/users/logic/userDialogSlice";
 import userReducer from "../../features/users/logic/userSlice";
 import type { Setting } from "../data/setting";
-import branchReducer from "../../features/branches/logic/branchSlice";
-import branchDialogReducer from "../../features/branches/logic/branchDialogSlice";
 import cityReducer from "./shared/citySlice";
 import countryReducer from "./shared/countrySlice";
 import currencyReducer from "./shared/currencySlice";
-import roleReducer from "./shared/roleSlice";
 import systemReducer from "./shared/systemSlice";
 
 const authSlice = createAuthSlice<User, Setting>();
@@ -20,9 +21,10 @@ export const { login, logout, updateLoggedInUser, updateSetting, syncFromStorage
 
 export const store = configureStore({
   reducer: {
-    role: roleReducer,
     branch: branchReducer,
     branchDialog: branchDialogReducer,
+    role: roleReducer,
+    roleDialog: roleDialogReducer,
     user: userReducer,
     userDialog: userDialogReducer,
     city: cityReducer,

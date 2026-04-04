@@ -3,8 +3,8 @@ import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, FieldGroup, FormField, PasswordField, SearchableSelect, SelectField, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "../../../core/state/store";
-import { filterRoles } from "../../../core/state/shared/roleSlice";
 import { filterBranches } from "../../branches/logic/branchSlice";
+import { filterRoles } from "../../roles/logic/roleSlice";
 
 export default function ChangeUserDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<User>)
 {

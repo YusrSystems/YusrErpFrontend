@@ -1,14 +1,13 @@
-
+import { Branch, BranchesApiService, BranchFilterColumns } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
-import { Building, MapPin } from "lucide-react";
+import { Building } from "lucide-react";
 import { useMemo } from "react";
-import ChangeBranchDialog from "./changeBranchDialog";
-import { BranchesApiService, Branch, BranchFilterColumns } from "@yusr_systems/core";
 import { selectPermissionsByResource } from "../../../core/auth/authSelectors";
 import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
 import { openBranchChangeDialog, openBranchDeleteDialog, setIsBranchChangeDialogOpen, setIsBranchDeleteDialogOpen } from "../logic/branchDialogSlice";
 import { filterBranches, refreshBranches, setCurrentBranchesPage } from "../logic/branchSlice";
+import ChangeBranchDialog from "./changeBranchDialog";
 
 export default function BranchesPage()
 {
@@ -33,7 +32,7 @@ export default function BranchesPage()
         title: "إجمالي الفروع",
         data: (branchState.entities?.count ?? 0).toString(),
         icon: <Building className="h-4 w-4 text-muted-foreground" />
-      }, { title: "المدن المغطاة", data: (4).toString(), icon: <MapPin className="h-4 w-4 text-muted-foreground" /> }] }
+      }] }
       columnsToFilter={ BranchFilterColumns.columnsNames }
       tableHeadRows={ [{ rowName: "", rowStyles: "text-left w-12.5" }, { rowName: "رقم الفرع", rowStyles: "w-30" }, {
         rowName: "اسم الفرع",
