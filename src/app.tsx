@@ -1,4 +1,10 @@
-import { ProtectedRoute, Skeleton, ThemeProvider, Toaster, TooltipProvider } from "@yusr_systems/ui";
+import {
+  ProtectedRoute,
+  Skeleton,
+  ThemeProvider,
+  Toaster,
+  TooltipProvider,
+} from "@yusr_systems/ui";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AppLayout from "./appLayout";
 import useAppInitialization from "./core/hooks/useAppInitialization";
@@ -12,21 +18,19 @@ import TaxesPage from "./features/taxes/presentation/taxesPage";
 import UsersPage from "./features/users/presentation/usersPage";
 import BranchesPage from "./features/branches/presentation/branchesPage";
 import RolesPage from "./features/roles/presentation/rolesPage";
+import StoresPage from "./features/stores/presentation/storePage";
 
-function App()
-{
+function App() {
   const { isLoading } = useAppInitialization();
 
-  if (isLoading)
-  {
+  if (isLoading) {
     return <Apploading />;
   }
 
   return <AppBody />;
 }
 
-function AppBody()
-{
+function AppBody() {
   return (
     <TooltipProvider>
       <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
@@ -37,8 +41,7 @@ function AppBody()
   );
 }
 
-function Apploading()
-{
+function Apploading() {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="flex w-full max-w-xs flex-col gap-2">
@@ -48,28 +51,28 @@ function Apploading()
   );
 }
 
-function AppRoutes()
-{
+function AppRoutes() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={ <LandingPage /> } />
-        <Route path="/login" element={ <LoginPage /> } />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
-        <Route element={ <ProtectedRoute isAuthenticated={ isAuthenticated } /> }>
-          <Route element={ <AppLayout /> }>
-            <Route path="/dashboard" element={ <DashboardPage /> } />
-            <Route path="/users" element={ <UsersPage /> } />
-            <Route path="/settings" element={ <SettingPage /> } />
-            <Route path="/taxes" element={ <TaxesPage /> } />
-            <Route path="/branches" element={ <BranchesPage /> } />
-            <Route path="/roles" element={ <RolesPage /> } />
+        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/settings" element={<SettingPage />} />
+            <Route path="/taxes" element={<TaxesPage />} />
+            <Route path="/branches" element={<BranchesPage />} />
+            <Route path="/roles" element={<RolesPage />} />
+            <Route path="/stores" element={<StoresPage />} />
           </Route>
         </Route>
 
-        <Route path="*" element={ <NotFoundPage /> } />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );

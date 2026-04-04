@@ -1,7 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { createAuthSlice, User } from "@yusr_systems/core";
 import { setupAuthListeners } from "@yusr_systems/ui";
-import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import {
+  type TypedUseSelectorHook,
+  useDispatch,
+  useSelector,
+} from "react-redux";
 import branchDialogReducer from "../../features/branches/logic/branchDialogSlice";
 import branchReducer from "../../features/branches/logic/branchSlice";
 import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
@@ -15,9 +19,17 @@ import cityReducer from "./shared/citySlice";
 import countryReducer from "./shared/countrySlice";
 import currencyReducer from "./shared/currencySlice";
 import systemReducer from "./shared/systemSlice";
+import storeReducer from "../../features/stores/logic/storeSlice";
+import storeDialogReducer from "../../features/stores/logic/storeDialogSlice";
 
 const authSlice = createAuthSlice<User, Setting>();
-export const { login, logout, updateLoggedInUser, updateSetting, syncFromStorage } = authSlice.actions;
+export const {
+  login,
+  logout,
+  updateLoggedInUser,
+  updateSetting,
+  syncFromStorage,
+} = authSlice.actions;
 
 export const store = configureStore({
   reducer: {
@@ -33,13 +45,15 @@ export const store = configureStore({
     auth: authSlice.reducer,
     system: systemReducer,
     tax: taxReducer,
-    taxDialog: taxDialogReducer
-  }
+    taxDialog: taxDialogReducer,
+    store: storeReducer,
+    storeDialog: storeDialogReducer,
+  },
 });
 
 setupAuthListeners(store.dispatch, {
   logout: authSlice.actions.logout,
-  syncFromStorage: authSlice.actions.syncFromStorage
+  syncFromStorage: authSlice.actions.syncFromStorage,
 });
 
 export type RootState = ReturnType<typeof store.getState>;
