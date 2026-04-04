@@ -34,7 +34,6 @@ export default function ChangeStoreDialog({
     () => ({
       ...entity,
       storeName: entity?.storeName || "",
-      authorized: entity?.authorized ?? true,
     }),
     [entity],
   );
@@ -67,19 +66,6 @@ export default function ChangeStoreDialog({
           onChange={(e) => handleChange({ storeName: e.target.value })}
           isInvalid={isInvalid("storeName")}
           error={getError("storeName")}
-        />
-
-        <SelectField
-          label="حالة التصريح"
-          value={formData.authorized ? "authorized" : "unauthorized"}
-          onValueChange={(val) =>
-            handleChange({ authorized: val === "authorized" })
-          }
-          required={true}
-          options={[
-            { label: "مصرح", value: "authorized" },
-            { label: "غير مصرح", value: "unauthorized" },
-          ]}
         />
       </FieldGroup>
     </ChangeDialog>

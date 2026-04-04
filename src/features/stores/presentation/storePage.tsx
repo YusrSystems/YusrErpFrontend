@@ -50,17 +50,10 @@ export default function StoresPage() {
         { rowName: "", rowStyles: "text-left w-12.5" },
         { rowName: "رقم المستودع", rowStyles: "w-30" },
         { rowName: "اسم المستودع", rowStyles: "w-70" },
-        { rowName: "الحالة", rowStyles: "" },
       ]}
       tableRowMapper={(store: Store) => [
         { rowName: `#${store.id}`, rowStyles: "" },
         { rowName: store.storeName, rowStyles: "font-semibold" },
-        {
-          rowName: store.authorized ? "مصرح" : "غير مصرح",
-          rowStyles: `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            store.authorized ? "bg-green-300" : "bg-red-300"
-          } text-slate-800`,
-        },
       ]}
       actions={{
         filter: filterStores,
