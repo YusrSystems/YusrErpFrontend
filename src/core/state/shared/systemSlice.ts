@@ -1,5 +1,5 @@
-import SystemApiService from "@/app/core/networking/systemApiService";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import SystemApiService from "../../networking/systemApiService";
 
 export const fetchSystemPermissions = createAsyncThunk("system/fetchPermissions", async () =>
 {

@@ -1,8 +1,8 @@
-import { SideBar } from "@/app/core/components/sideBar/sideBar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@yusr_systems/ui";
 import { Outlet } from "react-router-dom";
+import { SideBar } from "./features/sideBar/sideBar";
 
-const MainPage = () =>
+const AppLayout = () =>
 {
   return (
     <SidebarProvider>
@@ -22,4 +22,4 @@ const MainPage = () =>
   );
 };
 
-export default MainPage;
+export default AppLayout;

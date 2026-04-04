@@ -1,18 +1,18 @@
 import { ApiConstants, SystemPermissions, YusrApiHelper } from "@yusr_systems/core";
 import { Sidebar, SideBarCompanyData, SidebarContent, SidebarFooter, SidebarHeader, SidebarLogo, SideBarMainMenu, SidebarMenu, SidebarMenuItem, SideBarSecondaryMenu, SideBarUserData } from "@yusr_systems/ui";
-import { Building2Icon, BusFrontIcon, LayoutDashboardIcon, MapPinnedIcon, SettingsIcon, ShieldCheck, UserCogIcon, UsersIcon } from "lucide-react";
+import { Building2Icon, LayoutDashboardIcon, Percent, SettingsIcon, ShieldCheck, UserCogIcon } from "lucide-react";
 import * as React from "react";
-import { SystemPermissionsActions } from "../../auth/systemPermissionsActions";
-import { SystemPermissionsResources } from "../../auth/systemPermissionsResources";
-import ApplicationLang from "../../services/langService/applicationLang";
-import { logout, useAppDispatch, useAppSelector } from "../../state/store";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import ApplicationLanguages from "../../core/services/language/applicationLanguages";
+import { logout, useAppDispatch, useAppSelector } from "../../core/state/store";
 
 import logoFullDark from "@/assets/yusrBusLogoRTL_Dark.png";
 import logoFullLight from "@/assets/yusrBusLogoRTL_Light.png";
 import logoOnlyDark from "@/assets/yusrLogoOnly_Dark.png";
 import logoOnlyLight from "@/assets/yusrLogoOnly_Light.png";
 
-const appLang = ApplicationLang.getAppLangText();
+const appLang = ApplicationLanguages.getAppLanguageText();
 const appLangSections = appLang.sections;
 
 export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
@@ -36,26 +36,13 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         SystemPermissionsResources.Dashboard,
         SystemPermissionsActions.Get
       )
-    }, {
-      title: appLangSections.trips,
-      url: "/trips",
-      icon: <BusFrontIcon />,
-      hasAuth: SystemPermissions.hasAuth(permissions, SystemPermissionsResources.Trips, SystemPermissionsActions.Get)
-    }, {
-      title: appLangSections.passengers,
-      url: "/passengers",
-      icon: <UsersIcon />,
-      hasAuth: SystemPermissions.hasAuth(
-        permissions,
-        SystemPermissionsResources.Passengers,
-        SystemPermissionsActions.Get
-      )
-    }, {
-      title: appLangSections.routes,
-      url: "/routes",
-      icon: <MapPinnedIcon />,
-      hasAuth: SystemPermissions.hasAuth(permissions, SystemPermissionsResources.Routes, SystemPermissionsActions.Get)
-    }, {
+    },{
+      title: appLangSections.taxes,
+      url: "/taxes",
+      icon: <Percent />,
+      hasAuth: SystemPermissions.hasAuth(permissions, SystemPermissionsResources.Taxes, SystemPermissionsActions.Get)
+    },
+     {
       title: appLangSections.branches,
       url: "/branches",
       icon: <Building2Icon />,

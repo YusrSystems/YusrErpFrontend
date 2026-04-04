@@ -1,13 +1,12 @@
-import { Setting } from "@/app/core/data/setting";
-import { StorageFileStatus } from "@/app/core/data/storageFile";
-import SettingsApiService from "@/app/core/networking/settingsApiService";
-import { filterCurrencies } from "@/app/core/state/shared/currencySlice";
-import { updateSetting, useAppDispatch, useAppSelector } from "@/app/core/state/store";
-import { type ValidationRule, Validators } from "@yusr_systems/core";
+import { StorageFileStatus, type ValidationRule, Validators } from "@yusr_systems/core";
 import { Avatar, AvatarFallback, AvatarImage, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, FieldGroup, FormField, Label, SelectInput, Separator, TextField, useEntityForm, useStorageFile } from "@yusr_systems/ui";
 import { differenceInDays, format } from "date-fns";
 import { Camera, Loader2, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import type { Setting } from "../../core/data/setting";
+import SettingsApiService from "../../core/networking/settingsApiService";
+import { filterCurrencies } from "../../core/state/shared/currencySlice";
+import { useAppSelector, useAppDispatch, updateSetting } from "../../core/state/store";
 
 export default function SettingPage()
 {
@@ -197,15 +196,6 @@ export default function SettingPage()
                 handleChange({ email: e.target.value });
                 clearError("email");
               } }
-            />
-
-            <TextField
-              label="رمز خدمة الإرسال (Email Key)"
-              placeholder="أدخل الرمز الخاص بالخدمة"
-              dir="ltr"
-              className="text-right"
-              value={ formData.emailKey || "" }
-              onChange={ (e) => handleChange({ emailKey: e.target.value }) }
             />
 
             <FormField label="العملة الافتراضية" isInvalid={ isInvalid("currencyId") } error={ getError("currencyId") }>

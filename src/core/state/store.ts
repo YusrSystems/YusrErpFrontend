@@ -1,22 +1,13 @@
-import branchDialogReducer from "@/app/features/branches/logic/branchDialogSlice";
-import branchReducer from "@/app/features/branches/logic/branchSlice";
-import passengerDialogReducer from "@/app/features/passengers/logic/passengerDialogSlice";
-import passengerReducer from "@/app/features/passengers/logic/passengerSlice";
-import roleDialogReducer from "@/app/features/roles/logic/roleDialogSlice";
-import roleReducer from "@/app/features/roles/logic/roleSlice";
-import routeDialogReducer from "@/app/features/routes/logic/routeDialogSlice";
-import routeReducer from "@/app/features/routes/logic/routeSlice";
-import tripDialogReducer from "@/app/features/trips/logic/tripDialogSlice";
-import tripReducer from "@/app/features/trips/logic/tripSlice";
-import type User from "@/app/features/users/data/user";
-import userDialogReducer from "@/app/features/users/logic/userDialogSlice";
-import userReducer from "@/app/features/users/logic/userSlice";
 import { configureStore } from "@reduxjs/toolkit";
-import { createAuthSlice } from "@yusr_systems/core";
+import { createAuthSlice, User } from "@yusr_systems/core";
 import { setupAuthListeners } from "@yusr_systems/ui";
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import userDialogReducer from "../../features/users/logic/userDialogSlice";
+import userReducer from "../../features/users/logic/userSlice";
 import type { Setting } from "../data/setting";
 import cityReducer from "./shared/citySlice";
+import roleReducer from "./shared/roleSlice";
+import branchReducer from "./shared/branchSlice";
 import countryReducer from "./shared/countrySlice";
 import currencyReducer from "./shared/currencySlice";
 import systemReducer from "./shared/systemSlice";
@@ -26,18 +17,10 @@ export const { login, logout, updateLoggedInUser, updateSetting, syncFromStorage
 
 export const store = configureStore({
   reducer: {
-    branch: branchReducer,
-    branchDialog: branchDialogReducer,
     role: roleReducer,
-    roleDialog: roleDialogReducer,
-    route: routeReducer,
-    routeDialog: routeDialogReducer,
+    branch: branchReducer,
     user: userReducer,
     userDialog: userDialogReducer,
-    passenger: passengerReducer,
-    passengerDialog: passengerDialogReducer,
-    trip: tripReducer,
-    tripDialog: tripDialogReducer,
     city: cityReducer,
     country: countryReducer,
     currency: currencyReducer,

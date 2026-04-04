@@ -1,4 +1,4 @@
-export class LangConstants
+export class LanguageConstants
 {
   static langKey = "lang";
 }

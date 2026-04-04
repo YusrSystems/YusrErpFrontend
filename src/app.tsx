@@ -1,22 +1,14 @@
 import { ProtectedRoute, Skeleton, ThemeProvider, Toaster, TooltipProvider } from "@yusr_systems/ui";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import useAppInitialization from "./core/hooks/useAppInitialization";
-import RoutesService from "./core/services/constants/routesService";
 import { useAppSelector } from "./core/state/store";
-import BranchesPage from "./features/branches/presentation/branchesPage";
 import DashboardPage from "./features/dashboard/dashboardPage";
 import LandingPage from "./features/landing/landingPage";
 import LoginPage from "./features/login/loginPage";
-import MainPage from "./features/main/mainPage";
 import NotFoundPage from "./features/notFound/notFoundPage";
-import PassengersPage from "./features/passengers/presentation/passengersPage";
-import PrfilePage from "./features/profile/prfilePage";
-import TicketRedirect from "./features/redirection/ticketRedirect";
-import RolesPage from "./features/roles/presentation/rolesPage";
-import RoutesPage from "./features/routes/presentation/routesPage";
 import SettingPage from "./features/setting/settingPage";
-import TripsPage from "./features/trips/presentation/tripsPage";
 import UsersPage from "./features/users/presentation/usersPage";
+import AppLayout from "./appLayout";
 
 function App()
 {
@@ -56,27 +48,18 @@ function Apploading()
 function AppRoutes()
 {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
-  
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={ <LandingPage /> } />
         <Route path="/login" element={ <LoginPage /> } />
 
-        <Route path="/t/:accessKey" element={ <TicketRedirect /> } />
-
         <Route element={ <ProtectedRoute isAuthenticated={ isAuthenticated } /> }>
-          <Route element={ <MainPage /> }>
+          <Route element={ <AppLayout /> }>
             <Route path="/dashboard" element={ <DashboardPage /> } />
-            <Route path="/trips" element={ <TripsPage /> } />
-            <Route path="/passengers" element={ <PassengersPage /> } />
-            <Route path="/routes" element={ <RoutesPage /> } />
-            <Route path="/branches" element={ <BranchesPage /> } />
             <Route path="/users" element={ <UsersPage /> } />
             <Route path="/settings" element={ <SettingPage /> } />
-            <Route path="/roles" element={ <RolesPage /> } />
-
-            <Route path={ RoutesService.Profile } element={ <PrfilePage /> } />
           </Route>
         </Route>
 

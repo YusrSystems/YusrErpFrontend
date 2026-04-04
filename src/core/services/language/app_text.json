@@ -13,9 +13,7 @@
     },
     "sections": {
       "dashboard": "لوحة المعلومات",
-      "trips": "الرحلات",
-      "passengers": "الركاب",
-      "routes": "الخطوط",
+      "taxes": "الضرائب",
       "branches": "الفروع",
       "users": "المستخدمون",
       "roles": "الأدوار",

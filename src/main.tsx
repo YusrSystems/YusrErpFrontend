@@ -1,15 +1,14 @@
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-
-import ErrorBoundary from "./app/features/error/errorBoundary.tsx";
-import "./index.css";
+import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux";
-import { store } from "./app/core/state/store.ts";
 import { ApiConstants } from "@yusr_systems/core";
-import App from "./App.tsx";
+import ErrorBoundary from "./features/error/errorBoundary";
+import App from "./app";
+import "./index.css";
+import { store } from "./core/state/store";
 
 ApiConstants.initialize("https://yusrerp.runasp.net/api");
-// ApiConstants.initialize("https://localhost:7226/api");
+ApiConstants.initialize("https://localhost:7142/api");
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

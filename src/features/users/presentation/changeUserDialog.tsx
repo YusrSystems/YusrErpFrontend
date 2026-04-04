@@ -1,12 +1,10 @@
-import { useAppDispatch, useAppSelector } from "@/app/core/state/store";
-import { type ValidationRule, Validators } from "@yusr_systems/core";
+import { RoleFilterColumns, User, type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, FieldGroup, FormField, PasswordField, SearchableSelect, SelectField, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
-import { filterBranches } from "../../branches/logic/branchSlice";
-import { RoleFilterColumns } from "../../roles/data/role";
-import { filterRoles } from "../../roles/logic/roleSlice";
-import type User from "../data/user";
+import { useAppSelector, useAppDispatch } from "../../../core/state/store";
+import { filterRoles } from "../../../core/state/shared/roleSlice";
+import { filterBranches } from "../../../core/state/shared/branchSlice";
 
 export default function ChangeUserDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<User>)
 {
