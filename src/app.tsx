@@ -19,6 +19,7 @@ import UsersPage from "./features/users/presentation/usersPage";
 import BranchesPage from "./features/branches/presentation/branchesPage";
 import RolesPage from "./features/roles/presentation/rolesPage";
 import StoresPage from "./features/stores/presentation/storePage";
+import UnitsPage from "./features/units/presentation/UnitsPage";
 
 function App() {
   const { isLoading } = useAppInitialization();
@@ -69,6 +70,7 @@ function AppRoutes() {
             <Route path="/branches" element={<BranchesPage />} />
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/stores" element={<StoresPage />} />
+            <Route path="/units" element={<UnitsPage />} />
           </Route>
         </Route>
 

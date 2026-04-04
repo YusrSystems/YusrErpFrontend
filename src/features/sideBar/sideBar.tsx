@@ -21,6 +21,7 @@ import {
   LayoutDashboardIcon,
   Percent,
   SettingsIcon,
+  ShelvingUnit,
   ShieldCheck,
   Store,
   UserCogIcon,
@@ -80,6 +81,16 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         hasAuth: SystemPermissions.hasAuth(
           permissions,
           SystemPermissionsResources.Stores,
+          SystemPermissionsActions.Get,
+        ),
+      },
+      {
+        title: appLangSections.units,
+        url: "/units",
+        icon: <ShelvingUnit />,
+        hasAuth: SystemPermissions.hasAuth(
+          permissions,
+          SystemPermissionsResources.Units,
           SystemPermissionsActions.Get,
         ),
       },
