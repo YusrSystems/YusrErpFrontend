@@ -7,8 +7,8 @@ import {
   useEntityForm,
 } from "@yusr_systems/ui";
 import { useMemo } from "react";
-import { useAppDispatch } from "../../../core/state/store";
-import type Unit from "../../../core/data/units";
+import { useAppDispatch } from "../../core/state/store";
+import type Unit from "../../core/data/units";
 
 export default function ChangeUnitDialog({
   entity,

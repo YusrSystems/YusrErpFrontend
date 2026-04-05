@@ -1,24 +1,13 @@
 import { CrudPage } from "@yusr_systems/ui";
 import { BoxIcon } from "lucide-react";
 import { useMemo } from "react";
-import {
-  openUnitChangeDialog,
-  openUnitDeleteDialog,
-  setIsUnitChangeDialogOpen,
-  setIsUnitDeleteDialogOpen,
-} from "../logic/unitDialogSlice";
-import {
-  filterUnits,
-  refreshUnits,
-  setCurrentUnitsPage,
-} from "../logic/unitSlice";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import UnitsApiService from "../../core/networking/unitApiService";
+import type Unit from "../../core/data/units";
+import { UnitFilterColumns, UnitSlice } from "../../core/data/units";
 import ChangeUnitDialog from "./changeUnitDialog";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
-import { selectPermissionsByResource } from "../../../core/auth/authSelectors";
-import UnitsApiService from "../../../core/networking/unitApiService";
-import type Unit from "../../../core/data/units";
-import { UnitFilterColumns } from "../../../core/data/units";
 
 export default function UnitsPage() {
   const dispatch = useAppDispatch();
@@ -56,13 +45,17 @@ export default function UnitsPage() {
         { rowName: unit.unitName, rowStyles: "font-semibold" },
       ]}
       actions={{
-        filter: filterUnits,
-        openChangeDialog: (entity) => openUnitChangeDialog(entity),
-        openDeleteDialog: (entity) => openUnitDeleteDialog(entity),
-        setIsChangeDialogOpen: (open) => setIsUnitChangeDialogOpen(open),
-        setIsDeleteDialogOpen: (open) => setIsUnitDeleteDialogOpen(open),
-        refresh: refreshUnits,
-        setCurrentPage: (page) => setCurrentUnitsPage(page),
+        filter: UnitSlice.entityActions.filter,
+        openChangeDialog: (entity) =>
+          UnitSlice.dialogActions.openChangeDialog(entity),
+        openDeleteDialog: (entity) =>
+          UnitSlice.dialogActions.openDeleteDialog(entity),
+        setIsChangeDialogOpen: (open) =>
+          UnitSlice.dialogActions.setIsChangeDialogOpen(open),
+        setIsDeleteDialogOpen: (open) =>
+          UnitSlice.dialogActions.setIsDeleteDialogOpen(open),
+        refresh: UnitSlice.entityActions.refresh,
+        setCurrentPage: (page) => UnitSlice.entityActions.setCurrentPage(page),
       }}
       ChangeDialog={
         <ChangeUnitDialog
@@ -70,9 +63,9 @@ export default function UnitsPage() {
           mode={unitDialogState.selectedRow ? "update" : "create"}
           service={service}
           onSuccess={(data, mode) => {
-            dispatch(refreshUnits({ data: data }));
+            dispatch(UnitSlice.entityActions.refresh({ data: data }));
             if (mode === "create") {
-              dispatch(setIsUnitChangeDialogOpen(false));
+              dispatch(UnitSlice.dialogActions.setIsChangeDialogOpen(false));
             }
           }}
         />

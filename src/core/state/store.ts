@@ -21,8 +21,7 @@ import currencyReducer from "./shared/currencySlice";
 import systemReducer from "./shared/systemSlice";
 import storeReducer from "../../features/stores/logic/storeSlice";
 import storeDialogReducer from "../../features/stores/logic/storeDialogSlice";
-import unitReducer from "../../features/units/logic/unitSlice";
-import unitDialogReducer from "../../features/units/logic/unitDialogSlice";
+import { UnitSlice } from "../data/units";
 const authSlice = createAuthSlice<User, Setting>();
 export const {
   login,
@@ -49,8 +48,8 @@ export const store = configureStore({
     taxDialog: taxDialogReducer,
     store: storeReducer,
     storeDialog: storeDialogReducer,
-    unit: unitReducer,
-    unitDialog: unitDialogReducer,
+    unit: UnitSlice.entityReducer,
+    unitDialog: UnitSlice.dialogReducer,
   },
 });
 

@@ -19,7 +19,7 @@ import UsersPage from "./features/users/presentation/usersPage";
 import BranchesPage from "./features/branches/presentation/branchesPage";
 import RolesPage from "./features/roles/presentation/rolesPage";
 import StoresPage from "./features/stores/presentation/storePage";
-import UnitsPage from "./features/units/presentation/UnitsPage";
+import UnitsPage from "./features/units/unitsPage";
 
 function App() {
   const { isLoading } = useAppInitialization();
