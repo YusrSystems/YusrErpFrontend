@@ -25,6 +25,7 @@ import {
   ShieldCheck,
   Store,
   UserCogIcon,
+  Users2,
 } from "lucide-react";
 import * as React from "react";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
@@ -81,6 +82,16 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         hasAuth: SystemPermissions.hasAuth(
           permissions,
           SystemPermissionsResources.Stores,
+          SystemPermissionsActions.Get,
+        ),
+      },
+      {
+        title: appLangSections.accounts,
+        url: "/accounts",
+        icon: <Users2 />,
+        hasAuth: SystemPermissions.hasAuth(
+          permissions,
+          SystemPermissionsResources.Accounts,
           SystemPermissionsActions.Get,
         ),
       },
