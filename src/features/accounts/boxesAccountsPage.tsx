@@ -1,7 +1,15 @@
-import { AccountType } from "../../core/data/account";
+import { AccountType, BoxesSlice } from "../../core/data/account";
 import AccountsPage from "./accountsPage";
 
 export default function BoxesAccountsPage()
 {
-  return <AccountsPage type={ AccountType.Box } title="إدارة الصناديق" />;
+  return (
+    <AccountsPage
+      slice={ BoxesSlice }
+      stateKey="boxes"
+      dialogStateKey="boxesDialog"
+      title="إدارة حسابات الصناديق"
+      fixedType={AccountType.Box}
+    />
+  );
 }

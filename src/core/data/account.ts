@@ -66,24 +66,33 @@ export class AccountFilterColumns
   ];
 }
 
-export class AccountSlice
-{
-  private static entitySliceInstance = createGenericEntitySlice(
-    "account",
-    new AccountsApiService(),
-    (pageNumber, rowsPerPage, condition, filterTypes) =>
-      new AccountsApiService().FilterByTypes(
-        pageNumber,
-        rowsPerPage,
-        new FilterByTypeRequest({ types: filterTypes ?? [], condition })
-      )
-  );
+// account.ts
+export class AccountSlice {
+  static create(sliceName: string, types: AccountType[]) {
+    const entitySliceInstance = createGenericEntitySlice(
+      sliceName,
+      new AccountsApiService(),
+      (pageNumber, rowsPerPage, condition) =>
+        new AccountsApiService().FilterByTypes(
+          pageNumber,
+          rowsPerPage,
+          new FilterByTypeRequest({ types, condition })
+        )
+    );
 
-  public static entityActions = AccountSlice.entitySliceInstance.actions;
-  public static entityReducer = AccountSlice.entitySliceInstance.reducer;
+    const dialogSliceInstance = createGenericDialogSlice<Account>(sliceName + "Dialog");
 
-  private static dialogSliceInstance = createGenericDialogSlice<Account>("accountDialog");
-
-  public static dialogActions = AccountSlice.dialogSliceInstance.actions;
-  public static dialogReducer = AccountSlice.dialogSliceInstance.reducer;
+    return {
+      entityActions: entitySliceInstance.actions,
+      entityReducer: entitySliceInstance.reducer,
+      dialogActions: dialogSliceInstance.actions,
+      dialogReducer: dialogSliceInstance.reducer,
+    };
+  }
 }
+
+export const ClientsSlice = AccountSlice.create("clients", [AccountType.Client]);
+export const SuppliersSlice = AccountSlice.create("suppliers", [AccountType.Supplier]);
+export const EmployeesSlice = AccountSlice.create("employees", [AccountType.Employee]);
+export const BanksSlice = AccountSlice.create("banks", [AccountType.Bank]);
+export const BoxesSlice = AccountSlice.create("boxes", [AccountType.Box]);

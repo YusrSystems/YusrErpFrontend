@@ -1,8 +1,15 @@
-import { AccountType } from "../../core/data/account";
+import { AccountType, ClientsSlice } from "../../core/data/account";
 import AccountsPage from "./accountsPage";
 
-export default function ClientsAccountsPage() {
+export default function ClientsAccountsPage()
+{
   return (
-    <AccountsPage type={AccountType.Client} title="إدارة العملاء"/>
+    <AccountsPage
+      title="إدارة حسابات العملاء"
+      slice={ ClientsSlice }
+      stateKey="clients"
+      dialogStateKey="clientsDialog"
+      fixedType={AccountType.Client}
+    />
   );
 }
