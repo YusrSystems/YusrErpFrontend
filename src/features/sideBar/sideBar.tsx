@@ -1,28 +1,6 @@
-import {
-  ApiConstants,
-  SystemPermissions,
-  YusrApiHelper,
-} from "@yusr_systems/core";
-import {
-  Sidebar,
-  SideBarCompanyData,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarLogo,
-  SideBarMainMenu,
-  SidebarMenu,
-  SidebarMenuItem,
-  SideBarSecondaryMenu,
-  SideBarUserData,
-} from "@yusr_systems/ui";
-import {
-  Building2Icon,
-  LayoutDashboardIcon,
-  Percent,
-  SettingsIcon,
-  UsersIcon, // Added for the new parent group
-} from "lucide-react";
+import { ApiConstants, SystemPermissions, YusrApiHelper } from "@yusr_systems/core";
+import { Sidebar, SideBarCompanyData, SidebarContent, SidebarFooter, SidebarHeader, SidebarLogo, SideBarMainMenu, SidebarMenu, SidebarMenuItem, SideBarSecondaryMenu, SideBarUserData } from "@yusr_systems/ui";
+import { Building2Icon, LayoutDashboardIcon, Percent, SettingsIcon, UsersIcon } from "lucide-react";
 import * as React from "react";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
@@ -37,7 +15,8 @@ import logoOnlyLight from "@/assets/yusrLogoOnly_Light.png";
 const appLang = ApplicationLanguages.getAppLanguageText();
 const appLangSections = appLang.sections;
 
-export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
+{
   const authState = useAppSelector((state) => state.auth);
   const permissions: string[] = authState.loggedInUser?.role?.permissions || [];
 
@@ -45,7 +24,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const logoConfig = {
     full: { light: logoFullLight, dark: logoFullDark },
-    collapsed: { light: logoOnlyLight, dark: logoOnlyDark },
+    collapsed: { light: logoOnlyLight, dark: logoOnlyDark }
   };
 
   const data = {
@@ -57,8 +36,8 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         hasAuth: SystemPermissions.hasAuth(
           permissions,
           SystemPermissionsResources.Dashboard,
-          SystemPermissionsActions.Get,
-        ),
+          SystemPermissionsActions.Get
+        )
       },
       {
         title: appLangSections.taxes,
@@ -67,8 +46,18 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         hasAuth: SystemPermissions.hasAuth(
           permissions,
           SystemPermissionsResources.Taxes,
-          SystemPermissionsActions.Get,
-        ),
+          SystemPermissionsActions.Get
+        )
+      },
+      {
+        title: appLangSections.accounts,
+        url: "/accounts",
+        icon: <UsersIcon />,
+        hasAuth: SystemPermissions.hasAuth(
+          permissions,
+          SystemPermissionsResources.Accounts,
+          SystemPermissionsActions.Get
+        )
       },
       // --- NEW: Grouped Organization Items ---
       {
@@ -76,35 +65,31 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "#",
         icon: <Building2Icon />,
         hasAuth: true, // Parent auth is true, children will be filtered automatically by the updated component
-        subItems: [
-          {
-            title: appLangSections.stores,
-            url: "/stores",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Stores,
-              SystemPermissionsActions.Get,
-            ),
-          },
-          {
-            title: appLangSections.units,
-            url: "/units",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Units,
-              SystemPermissionsActions.Get,
-            ),
-          },
-          {
-            title: appLangSections.branches,
-            url: "/branches",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Branches,
-              SystemPermissionsActions.Get,
-            ),
-          },
-        ],
+        subItems: [{
+          title: appLangSections.stores,
+          url: "/stores",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Stores,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.units,
+          url: "/units",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Units,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.branches,
+          url: "/branches",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Branches,
+            SystemPermissionsActions.Get
+          )
+        }]
       },
       // --- NEW: Grouped User Management Items ---
       {
@@ -112,72 +97,69 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "#",
         icon: <UsersIcon />,
         hasAuth: true,
-        subItems: [
-          {
-            title: appLangSections.users,
-            url: "/users",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Users,
-              SystemPermissionsActions.Get,
-            ),
-          },
-          {
-            title: appLangSections.roles,
-            url: "/roles",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Roles,
-              SystemPermissionsActions.Get,
-            ),
-          },
-        ],
-      },
+        subItems: [{
+          title: appLangSections.users,
+          url: "/users",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Users,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.roles,
+          url: "/roles",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Roles,
+            SystemPermissionsActions.Get
+          )
+        }]
+      }
     ],
-    navSecondary: [
-      {
-        title: appLangSections.settings,
-        url: "/settings",
-        icon: <SettingsIcon />,
-      },
-    ],
+    navSecondary: [{
+      title: appLangSections.settings,
+      url: "/settings",
+      icon: <SettingsIcon />
+    }]
   };
 
   const displayCompany = {
     name: authState.setting?.companyName || "Default Name",
-    logo: authState.setting?.logo?.url || "/default-avatar.jpg",
+    logo: authState.setting?.logo?.url || "/default-avatar.jpg"
   };
 
-  const LogoutHandler = async () => {
+  const LogoutHandler = async () =>
+  {
     const result = await YusrApiHelper.Post(`${ApiConstants.baseUrl}/Logout`);
 
-    if (result.status === 200 || result.status === 204) {
+    if (result.status === 200 || result.status === 204)
+    {
       dispatch(logout());
     }
   };
 
   return (
-    <Sidebar collapsible="icon" side="right" {...props}>
+    <Sidebar collapsible="icon" side="right" { ...props }>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarLogo logos={logoConfig} />
-            <SideBarCompanyData company={displayCompany} />
+            <SidebarLogo logos={ logoConfig } />
+            <SideBarCompanyData company={ displayCompany } />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
-        <SideBarMainMenu items={data.navMain} />
+        <SideBarMainMenu items={ data.navMain } />
         <SideBarSecondaryMenu
-          items={data.navSecondary}
+          items={ data.navSecondary }
           className="pt-10 mt-auto text-center"
-          onLogout={LogoutHandler}
+          onLogout={ LogoutHandler }
         />
       </SidebarContent>
 
       <SidebarFooter>
-        <SideBarUserData user={authState.loggedInUser} />
+        <SideBarUserData user={ authState.loggedInUser } />
       </SidebarFooter>
     </Sidebar>
   );

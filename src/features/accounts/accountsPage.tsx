@@ -11,11 +11,11 @@ import ChangeAccountDialog from "./changeAccountDialog";
 
 const getAccountTypeName = (type: AccountType) => {
   switch (type) {
-    case AccountType.Client: return "أصول";
-    case AccountType.Supplier: return "خصوم";
-    case AccountType.Employee: return "حقوق ملكية";
-    case AccountType.Bank: return "إيرادات";
-    case AccountType.Box: return "مصروفات";
+    case AccountType.Client: return "عميل";
+    case AccountType.Supplier: return "مورد";
+    case AccountType.Employee: return "موظف";
+    case AccountType.Bank: return "بنك";
+    case AccountType.Box: return "صندوق";
     default: return "غير محدد";
   }
 };
@@ -25,7 +25,6 @@ export default function AccountsPage() {
   const accountState = useAppSelector((state) => state.account);
   const accountDialogState = useAppSelector((state) => state.accountDialog);
   
-  // بافتراض وجود صلاحيات خاصة بالحسابات
   const permissions = useAppSelector((state) => 
     selectPermissionsByResource(state, SystemPermissionsResources.Accounts)
   );
@@ -34,7 +33,7 @@ export default function AccountsPage() {
 
   return (
     <CrudPage<Account>
-      title="الدليل المحاسبي"
+      title="إدارة الحسابات"
       entityName="الحساب"
       addNewItemTitle="إضافة حساب جديد"
       permissions={permissions}

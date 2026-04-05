@@ -3,27 +3,29 @@ import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_system
 import AccountsApiService from "../networking/accountApiService";
 
 export const AccountType = {
-    Client: 1,
-    Supplier: 2,
-    Employee: 3,
-    Bank: 4,
-    Box: 5
+  Client: 1,
+  Supplier: 2,
+  Employee: 3,
+  Bank: 4,
+  Box: 5
 } as const;
 
 export type AccountType = typeof AccountType[keyof typeof AccountType];
 
-export class AccountContact extends BaseEntity {
+export class AccountContact extends BaseEntity
+{
   public accountId!: number;
-  public contactName?: string;
-  public contactNumber!: string;
+  public number!: string;
 
-  constructor(init?: Partial<AccountContact>) {
+  constructor(init?: Partial<AccountContact>)
+  {
     super();
     Object.assign(this, init);
   }
 }
 
-export default class Account extends BaseEntity {
+export default class Account extends BaseEntity
+{
   public type!: AccountType;
   public name!: string;
   public initialBalance!: number;
@@ -42,16 +44,19 @@ export default class Account extends BaseEntity {
   public notes?: string;
   public accountContacts: AccountContact[] = [];
 
-  constructor(init?: Partial<Account>) {
+  constructor(init?: Partial<Account>)
+  {
     super();
     Object.assign(this, init);
-    if (init?.accountContacts) {
-      this.accountContacts = init.accountContacts.map(c => new AccountContact(c));
+    if (init?.accountContacts)
+    {
+      this.accountContacts = init.accountContacts.map((c) => new AccountContact(c));
     }
   }
 }
 
-export class AccountFilterColumns {
+export class AccountFilterColumns
+{
   public static columnsNames: ColumnName[] = [
     { label: "رقم الحساب", value: "Id" },
     { label: "اسم الحساب", value: "Name" },
@@ -60,7 +65,8 @@ export class AccountFilterColumns {
   ];
 }
 
-export class AccountSlice {
+export class AccountSlice
+{
   private static entitySliceInstance = createGenericEntitySlice(
     "account",
     new AccountsApiService()
