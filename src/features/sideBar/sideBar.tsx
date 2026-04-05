@@ -1,6 +1,6 @@
 import { ApiConstants, SystemPermissions, YusrApiHelper } from "@yusr_systems/core";
 import { Sidebar, SideBarCompanyData, SidebarContent, SidebarFooter, SidebarHeader, SidebarLogo, SideBarMainMenu, SidebarMenu, SidebarMenuItem, SideBarSecondaryMenu, SideBarUserData } from "@yusr_systems/ui";
-import { Building2Icon, LayoutDashboardIcon, Percent, SettingsIcon, UsersIcon } from "lucide-react";
+import { Building2Icon, DollarSignIcon, LayoutDashboardIcon, Percent, SettingsIcon, UsersIcon } from "lucide-react";
 import * as React from "react";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
@@ -50,14 +50,51 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         )
       },
       {
-        title: appLangSections.accounts,
-        url: "/accounts",
-        icon: <UsersIcon />,
-        hasAuth: SystemPermissions.hasAuth(
-          permissions,
-          SystemPermissionsResources.Accounts,
-          SystemPermissionsActions.Get
-        )
+        title: "الحسابات",
+        url: "#",
+        icon: <DollarSignIcon />,
+        hasAuth: true,
+        subItems: [{
+          title: appLangSections.clients,
+          url: "/clients",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Accounts,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.suppliers,
+          url: "/suppliers",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Accounts,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.employees,
+          url: "/employees",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Accounts,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.banks,
+          url: "/banks",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Accounts,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.boxes,
+          url: "/boxes",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Accounts,
+            SystemPermissionsActions.Get
+          )
+        }]
       },
       // --- NEW: Grouped Organization Items ---
       {
@@ -65,44 +102,39 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "#",
         icon: <Building2Icon />,
         hasAuth: true, // Parent auth is true, children will be filtered automatically by the updated component
-        subItems: [
-          {
-            title: appLangSections.invoices,
-            url: "/invoices",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Invoices,
-              SystemPermissionsActions.Get,
-            ),
-          },
-          {
-            title: appLangSections.stores,
-            url: "/stores",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Stores,
-              SystemPermissionsActions.Get,
-            ),
-          },
-          {
-            title: appLangSections.units,
-            url: "/units",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Units,
-              SystemPermissionsActions.Get,
-            ),
-          },
-          {
-            title: appLangSections.branches,
-            url: "/branches",
-            hasAuth: SystemPermissions.hasAuth(
-              permissions,
-              SystemPermissionsResources.Branches,
-              SystemPermissionsActions.Get,
-            ),
-          },
-        ],
+        subItems: [{
+          title: appLangSections.invoices,
+          url: "/invoices",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Invoices,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.stores,
+          url: "/stores",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Stores,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.units,
+          url: "/units",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Units,
+            SystemPermissionsActions.Get
+          )
+        }, {
+          title: appLangSections.branches,
+          url: "/branches",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.Branches,
+            SystemPermissionsActions.Get
+          )
+        }]
       },
       // --- NEW: Grouped User Management Items ---
       {

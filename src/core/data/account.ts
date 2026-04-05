@@ -1,6 +1,7 @@
 import { BaseEntity, City, type ColumnName } from "@yusr_systems/core";
 import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
 import AccountsApiService from "../networking/accountApiService";
+import { FilterByTypeRequest } from "./filterByTypeRequest";
 
 export const AccountType = {
   Client: 1,
@@ -69,7 +70,13 @@ export class AccountSlice
 {
   private static entitySliceInstance = createGenericEntitySlice(
     "account",
-    new AccountsApiService()
+    new AccountsApiService(),
+    (pageNumber, rowsPerPage, condition, filterTypes) =>
+      new AccountsApiService().FilterByTypes(
+        pageNumber,
+        rowsPerPage,
+        new FilterByTypeRequest({ types: filterTypes ?? [], condition })
+      )
   );
 
   public static entityActions = AccountSlice.entitySliceInstance.actions;
