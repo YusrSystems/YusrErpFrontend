@@ -78,6 +78,15 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         hasAuth: true, // Parent auth is true, children will be filtered automatically by the updated component
         subItems: [
           {
+            title: appLangSections.invoices,
+            url: "/invoices",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Invoices,
+              SystemPermissionsActions.Get,
+            ),
+          },
+          {
             title: appLangSections.stores,
             url: "/stores",
             hasAuth: SystemPermissions.hasAuth(
