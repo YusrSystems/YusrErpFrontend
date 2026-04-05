@@ -65,31 +65,44 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "#",
         icon: <Building2Icon />,
         hasAuth: true, // Parent auth is true, children will be filtered automatically by the updated component
-        subItems: [{
-          title: appLangSections.stores,
-          url: "/stores",
-          hasAuth: SystemPermissions.hasAuth(
-            permissions,
-            SystemPermissionsResources.Stores,
-            SystemPermissionsActions.Get
-          )
-        }, {
-          title: appLangSections.units,
-          url: "/units",
-          hasAuth: SystemPermissions.hasAuth(
-            permissions,
-            SystemPermissionsResources.Units,
-            SystemPermissionsActions.Get
-          )
-        }, {
-          title: appLangSections.branches,
-          url: "/branches",
-          hasAuth: SystemPermissions.hasAuth(
-            permissions,
-            SystemPermissionsResources.Branches,
-            SystemPermissionsActions.Get
-          )
-        }]
+        subItems: [
+          {
+            title: appLangSections.invoices,
+            url: "/invoices",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Invoices,
+              SystemPermissionsActions.Get,
+            ),
+          },
+          {
+            title: appLangSections.stores,
+            url: "/stores",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Stores,
+              SystemPermissionsActions.Get,
+            ),
+          },
+          {
+            title: appLangSections.units,
+            url: "/units",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Units,
+              SystemPermissionsActions.Get,
+            ),
+          },
+          {
+            title: appLangSections.branches,
+            url: "/branches",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Branches,
+              SystemPermissionsActions.Get,
+            ),
+          },
+        ],
       },
       // --- NEW: Grouped User Management Items ---
       {
