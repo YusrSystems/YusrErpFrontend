@@ -20,7 +20,6 @@ export default function PaymentMethodsPage() {
     (state) => state.paymentMethodDialog,
   );
 
-  // افترضنا وجود الصلاحية في SystemPermissionsResources
   const permissions = useAppSelector((state) =>
     selectPermissionsByResource(
       state,

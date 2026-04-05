@@ -20,6 +20,7 @@ import StoresPage from "./features/stores/presentation/storePage";
 import TaxesPage from "./features/taxes/presentation/taxesPage";
 import UnitsPage from "./features/units/unitsPage";
 import UsersPage from "./features/users/presentation/usersPage";
+import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 
 function App()
 {
@@ -81,6 +82,7 @@ function AppRoutes()
             <Route path="/employees" element={ <EmployeesAccountsPage /> } />
             <Route path="/banks" element={ <BanksAccountsPage /> } />
             <Route path="/boxes" element={ <BoxesAccountsPage /> } />
+            <Route path="/paymentMethods" element={ <PaymentMethodsPage /> } />
             <Route path="/invoices" element={ <InvoicesPage /> } />
           </Route>
         </Route>

@@ -93,6 +93,14 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             SystemPermissionsResources.Accounts,
             SystemPermissionsActions.Get
           )
+        }, {
+          title: appLangSections.paymentMethods,
+          url: "/paymentMethods",
+          hasAuth: SystemPermissions.hasAuth(
+            permissions,
+            SystemPermissionsResources.PaymentMethods,
+            SystemPermissionsActions.Get
+          )
         }]
       },
       // --- NEW: Grouped Organization Items ---
