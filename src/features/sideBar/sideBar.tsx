@@ -15,8 +15,7 @@ import logoOnlyLight from "@/assets/yusrLogoOnly_Light.png";
 const appLang = ApplicationLanguages.getAppLanguageText();
 const appLangSections = appLang.sections;
 
-export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
-{
+export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const authState = useAppSelector((state) => state.auth);
   const permissions: string[] = authState.loggedInUser?.role?.permissions || [];
 
@@ -24,7 +23,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
 
   const logoConfig = {
     full: { light: logoFullLight, dark: logoFullDark },
-    collapsed: { light: logoOnlyLight, dark: logoOnlyDark }
+    collapsed: { light: logoOnlyLight, dark: logoOnlyDark },
   };
 
   const data = {
@@ -36,8 +35,8 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         hasAuth: SystemPermissions.hasAuth(
           permissions,
           SystemPermissionsResources.Dashboard,
-          SystemPermissionsActions.Get
-        )
+          SystemPermissionsActions.Get,
+        ),
       },
       {
         title: appLangSections.taxes,
@@ -46,8 +45,8 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         hasAuth: SystemPermissions.hasAuth(
           permissions,
           SystemPermissionsResources.Taxes,
-          SystemPermissionsActions.Get
-        )
+          SystemPermissionsActions.Get,
+        ),
       },
       {
         title: "الحسابات",
@@ -142,69 +141,72 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "#",
         icon: <UsersIcon />,
         hasAuth: true,
-        subItems: [{
-          title: appLangSections.users,
-          url: "/users",
-          hasAuth: SystemPermissions.hasAuth(
-            permissions,
-            SystemPermissionsResources.Users,
-            SystemPermissionsActions.Get
-          )
-        }, {
-          title: appLangSections.roles,
-          url: "/roles",
-          hasAuth: SystemPermissions.hasAuth(
-            permissions,
-            SystemPermissionsResources.Roles,
-            SystemPermissionsActions.Get
-          )
-        }]
-      }
+        subItems: [
+          {
+            title: appLangSections.users,
+            url: "/users",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Users,
+              SystemPermissionsActions.Get,
+            ),
+          },
+          {
+            title: appLangSections.roles,
+            url: "/roles",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Roles,
+              SystemPermissionsActions.Get,
+            ),
+          },
+        ],
+      },
     ],
-    navSecondary: [{
-      title: appLangSections.settings,
-      url: "/settings",
-      icon: <SettingsIcon />
-    }]
+    navSecondary: [
+      {
+        title: appLangSections.settings,
+        url: "/settings",
+        icon: <SettingsIcon />,
+      },
+    ],
   };
 
   const displayCompany = {
     name: authState.setting?.companyName || "Default Name",
-    logo: authState.setting?.logo?.url || "/default-avatar.jpg"
+    logo: authState.setting?.logo?.url || "/default-avatar.jpg",
   };
 
-  const LogoutHandler = async () =>
-  {
+  const LogoutHandler = async () => {
     const result = await YusrApiHelper.Post(`${ApiConstants.baseUrl}/Logout`);
 
-    if (result.status === 200 || result.status === 204)
-    {
+    if (result.status === 200 || result.status === 204) {
       dispatch(logout());
     }
   };
 
   return (
-    <Sidebar collapsible="icon" side="right" { ...props }>
+    <Sidebar collapsible="icon" side="right" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarLogo logos={ logoConfig } />
-            <SideBarCompanyData company={ displayCompany } />
+            <SidebarLogo logos={logoConfig} />
+            <SideBarCompanyData company={displayCompany} />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
-        <SideBarMainMenu items={ data.navMain } />
+        <SideBarMainMenu items={data.navMain} />
         <SideBarSecondaryMenu
-          items={ data.navSecondary }
+          items={data.navSecondary}
           className="pt-10 mt-auto text-center"
-          onLogout={ LogoutHandler }
+          onLogout={LogoutHandler}
         />
       </SidebarContent>
 
       <SidebarFooter>
-        <SideBarUserData user={ authState.loggedInUser } />
+        <SideBarUserData user={authState.loggedInUser} />
       </SidebarFooter>
     </Sidebar>
   );
