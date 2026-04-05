@@ -13,7 +13,7 @@ export default class Store extends BaseEntity {
 
 export class StoreFilterColumns {
   public static columnsNames: ColumnName[] = [
-    { label: "رقم المتجر", value: "Id" },
-    { label: "اسم المتجر", value: "StoreName" },
+    { label: "رقم المستودع", value: "Id" },
+    { label: "اسم المستودع", value: "StoreName" },
   ];
 }

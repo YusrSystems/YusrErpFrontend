@@ -21,11 +21,7 @@ import {
   LayoutDashboardIcon,
   Percent,
   SettingsIcon,
-  ShelvingUnit,
-  ShieldCheck,
-  Store,
-  UserCogIcon,
-  Users2,
+  UsersIcon, // Added for the new parent group
 } from "lucide-react";
 import * as React from "react";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
@@ -44,7 +40,6 @@ const appLangSections = appLang.sections;
 export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const authState = useAppSelector((state) => state.auth);
   const permissions: string[] = authState.loggedInUser?.role?.permissions || [];
-  console.log(permissions);
 
   const dispatch = useAppDispatch();
 
@@ -75,65 +70,68 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           SystemPermissionsActions.Get,
         ),
       },
+      // --- NEW: Grouped Organization Items ---
       {
-        title: appLangSections.stores,
-        url: "/stores",
-        icon: <Store />,
-        hasAuth: SystemPermissions.hasAuth(
-          permissions,
-          SystemPermissionsResources.Stores,
-          SystemPermissionsActions.Get,
-        ),
-      },
-      {
-        title: appLangSections.accounts,
-        url: "/accounts",
-        icon: <Users2 />,
-        hasAuth: SystemPermissions.hasAuth(
-          permissions,
-          SystemPermissionsResources.Accounts,
-          SystemPermissionsActions.Get,
-        ),
-      },
-      {
-        title: appLangSections.units,
-        url: "/units",
-        icon: <ShelvingUnit />,
-        hasAuth: SystemPermissions.hasAuth(
-          permissions,
-          SystemPermissionsResources.Units,
-          SystemPermissionsActions.Get,
-        ),
-      },
-      {
-        title: appLangSections.branches,
-        url: "/branches",
+        title: "المؤسسة", // Replace with appLangSections.organization if available
+        url: "#",
         icon: <Building2Icon />,
-        hasAuth: SystemPermissions.hasAuth(
-          permissions,
-          SystemPermissionsResources.Branches,
-          SystemPermissionsActions.Get,
-        ),
+        hasAuth: true, // Parent auth is true, children will be filtered automatically by the updated component
+        subItems: [
+          {
+            title: appLangSections.stores,
+            url: "/stores",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Stores,
+              SystemPermissionsActions.Get,
+            ),
+          },
+          {
+            title: appLangSections.units,
+            url: "/units",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Units,
+              SystemPermissionsActions.Get,
+            ),
+          },
+          {
+            title: appLangSections.branches,
+            url: "/branches",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Branches,
+              SystemPermissionsActions.Get,
+            ),
+          },
+        ],
       },
+      // --- NEW: Grouped User Management Items ---
       {
-        title: appLangSections.users,
-        url: "/users",
-        icon: <UserCogIcon />,
-        hasAuth: SystemPermissions.hasAuth(
-          permissions,
-          SystemPermissionsResources.Users,
-          SystemPermissionsActions.Get,
-        ),
-      },
-      {
-        title: appLangSections.roles,
-        url: "/roles",
-        icon: <ShieldCheck />,
-        hasAuth: SystemPermissions.hasAuth(
-          permissions,
-          SystemPermissionsResources.Roles,
-          SystemPermissionsActions.Get,
-        ),
+        title: "إدارة المستخدمين", // Replace with appLangSections.userManagement if available
+        url: "#",
+        icon: <UsersIcon />,
+        hasAuth: true,
+        subItems: [
+          {
+            title: appLangSections.users,
+            url: "/users",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Users,
+              SystemPermissionsActions.Get,
+            ),
+          },
+          {
+            title: appLangSections.roles,
+            url: "/roles",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.Roles,
+              SystemPermissionsActions.Get,
+            ),
+          },
+        ],
       },
     ],
     navSecondary: [
@@ -164,11 +162,11 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarLogo logos={logoConfig} />
-
             <SideBarCompanyData company={displayCompany} />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
         <SideBarMainMenu items={data.navMain} />
         <SideBarSecondaryMenu
@@ -177,6 +175,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           onLogout={LogoutHandler}
         />
       </SidebarContent>
+
       <SidebarFooter>
         <SideBarUserData user={authState.loggedInUser} />
       </SidebarFooter>
