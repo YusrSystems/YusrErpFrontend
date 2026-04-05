@@ -24,6 +24,7 @@ import countryReducer from "./shared/countrySlice";
 import currencyReducer from "./shared/currencySlice";
 import systemReducer from "./shared/systemSlice";
 import { InvoiceSlice } from "../data/invoice";
+import { PaymentMethodSlice } from "../data/paymentMethod";
 
 const authSlice = createAuthSlice<User, Setting>();
 export const {
@@ -57,6 +58,8 @@ export const store = configureStore({
     accountDialog: AccountSlice.dialogReducer,
     invoice: InvoiceSlice.entityReducer,
     invoiceDialog: InvoiceSlice.dialogReducer,
+    paymentMethod: PaymentMethodSlice.entityReducer,
+    paymentMethodDialog: PaymentMethodSlice.dialogReducer,
   },
 });
 

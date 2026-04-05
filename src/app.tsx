@@ -22,6 +22,7 @@ import StoresPage from "./features/stores/presentation/storePage";
 import UnitsPage from "./features/units/unitsPage";
 import AccountsPage from "./features/accounts/accountsPage";
 import InvoicesPage from "./features/invoices/invoicesPage";
+import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 
 function App() {
   const { isLoading } = useAppInitialization();
@@ -75,6 +76,7 @@ function AppRoutes() {
             <Route path="/units" element={<UnitsPage />} />
             <Route path="/accounts" element={<AccountsPage />} />
             <Route path="/invoices" element={<InvoicesPage />} />
+            <Route path="/payment-methods" element={<PaymentMethodsPage />} />
           </Route>
         </Route>
 
