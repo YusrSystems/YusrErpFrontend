@@ -123,6 +123,14 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
       icon: <Package />,
       hasAuth: true,
       subItems: [{
+        title: appLangSections.items,
+        url: "/items",
+        hasAuth: SystemPermissions.hasAuth(
+          permissions,
+          SystemPermissionsResources.Items,
+          SystemPermissionsActions.Get
+        )
+      },{
         title: appLangSections.units,
         url: "/units",
         hasAuth: SystemPermissions.hasAuth(

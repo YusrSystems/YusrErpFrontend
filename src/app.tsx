@@ -12,6 +12,7 @@ import BalanceTransfersPage from "./features/balanceTransfer/balanceTransfersPag
 import BranchesPage from "./features/branches/presentation/branchesPage";
 import DashboardPage from "./features/dashboard/dashboardPage";
 import InvoicesPage from "./features/invoices/invoicesPage";
+import ItemsPage from "./features/items/itemsPage";
 import LandingPage from "./features/landing/landingPage";
 import LoginPage from "./features/login/loginPage";
 import NotFoundPage from "./features/notFound/notFoundPage";
@@ -88,6 +89,7 @@ function AppRoutes()
             <Route path="/balanceTransfer" element={ <BalanceTransfersPage /> } />
             <Route path="/invoices" element={ <InvoicesPage /> } />
             <Route path="/vouchers" element={ <VouchersPage /> } />
+            <Route path="/items" element={ <ItemsPage /> } />
           </Route>
         </Route>
 
