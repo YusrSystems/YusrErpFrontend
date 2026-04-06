@@ -188,6 +188,15 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               SystemPermissionsActions.Get,
             ),
           },
+          {
+            title: appLangSections.pricingMethods,
+            url: "/pricingMethods",
+            hasAuth: SystemPermissions.hasAuth(
+              permissions,
+              SystemPermissionsResources.PricingMethods,
+              SystemPermissionsActions.Get,
+            ),
+          },
         ],
       },
       {
