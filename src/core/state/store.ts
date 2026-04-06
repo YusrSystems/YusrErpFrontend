@@ -1,7 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { createAuthSlice, User } from "@yusr_systems/core";
 import { setupAuthListeners } from "@yusr_systems/ui";
-import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import {
+  type TypedUseSelectorHook,
+  useDispatch,
+  useSelector,
+} from "react-redux";
 import branchDialogReducer from "../../features/branches/logic/branchDialogSlice";
 import branchReducer from "../../features/branches/logic/branchSlice";
 import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
@@ -12,7 +16,15 @@ import taxDialogReducer from "../../features/taxes/logic/taxDialogSlice";
 import taxReducer from "../../features/taxes/logic/taxSlice";
 import userDialogReducer from "../../features/users/logic/userDialogSlice";
 import userReducer from "../../features/users/logic/userSlice";
-import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsSlice, EmployeesSlice, SuppliersSlice, VoucherAccountsSlice } from "../data/account";
+import {
+  BanksAndBoxesSlice,
+  BanksSlice,
+  BoxesSlice,
+  ClientsSlice,
+  EmployeesSlice,
+  SuppliersSlice,
+  VoucherAccountsSlice,
+} from "../data/account";
 import { BalanceTransferSlice } from "../data/balanceTransfer";
 import { InvoiceSlice } from "../data/invoice";
 import { ItemSlice } from "../data/item";
@@ -24,6 +36,7 @@ import cityReducer from "./shared/citySlice";
 import countryReducer from "./shared/countrySlice";
 import currencyReducer from "./shared/currencySlice";
 import systemReducer from "./shared/systemSlice";
+import { PricingMethodSlice } from "../data/pricingMethod";
 
 const authSlice = createAuthSlice<User, Setting>();
 export const {
@@ -31,7 +44,7 @@ export const {
   logout,
   updateLoggedInUser,
   updateSetting,
-  syncFromStorage
+  syncFromStorage,
 } = authSlice.actions;
 
 export const store = configureStore({
@@ -80,7 +93,7 @@ export const store = configureStore({
 
 setupAuthListeners(store.dispatch, {
   logout: authSlice.actions.logout,
-  syncFromStorage: authSlice.actions.syncFromStorage
+  syncFromStorage: authSlice.actions.syncFromStorage,
 });
 
 export type RootState = ReturnType<typeof store.getState>;
