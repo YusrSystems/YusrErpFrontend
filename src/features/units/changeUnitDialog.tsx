@@ -3,7 +3,6 @@ import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, FieldGroup, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useMemo } from "react";
 import type Unit from "../../core/data/unit";
-import { useAppDispatch } from "../../core/state/store";
 
 export default function ChangeUnitDialog({
   entity,
@@ -12,8 +11,6 @@ export default function ChangeUnitDialog({
   onSuccess
 }: CommonChangeDialogProps<Unit>)
 {
-  const dispatch = useAppDispatch();
-
   const validationRules: ValidationRule<Partial<Unit>>[] = useMemo(
     () => [{
       field: "unitName",
@@ -36,8 +33,7 @@ export default function ChangeUnitDialog({
     handleChange,
     getError,
     isInvalid,
-    validate,
-    errorInputClass
+    validate
   } = useEntityForm<Unit>(initialValues, validationRules);
 
   return (

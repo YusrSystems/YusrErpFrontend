@@ -1,41 +1,31 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import {
-  ChangeDialog,
-  FieldGroup,
-  SelectField,
-  TextField,
-  useEntityForm,
-} from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useMemo } from "react";
 import type Store from "../../../core/data/store";
-import { useAppDispatch } from "../../../core/state/store";
 
 export default function ChangeStoreDialog({
   entity,
   mode,
   service,
-  onSuccess,
-}: CommonChangeDialogProps<Store>) {
-  const dispatch = useAppDispatch();
-
+  onSuccess
+}: CommonChangeDialogProps<Store>)
+{
   const validationRules: ValidationRule<Partial<Store>>[] = useMemo(
-    () => [
-      {
-        field: "storeName",
-        selector: (d) => d.storeName,
-        validators: [Validators.required("يرجى إدخال اسم المستودع")],
-      },
-    ],
-    [],
+    () => [{
+      field: "storeName",
+      selector: (d) => d.storeName,
+      validators: [Validators.required("يرجى إدخال اسم المستودع")]
+    }],
+    []
   );
 
   const initialValues = useMemo(
     () => ({
       ...entity,
-      storeName: entity?.storeName || "",
+      storeName: entity?.storeName || ""
     }),
-    [entity],
+    [entity]
   );
 
   const {
@@ -43,29 +33,28 @@ export default function ChangeStoreDialog({
     handleChange,
     getError,
     isInvalid,
-    validate,
-    errorInputClass,
+    validate
   } = useEntityForm<Store>(initialValues, validationRules);
 
   return (
     <ChangeDialog<Store>
-      title={`${mode === "create" ? "إضافة" : "تعديل"} مستودع`}
+      title={ `${mode === "create" ? "إضافة" : "تعديل"} مستودع` }
       className="sm:max-w-md"
-      formData={formData}
-      dialogMode={mode}
-      service={service}
-      disable={() => false}
-      onSuccess={(data) => onSuccess?.(data, mode)}
-      validate={validate}
+      formData={ formData }
+      dialogMode={ mode }
+      service={ service }
+      disable={ () => false }
+      onSuccess={ (data) => onSuccess?.(data, mode) }
+      validate={ validate }
     >
       <FieldGroup>
         <TextField
           label="اسم المستودع"
           required
-          value={formData.storeName || ""}
-          onChange={(e) => handleChange({ storeName: e.target.value })}
-          isInvalid={isInvalid("storeName")}
-          error={getError("storeName")}
+          value={ formData.storeName || "" }
+          onChange={ (e) => handleChange({ storeName: e.target.value }) }
+          isInvalid={ isInvalid("storeName") }
+          error={ getError("storeName") }
         />
       </FieldGroup>
     </ChangeDialog>
