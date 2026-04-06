@@ -1,12 +1,12 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { Button, ChangeDialog, FieldGroup, FormField, NumberField, SearchableSelect, SelectField, StorageFileField, TextAreaField, TextField, useEntityForm, useStorageFile } from "@yusr_systems/ui";
+import { Button, ChangeDialog, Checkbox, FieldGroup, FormField, NumberField, SearchableSelect, SelectField, StorageFileField, TextAreaField, TextField, useEntityForm, useStorageFile } from "@yusr_systems/ui";
 import { Box, Database, DollarSign, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import Item, { ItemStore, ItemTax, ItemType, ItemUnitPricingMethod } from "../../core/data/item";
-import { PricingMethodSlice } from "../../core/data/pricingMethod";
+import { PricingMethodFilterColumns, PricingMethodSlice } from "../../core/data/pricingMethod";
 import { StoreFilterColumns } from "../../core/data/store";
-import { UnitSlice } from "../../core/data/unit";
+import { UnitFilterColumns, UnitSlice } from "../../core/data/unit";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import { filterTaxes } from "../taxes/logic/taxSlice";
@@ -92,10 +92,13 @@ export default function ChangeItemDialog({ entity, mode, service, onSuccess }: C
   // 2. التسعير
   const addPricingMethod = () =>
     handleChange({ itemUnitPricingMethods: [...(formData.itemUnitPricingMethods || []), new ItemUnitPricingMethod()] });
-  const updatePricingMethod = (index: number, field: keyof ItemUnitPricingMethod, value: any) =>
+  const updatePricingMethod = (index: number, updates: Partial<ItemUnitPricingMethod>) =>
   {
     const list = [...(formData.itemUnitPricingMethods || [])];
-    list[index] = { ...list[index], [field]: value };
+    let iupm = list[index];
+    let suggestName = `${updates.unitName || iupm.unitName || ""} ${ updates.pricingMethodName || iupm.pricingMethodName || ""}`;
+    iupm.itemUnitPricingMethodName = updates.itemUnitPricingMethodName || suggestName;
+    list[index] = { ...list[index], ...updates };
     handleChange({ itemUnitPricingMethods: list });
   };
   const removePricingMethod = (index: number) =>
@@ -368,27 +371,27 @@ export default function ChangeItemDialog({ entity, mode, service, onSuccess }: C
                           <tr key={ index } className="border-t border-muted">
                             <td className="p-3 font-bold">{ index + 1 }</td>
                             <td className="p-3">
-                                <FormField label="" isInvalid={ isInvalid("storeId") } error={ getError("storeId") }>
-                                    <SearchableSelect
-                                        items={ storeState.entities.data ?? [] }
-                                        itemLabelKey="storeName"
-                                        itemValueKey="id"
-                                        placeholder="اختر المستودع"
-                                        value={ store.storeId?.toString() || "" }
-                                        onValueChange={ (val) =>
-                                        {
-                                        const selected = storeState.entities.data?.find((s) =>
-                                            s.id.toString() === val
-                                        );
-                                        updateStore(index, {
-                                            storeId: selected?.id,
-                                            storeName: selected?.storeName
-                                        });
-                                        } }
-                                        columnsNames={ StoreFilterColumns.columnsNames }
-                                        onSearch={ (condition) => dispatch(filterStores(condition)) }
-                                        disabled={ storeState.isLoading }
-                                    />
+                              <FormField label="" isInvalid={ isInvalid("storeId") } error={ getError("storeId") }>
+                                <SearchableSelect
+                                  items={ storeState.entities.data ?? [] }
+                                  itemLabelKey="storeName"
+                                  itemValueKey="id"
+                                  placeholder="اختر المستودع"
+                                  value={ store.storeId?.toString() || "" }
+                                  onValueChange={ (val) =>
+                                  {
+                                    const selected = storeState.entities.data?.find((s) =>
+                                      s.id.toString() === val
+                                    );
+                                    updateStore(index, {
+                                      storeId: selected?.id,
+                                      storeName: selected?.storeName
+                                    });
+                                  } }
+                                  columnsNames={ StoreFilterColumns.columnsNames }
+                                  onSearch={ (condition) => dispatch(filterStores(condition)) }
+                                  disabled={ storeState.isLoading }
+                                />
                               </FormField>
                             </td>
                             <td className="p-3">
@@ -434,12 +437,32 @@ export default function ChangeItemDialog({ entity, mode, service, onSuccess }: C
             { activeTab === "pricing" && (
               <div className="space-y-6 animate-in fade-in">
                 <div className="grid grid-cols-3 gap-6">
-                  <TextField
+                  <FormField
                     label="الوحدة الأساسية للمادة"
                     required
-                    value={ formData.sellUnitName || "" }
-                    onChange={ (e) => handleChange({ sellUnitName: e.target.value }) }
-                  />
+                    isInvalid={ isInvalid("storeId") }
+                    error={ getError("storeId") }
+                  >
+                    <SearchableSelect
+                      items={ unitState.entities.data ?? [] }
+                      itemLabelKey="unitName"
+                      itemValueKey="id"
+                      placeholder="اختر الوحدة الأساسية"
+                      value={ formData.sellUnitId?.toString() || "" }
+                      onValueChange={ (val) =>
+                      {
+                        const selected = unitState.entities.data?.find((u) => u.id.toString() === val);
+                        handleChange({
+                          sellUnitId: selected?.id,
+                          sellUnitName: selected?.unitName
+                        });
+                      } }
+                      columnsNames={ UnitFilterColumns.columnsNames }
+                      onSearch={ (condition) => dispatch(UnitSlice.entityActions.filter(condition)) }
+                      disabled={ unitState.isLoading }
+                    />
+                  </FormField>
+
                   <NumberField
                     label="التكلفة المبدئية"
                     required
@@ -448,19 +471,17 @@ export default function ChangeItemDialog({ entity, mode, service, onSuccess }: C
                   />
                   <NumberField
                     label="التكلفة"
-                    required
+                    disabled
                     value={ formData.cost || 0 }
                     onChange={ (val) => handleChange({ cost: val }) }
                   />
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="taxIncluded"
+                  <Checkbox
+                    id="rememberMe"
                     checked={ formData.taxIncluded }
-                    onChange={ (e) => handleChange({ taxIncluded: e.target.checked }) }
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    onCheckedChange={ (checked) => handleChange({ taxIncluded: checked as boolean }) }
                   />
                   <label htmlFor="taxIncluded" className="text-sm font-bold">سعر البيع يشمل الضريبة</label>
                 </div>
@@ -472,14 +493,13 @@ export default function ChangeItemDialog({ entity, mode, service, onSuccess }: C
                       type="button"
                       size="sm"
                       onClick={ addPricingMethod }
-                      className="bg-blue-600 hover:bg-blue-700"
                     >
                       <Plus className="w-4 h-4 ml-2" /> إضافة طريقة تسعير
                     </Button>
                   </div>
 
                   <div className="bg-muted/20 rounded-lg border overflow-hidden overflow-x-auto">
-                    <table className="w-full text-sm text-right min-w-[800px]">
+                    <table className="w-full text-sm text-right min-w-200">
                       <thead className="bg-muted/50 text-muted-foreground">
                         <tr>
                           <th className="p-3 w-12">الرقم</th>
@@ -489,7 +509,7 @@ export default function ChangeItemDialog({ entity, mode, service, onSuccess }: C
                           <th className="p-3 w-32">سعر البيع</th>
                           <th className="p-3 w-40">الباركود</th>
                           <th className="p-3 w-40">الاسم</th>
-                          <th className="p-3 w-12 text-center">إجراء</th>
+                          <th className="p-3 w-12 text-center"></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -497,42 +517,71 @@ export default function ChangeItemDialog({ entity, mode, service, onSuccess }: C
                           <tr key={ index } className="border-t border-muted">
                             <td className="p-3 font-bold">{ index + 1 }</td>
                             <td className="p-3">
-                              <TextField
-                                label=""
-                                placeholder="الوحدة"
-                                value={ method.unitName || "" }
-                                onChange={ (e) =>
-                                  updatePricingMethod(index, "unitName", e.target.value) }
+                              <SearchableSelect
+                                items={ unitState.entities.data ?? [] }
+                                itemLabelKey="unitName"
+                                itemValueKey="id"
+                                placeholder="اختر الوحدة"
+                                value={ method.unitId?.toString() || "" }
+                                onValueChange={ (val) =>
+                                {
+                                  const selected = unitState.entities.data?.find((u) =>
+                                    u.id.toString() === val
+                                  );
+                                  updatePricingMethod(index, {
+                                    unitId: selected?.id,
+                                    unitName: selected?.unitName
+                                  });
+                                } }
+                                columnsNames={ UnitFilterColumns.columnsNames }
+                                onSearch={ (condition) => dispatch(UnitSlice.entityActions.filter(condition)) }
+                                disabled={ unitState.isLoading }
                               />
                             </td>
                             <td className="p-3">
-                              <TextField
-                                label=""
+                              <SearchableSelect
+                                items={ pricingMethodState.entities.data ?? [] }
+                                itemLabelKey="pricingMethodName"
+                                itemValueKey="id"
                                 placeholder="طريقة التسعير"
-                                value={ method.pricingMethodName || "" }
-                                onChange={ (e) =>
-                                  updatePricingMethod(index, "pricingMethodName", e.target.value) }
+                                value={ method.pricingMethodId?.toString() || "" }
+                                onValueChange={ (val) =>
+                                {
+                                  const selected = pricingMethodState.entities.data?.find((p) =>
+                                    p.id.toString() === val
+                                  );
+                                  updatePricingMethod(index, {
+                                    pricingMethodId: selected?.id,
+                                    pricingMethodName: selected?.pricingMethodName
+                                  });
+                                } }
+                                columnsNames={ PricingMethodFilterColumns.columnsNames }
+                                onSearch={ (condition) => dispatch(PricingMethodSlice.entityActions.filter(condition)) }
+                                disabled={ pricingMethodState.isLoading }
                               />
                             </td>
                             <td className="p-3">
                               <NumberField
                                 label=""
-                                value={ method.quantityMultiplier || 0 }
-                                onChange={ (val) => updatePricingMethod(index, "quantityMultiplier", val) }
+                                min={ 1 }
+                                disabled={method.unitId === formData.sellUnitId}
+                                value={ method.quantityMultiplier || 1 }
+                                onChange={ (val) => updatePricingMethod(index, { quantityMultiplier: val }) }
                               />
                             </td>
                             <td className="p-3">
                               <NumberField
                                 label=""
+                                min={ 0 }
                                 value={ method.price || 0 }
-                                onChange={ (val) => updatePricingMethod(index, "price", val) }
+                                onChange={ (val) => updatePricingMethod(index, { price: val }) }
                               />
                             </td>
                             <td className="p-3">
                               <TextField
                                 label=""
                                 value={ method.barcode || "" }
-                                onChange={ (e) => updatePricingMethod(index, "barcode", e.target.value) }
+                                onChange={ (e) => updatePricingMethod(index, { barcode: e.target.value }) }
                                 dir="ltr"
                               />
                             </td>
@@ -541,7 +590,7 @@ export default function ChangeItemDialog({ entity, mode, service, onSuccess }: C
                                 label=""
                                 value={ method.itemUnitPricingMethodName || "" }
                                 onChange={ (e) =>
-                                  updatePricingMethod(index, "itemUnitPricingMethodName", e.target.value) }
+                                  updatePricingMethod(index, { itemUnitPricingMethodName: e.target.value }) }
                               />
                             </td>
                             <td className="p-3 text-center">
