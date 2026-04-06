@@ -87,7 +87,9 @@ export const store = configureStore({
     voucher: VoucherSlice.entityReducer,
     voucherDialog: VoucherSlice.dialogReducer,
     item: ItemSlice.entityReducer,
-    itemDialog: ItemSlice.dialogReducer
+    itemDialog: ItemSlice.dialogReducer,
+    pricingMethod: PricingMethodSlice.entityReducer,
+    pricingMethodDialog: PricingMethodSlice.dialogReducer
   }
 });
 

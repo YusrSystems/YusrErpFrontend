@@ -1,10 +1,4 @@
-import {
-  ProtectedRoute,
-  Skeleton,
-  ThemeProvider,
-  Toaster,
-  TooltipProvider,
-} from "@yusr_systems/ui";
+import { ProtectedRoute, Skeleton, ThemeProvider, Toaster, TooltipProvider } from "@yusr_systems/ui";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AppLayout from "./appLayout";
 import useAppInitialization from "./core/hooks/useAppInitialization";
@@ -23,6 +17,7 @@ import LandingPage from "./features/landing/landingPage";
 import LoginPage from "./features/login/loginPage";
 import NotFoundPage from "./features/notFound/notFoundPage";
 import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
+import PricingMethodsPage from "./features/pricingMethods/pricingMethodsPage";
 import RolesPage from "./features/roles/presentation/rolesPage";
 import SettingPage from "./features/setting/settingPage";
 import StoresPage from "./features/stores/presentation/storePage";
@@ -30,19 +25,21 @@ import TaxesPage from "./features/taxes/presentation/taxesPage";
 import UnitsPage from "./features/units/unitsPage";
 import UsersPage from "./features/users/presentation/usersPage";
 import VouchersPage from "./features/vouchers/vouchersPage";
-import PricingMethodsPage from "./features/pricingMethods/pricingMethodsPage";
 
-function App() {
+function App()
+{
   const { isLoading } = useAppInitialization();
 
-  if (isLoading) {
+  if (isLoading)
+  {
     return <Apploading />;
   }
 
   return <AppBody />;
 }
 
-function AppBody() {
+function AppBody()
+{
   return (
     <TooltipProvider>
       <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
@@ -53,7 +50,8 @@ function AppBody() {
   );
 }
 
-function Apploading() {
+function Apploading()
+{
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="flex w-full max-w-xs flex-col gap-2">
@@ -63,14 +61,15 @@ function Apploading() {
   );
 }
 
-function AppRoutes() {
+function AppRoutes()
+{
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={ <LandingPage /> } />
+        <Route path="/login" element={ <LoginPage /> } />
 
         <Route element={ <ProtectedRoute isAuthenticated={ isAuthenticated } /> }>
           <Route element={ <AppLayout /> }>
@@ -92,10 +91,11 @@ function AppRoutes() {
             <Route path="/invoices" element={ <InvoicesPage /> } />
             <Route path="/vouchers" element={ <VouchersPage /> } />
             <Route path="/items" element={ <ItemsPage /> } />
+            <Route path="/pricingMethods" element={ <PricingMethodsPage /> } />
           </Route>
         </Route>
 
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="*" element={ <NotFoundPage /> } />
       </Routes>
     </Router>
   );
