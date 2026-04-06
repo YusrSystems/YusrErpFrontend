@@ -8,19 +8,20 @@ import BoxesAccountsPage from "./features/accounts/boxesAccountsPage";
 import ClientsAccountsPage from "./features/accounts/clientsAccountsPage";
 import EmployeesAccountsPage from "./features/accounts/employeesAccountsPage";
 import SuppliersAccountsPage from "./features/accounts/suppliersAccountsPage";
+import BalanceTransfersPage from "./features/balanceTransfer/balanceTransfersPage";
 import BranchesPage from "./features/branches/presentation/branchesPage";
 import DashboardPage from "./features/dashboard/dashboardPage";
 import InvoicesPage from "./features/invoices/invoicesPage";
 import LandingPage from "./features/landing/landingPage";
 import LoginPage from "./features/login/loginPage";
 import NotFoundPage from "./features/notFound/notFoundPage";
+import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 import RolesPage from "./features/roles/presentation/rolesPage";
 import SettingPage from "./features/setting/settingPage";
 import StoresPage from "./features/stores/presentation/storePage";
 import TaxesPage from "./features/taxes/presentation/taxesPage";
 import UnitsPage from "./features/units/unitsPage";
 import UsersPage from "./features/users/presentation/usersPage";
-import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 
 function App()
 {
@@ -83,6 +84,7 @@ function AppRoutes()
             <Route path="/banks" element={ <BanksAccountsPage /> } />
             <Route path="/boxes" element={ <BoxesAccountsPage /> } />
             <Route path="/paymentMethods" element={ <PaymentMethodsPage /> } />
+            <Route path="/balanceTransfer" element={ <BalanceTransfersPage /> } />
             <Route path="/invoices" element={ <InvoicesPage /> } />
           </Route>
         </Route>

@@ -13,6 +13,7 @@ import taxReducer from "../../features/taxes/logic/taxSlice";
 import userDialogReducer from "../../features/users/logic/userDialogSlice";
 import userReducer from "../../features/users/logic/userSlice";
 import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsSlice, EmployeesSlice, SuppliersSlice } from "../data/account";
+import { BalanceTransferSlice } from "../data/balanceTransfer";
 import { InvoiceSlice } from "../data/invoice";
 import { PaymentMethodSlice } from "../data/paymentMethod";
 import type { Setting } from "../data/setting";
@@ -64,7 +65,9 @@ export const store = configureStore({
     invoice: InvoiceSlice.entityReducer,
     invoiceDialog: InvoiceSlice.dialogReducer,
     paymentMethod: PaymentMethodSlice.entityReducer,
-    paymentMethodDialog: PaymentMethodSlice.dialogReducer
+    paymentMethodDialog: PaymentMethodSlice.dialogReducer,
+    balanceTransfer: BalanceTransferSlice.entityReducer,
+    balanceTransferDialog: BalanceTransferSlice.dialogReducer
   }
 });
 
