@@ -1,6 +1,6 @@
 import { ApiConstants, BaseApiService, type RequestResult, YusrApiHelper } from "@yusr_systems/core";
-import type Unit from "../data/unit";
 import type ServiceIds from "../data/serviceIds";
+import type Unit from "../data/unit";
 
 export default class UnitsApiService extends BaseApiService<Unit>
 {

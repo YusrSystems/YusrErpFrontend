@@ -9,7 +9,7 @@ export default function BanksAccountsPage()
       stateKey="banks"
       dialogStateKey="banksDialog"
       title="إدارة حسابات البنوك"
-      fixedType={AccountType.Bank}
+      fixedType={ AccountType.Bank }
     />
   );
 }

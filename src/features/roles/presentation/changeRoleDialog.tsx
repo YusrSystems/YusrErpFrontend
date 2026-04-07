@@ -1,15 +1,14 @@
-
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, FieldGroup, Skeleton, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
+import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
 import type { Role } from "../../../core/data/role";
+import { fetchSystemPermissions } from "../../../core/state/shared/systemSlice";
+import { useAppDispatch, useAppSelector } from "../../../core/state/store";
 import { categorizePermissions, PermissionCard } from "./permissionCard";
 import { ActionIcons, ArabicLabels, PERMISSION_SECTIONS } from "./permissionConfig";
 import { PermissionSkeleton } from "./permissionSkeleton";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
-import { fetchSystemPermissions } from "../../../core/state/shared/systemSlice";
-import { useAppSelector, useAppDispatch } from "../../../core/state/store";
 
 export default function ChangeRoleDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<Role>)
 {

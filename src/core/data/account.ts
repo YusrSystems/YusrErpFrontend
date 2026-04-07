@@ -67,8 +67,10 @@ export class AccountFilterColumns
 }
 
 // account.ts
-export class AccountSlice {
-  static create(sliceName: string, types: AccountType[]) {
+export class AccountSlice
+{
+  static create(sliceName: string, types: AccountType[])
+  {
     const entitySliceInstance = createGenericEntitySlice(
       sliceName,
       new AccountsApiService(),
@@ -86,7 +88,7 @@ export class AccountSlice {
       entityActions: entitySliceInstance.actions,
       entityReducer: entitySliceInstance.reducer,
       dialogActions: dialogSliceInstance.actions,
-      dialogReducer: dialogSliceInstance.reducer,
+      dialogReducer: dialogSliceInstance.reducer
     };
   }
 }

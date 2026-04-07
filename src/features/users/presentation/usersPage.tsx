@@ -1,13 +1,13 @@
+import { User, UserFilterColumns, UsersApiService } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { User2Icon } from "lucide-react";
 import { useMemo } from "react";
-import { openUserChangeDialog, openUserDeleteDialog, setIsUserChangeDialogOpen, setIsUserDeleteDialogOpen } from "../logic/userDialogSlice";
-import { filterUsers, refreshUsers, setCurrentUsersPage } from "../logic/userSlice";
-import ChangeUserDialog from "./changeUserDialog";
-import { UsersApiService, User, UserFilterColumns } from "@yusr_systems/core";
 import { selectPermissionsByResource } from "../../../core/auth/authSelectors";
 import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
+import { openUserChangeDialog, openUserDeleteDialog, setIsUserChangeDialogOpen, setIsUserDeleteDialogOpen } from "../logic/userDialogSlice";
+import { filterUsers, refreshUsers, setCurrentUsersPage } from "../logic/userSlice";
+import ChangeUserDialog from "./changeUserDialog";
 
 export default function UsersPage()
 {

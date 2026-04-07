@@ -130,7 +130,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
           SystemPermissionsResources.Items,
           SystemPermissionsActions.Get
         )
-      },{
+      }, {
         title: appLangSections.pricingMethods,
         url: "/pricingMethods",
         hasAuth: SystemPermissions.hasAuth(
@@ -138,7 +138,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
           SystemPermissionsResources.PricingMethods,
           SystemPermissionsActions.Get
         )
-      },{
+      }, {
         title: appLangSections.units,
         url: "/units",
         hasAuth: SystemPermissions.hasAuth(

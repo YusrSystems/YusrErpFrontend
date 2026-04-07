@@ -2,7 +2,8 @@ import { BaseEntity, type ColumnName } from "@yusr_systems/core";
 import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
 import BalanceTransfersApiService from "../networking/balanceTransferApiService";
 
-export default class BalanceTransfer extends BaseEntity {
+export default class BalanceTransfer extends BaseEntity
+{
   public description?: string;
   public date!: string | Date;
   public amount!: number;
@@ -11,20 +12,23 @@ export default class BalanceTransfer extends BaseEntity {
   public fromAccountName?: string;
   public toAccountName?: string;
 
-  constructor(init?: Partial<BalanceTransfer>) {
+  constructor(init?: Partial<BalanceTransfer>)
+  {
     super();
     Object.assign(this, init);
   }
 }
 
-export class BalanceTransferFilterColumns {
-  public static columnsNames: ColumnName[] = [
-    { label: "رقم التحويل", value: "Id" },
-    { label: "البيان", value: "Description" }
-  ];
+export class BalanceTransferFilterColumns
+{
+  public static columnsNames: ColumnName[] = [{ label: "رقم التحويل", value: "Id" }, {
+    label: "البيان",
+    value: "Description"
+  }];
 }
 
-export class BalanceTransferSlice {
+export class BalanceTransferSlice
+{
   private static entitySliceInstance = createGenericEntitySlice(
     "balanceTransfer",
     new BalanceTransfersApiService()

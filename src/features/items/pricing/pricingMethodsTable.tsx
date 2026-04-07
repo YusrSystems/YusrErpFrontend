@@ -1,27 +1,19 @@
-import {
-  Button,
-  FormField,
-  NumberField,
-  SearchableSelect,
-  TextField,
-} from "@yusr_systems/ui";
+import { Button, FormField, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
-import { UnitFilterColumns, UnitSlice } from "../../../core/data/unit";
 import { ItemType } from "../../../core/data/item";
-import {
-  PricingMethodFilterColumns,
-  PricingMethodSlice,
-} from "../../../core/data/pricingMethod";
+import { PricingMethodFilterColumns, PricingMethodSlice } from "../../../core/data/pricingMethod";
+import { UnitFilterColumns, UnitSlice } from "../../../core/data/unit";
 import usePricingMethodsTable from "./usePricingMethodsTable";
 
-export default function PricingMethodsTable() {
+export default function PricingMethodsTable()
+{
   const {
     dispatch,
     formData,
     unitState,
     pricingMethodState,
     updatePricingMethod,
-    removePricingMethod,
+    removePricingMethod
   } = usePricingMethodsTable();
 
   return (
@@ -40,106 +32,98 @@ export default function PricingMethodsTable() {
           </tr>
         </thead>
         <tbody>
-          {formData.itemUnitPricingMethods?.map((method, index) => (
-            <tr key={index} className="border-t border-muted">
-              <td className="p-3 font-bold">{index + 1}</td>
+          { formData.itemUnitPricingMethods?.map((method, index) => (
+            <tr key={ index } className="border-t border-muted">
+              <td className="p-3 font-bold">{ index + 1 }</td>
               <td className="p-3">
                 <FormField label="">
                   <SearchableSelect
-                    items={unitState.entities.data ?? []}
+                    items={ unitState.entities.data ?? [] }
                     itemLabelKey="unitName"
                     itemValueKey="id"
-                    value={method.unitId?.toString() || ""}
-                    onValueChange={(val) => {
+                    value={ method.unitId?.toString() || "" }
+                    onValueChange={ (val) =>
+                    {
                       const selected = unitState.entities.data?.find(
-                        (u) => u.id.toString() === val,
+                        (u) => u.id.toString() === val
                       );
                       updatePricingMethod(index, {
                         unitId: selected?.id,
-                        unitName: selected?.unitName,
+                        unitName: selected?.unitName
                       });
-                    }}
-                    columnsNames={UnitFilterColumns.columnsNames}
-                    onSearch={(condition) =>
-                      dispatch(UnitSlice.entityActions.filter(condition))
-                    }
-                    disabled={
-                      unitState.isLoading || formData.type === ItemType.Service
-                    }
+                    } }
+                    columnsNames={ UnitFilterColumns.columnsNames }
+                    onSearch={ (condition) => dispatch(UnitSlice.entityActions.filter(condition)) }
+                    disabled={ unitState.isLoading || formData.type === ItemType.Service }
                   />
                 </FormField>
               </td>
               <td className="p-3">
                 <FormField label="">
                   <SearchableSelect
-                    items={pricingMethodState.entities.data ?? []}
+                    items={ pricingMethodState.entities.data ?? [] }
                     itemLabelKey="pricingMethodName"
                     itemValueKey="id"
-                    value={method.pricingMethodId?.toString() || ""}
-                    onValueChange={(val) => {
+                    value={ method.pricingMethodId?.toString() || "" }
+                    onValueChange={ (val) =>
+                    {
                       const selected = pricingMethodState.entities.data?.find(
-                        (p) => p.id.toString() === val,
+                        (p) => p.id.toString() === val
                       );
                       updatePricingMethod(index, {
                         pricingMethodId: selected?.id,
-                        pricingMethodName: selected?.pricingMethodName,
+                        pricingMethodName: selected?.pricingMethodName
                       });
-                    }}
-                    columnsNames={PricingMethodFilterColumns.columnsNames}
-                    onSearch={(condition) =>
+                    } }
+                    columnsNames={ PricingMethodFilterColumns.columnsNames }
+                    onSearch={ (condition) =>
                       dispatch(
-                        PricingMethodSlice.entityActions.filter(condition),
-                      )
-                    }
-                    disabled={
-                      pricingMethodState.isLoading ||
-                      formData.type === ItemType.Service
-                    }
+                        PricingMethodSlice.entityActions.filter(condition)
+                      ) }
+                    disabled={ pricingMethodState.isLoading
+                      || formData.type === ItemType.Service }
                   />
                 </FormField>
               </td>
               <td className="p-3">
                 <NumberField
                   label=""
-                  min={1}
-                  disabled={method.unitId === formData.sellUnitId}
-                  value={method.quantityMultiplier || 1}
-                  onChange={(val) =>
+                  min={ 1 }
+                  disabled={ method.unitId === formData.sellUnitId }
+                  value={ method.quantityMultiplier || 1 }
+                  onChange={ (val) =>
                     updatePricingMethod(index, {
-                      quantityMultiplier: val,
-                    })
-                  }
+                      quantityMultiplier: val
+                    }) }
                 />
               </td>
               <td className="p-3">
                 <NumberField
                   label=""
-                  min={0}
-                  value={method.price || 0}
-                  onChange={(val) => updatePricingMethod(index, { price: val })}
+                  min={ 0 }
+                  value={ method.price || 0 }
+                  onChange={ (val) => updatePricingMethod(index, { price: val }) }
                 />
               </td>
               <td className="p-3">
                 <TextField
                   label=""
-                  value={method.barcode || ""}
-                  onChange={(e) =>
+                  value={ method.barcode || "" }
+                  onChange={ (e) =>
                     updatePricingMethod(index, {
-                      barcode: e.target.value,
-                    })
-                  }
+                      barcode: e.target.value
+                    }) }
                   dir="ltr"
                 />
               </td>
               <td className="p-3">
                 <TextField
                   label=""
-                  value={method.itemUnitPricingMethodName || ""}
-                  onChange={(e) =>
+                  value={ method.itemUnitPricingMethodName || "" }
+                  onChange={ (e) =>
                     updatePricingMethod(index, {
-                      itemUnitPricingMethodName: e.target.value,
-                    })
-                  }
+                      itemUnitPricingMethodName: e.target.value
+                    }) }
                 />
               </td>
               <td className="p-3 text-center">
@@ -148,20 +132,20 @@ export default function PricingMethodsTable() {
                   variant="ghost"
                   size="icon"
                   className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                  onClick={() => removePricingMethod(index)}
+                  onClick={ () => removePricingMethod(index) }
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </td>
             </tr>
-          ))}
+          )) }
         </tbody>
       </table>
-      {formData.itemUnitPricingMethods?.length === 0 && (
+      { formData.itemUnitPricingMethods?.length === 0 && (
         <div className="p-4 text-center text-muted-foreground">
           لا توجد طرق تسعير مضافة
         </div>
-      )}
+      ) }
     </div>
   );
 }

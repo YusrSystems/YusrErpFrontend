@@ -9,7 +9,7 @@ export default function EmployeesAccountsPage()
       stateKey="employees"
       dialogStateKey="employeesDialog"
       title="إدارة حسابات الموظفين"
-      fixedType={AccountType.Employee}
+      fixedType={ AccountType.Employee }
     />
   );
 }

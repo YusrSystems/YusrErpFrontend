@@ -9,7 +9,7 @@ export default function BoxesAccountsPage()
       stateKey="boxes"
       dialogStateKey="boxesDialog"
       title="إدارة حسابات الصناديق"
-      fixedType={AccountType.Box}
+      fixedType={ AccountType.Box }
     />
   );
 }
