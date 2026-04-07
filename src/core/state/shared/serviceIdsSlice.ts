@@ -14,7 +14,7 @@ interface ServiceIdsState
   isLoading: boolean;
 }
 
-const initialState: ServiceIdsState = { serviceIds: new ServiceIds(), isLoading: false };
+const initialState: ServiceIdsState = { serviceIds: undefined, isLoading: false };
 
 const systemSlice = createSlice({
   name: "serviceIds",

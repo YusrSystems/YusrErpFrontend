@@ -3,10 +3,11 @@ import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { Button, ChangeDialog, FieldGroup, FieldsSection, NumberField, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
 import { Barcode, ShoppingCart, Trash2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import { ItemFilterColumns, ItemSlice } from "../../core/data/item";
+import { ItemFilterColumns, ItemSlice, ItemType } from "../../core/data/item";
 import Stocktaking, { StocktakingItem } from "../../core/data/stocktaking";
 import { StoreFilterColumns } from "../../core/data/store";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import StoreItemSelector from "../items/storeItemSelector";
 import { filterStores } from "../stores/logic/storeSlice";
 
 export default function ChangeStocktakingDialog(
@@ -205,38 +206,44 @@ export default function ChangeStocktakingDialog(
     >
       <div className="max-h-[75vh] overflow-y-auto px-2 pb-2">
         <FieldGroup>
-            <TextField
-              label="تاريخ الجرد"
-              required
-              value={ formData.date ? new Date(formData.date).toISOString().split("T")[0] : undefined }
-              isInvalid={ isInvalid("date") }
-              error={ getError("date") }
-              disabled
-            />
+          <StoreItemSelector
+            storeId={ formData.storeId }
+            itemType={ ItemType.Product }
+            onSelect={ (result) => console.log(result) }
+          />
 
-            <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-sm font-medium">
-                المستودع <span className="text-red-500">*</span>
-              </label>
-              <SearchableSelect
-                items={ storeState.entities.data ?? [] }
-                itemLabelKey="storeName"
-                itemValueKey="id"
-                placeholder="اختر المستودع"
-                value={ formData.storeId?.toString() || "" }
-                onValueChange={ handleStoreChange }
-                columnsNames={ StoreFilterColumns.columnsNames }
-                onSearch={ (condition) => dispatch(filterStores(condition)) }
-                disabled={ storeState.isLoading || mode === "update" }
-              />
-              { isInvalid("storeId") && <span className="text-xs text-red-500">{ getError("storeId") }</span> }
-            </div>
+          <TextField
+            label="تاريخ الجرد"
+            required
+            value={ formData.date ? new Date(formData.date).toISOString().split("T")[0] : undefined }
+            isInvalid={ isInvalid("date") }
+            error={ getError("date") }
+            disabled
+          />
 
-            <TextField
-              label="الوصف"
-              value={ formData.description || "" }
-              onChange={ (e) => handleChange({ description: e.target.value }) }
+          <div className="flex flex-col gap-1.5 w-full">
+            <label className="text-sm font-medium">
+              المستودع <span className="text-red-500">*</span>
+            </label>
+            <SearchableSelect
+              items={ storeState.entities.data ?? [] }
+              itemLabelKey="storeName"
+              itemValueKey="id"
+              placeholder="اختر المستودع"
+              value={ formData.storeId?.toString() || "" }
+              onValueChange={ handleStoreChange }
+              columnsNames={ StoreFilterColumns.columnsNames }
+              onSearch={ (condition) => dispatch(filterStores(condition)) }
+              disabled={ storeState.isLoading || mode === "update" }
             />
+            { isInvalid("storeId") && <span className="text-xs text-red-500">{ getError("storeId") }</span> }
+          </div>
+
+          <TextField
+            label="الوصف"
+            value={ formData.description || "" }
+            onChange={ (e) => handleChange({ description: e.target.value }) }
+          />
 
           { /* 2. إضافة المواد (تظهر فقط بعد اختيار المستودع) */ }
           { formData.storeId && (

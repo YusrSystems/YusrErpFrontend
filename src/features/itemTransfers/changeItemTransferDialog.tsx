@@ -1,11 +1,13 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import { ChangeDialog, type CommonChangeDialogProps, DateField, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
-import ItemTransfer from "../../core/data/itemTransfer";
+import { ItemType } from "../../core/data/item";
+import ItemTransfer, { ItemTransfersItem } from "../../core/data/itemTransfer";
 import { StoreFilterColumns } from "../../core/data/store";
+import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import StoreItemSelector from "../items/storeItemSelector";
 import { filterStores } from "../stores/logic/storeSlice";
-import TransferItemAdder from "./transferItemAdder";
 
 export default function ChangeItemTransferDialog({
   entity,
@@ -47,7 +49,7 @@ export default function ChangeItemTransferDialog({
   const initialValues = useMemo(
     () => ({
       ...entity,
-      transferDate: entity?.transferDate || new Date().toISOString(),
+      transferDate: entity?.transferDate,
       itemTransfersItems: entity?.itemTransfersItems || []
     }),
     [entity]
@@ -60,7 +62,21 @@ export default function ChangeItemTransferDialog({
 
   useEffect(() =>
   {
-    dispatch(filterStores(undefined));
+    if (formData.fromStoreId)
+    {
+      dispatch(fetchStoreItems({
+        pageNumber: 1,
+        rowsPerPage: 100,
+        itemType: ItemType.Product,
+        storeId: formData.fromStoreId,
+        condition: undefined
+      }));
+    }
+  }, [dispatch, formData.fromStoreId]);
+
+  useEffect(() =>
+  {
+    dispatch(filterStores());
   }, [dispatch]);
 
   // فلترة المستودعات المتاحة لحقل "من مستودع" (إخفاء المستودع المختار في "إلى")
@@ -100,7 +116,7 @@ export default function ChangeItemTransferDialog({
             label="تاريخ التحويل"
             required
             value={ formData.transferDate ? new Date(formData.transferDate) : undefined }
-            onChange={ (date) => handleChange({ transferDate: date?.toISOString() }) }
+            onChange={ (date) => handleChange({ transferDate: date }) }
             isInvalid={ isInvalid("transferDate") }
             error={ getError("transferDate") }
           />
@@ -112,7 +128,7 @@ export default function ChangeItemTransferDialog({
             error={ getError("fromStoreId") }
           >
             <SearchableSelect
-              items={ availableFromStores } // استخدام القائمة المفلترة
+              items={ availableFromStores }
               itemLabelKey="storeName"
               itemValueKey="id"
               placeholder="اختر المستودع"
@@ -174,10 +190,24 @@ export default function ChangeItemTransferDialog({
               { getError("itemTransfersItems") }
             </div>
           ) }
-          <TransferItemAdder
-            fromStoreId={ formData.fromStoreId }
-            value={ formData.itemTransfersItems }
-            onChange={ (items) => handleChange({ itemTransfersItems: items }) }
+          <StoreItemSelector
+            storeId={ formData.fromStoreId }
+            onSelect={ (storeItem, selectedIupm) =>
+              handleChange(
+                {
+                  itemTransfersItems: [
+                    ...(formData.itemTransfersItems ?? []),
+                    new ItemTransfersItem({
+                      itemId: storeItem.item.id,
+                      itemName: storeItem.item.name,
+                      itemUnitPricingMethodId: selectedIupm?.id,
+                      itemUnitPricingMethodName: selectedIupm?.itemUnitPricingMethodName,
+                      quantity: 1,
+                      itemUnitPricingMethods: storeItem.item.itemUnitPricingMethods
+                    })
+                  ]
+                }
+              ) }
           />
         </FieldsSection>
       </FieldGroup>

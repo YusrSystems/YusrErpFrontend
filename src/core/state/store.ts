@@ -16,19 +16,20 @@ import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsSlice, EmployeesSlic
 import { BalanceTransferSlice } from "../data/balanceTransfer";
 import { InvoiceSlice } from "../data/invoice";
 import { ItemSlice } from "../data/item";
+import { ItemTransferSlice } from "../data/itemTransfer";
 import { PaymentMethodSlice } from "../data/paymentMethod";
 import { PricingMethodSlice } from "../data/pricingMethod";
 import type { Setting } from "../data/setting";
+import { StocktakingSlice } from "../data/stocktaking";
 import { UnitSlice } from "../data/unit";
 import { VoucherSlice } from "../data/voucher";
 import cityReducer from "./shared/citySlice";
 import countryReducer from "./shared/countrySlice";
 import currencyReducer from "./shared/currencySlice";
+import itemBarcodeReducer from "./shared/itemBarcodeSlice";
 import serviceIdsReducer from "./shared/serviceIdsSlice";
-import systemReducer from "./shared/systemSlice";
 import storeItemsReducer from "./shared/storeItemsSlice";
-import { StocktakingSlice } from "../data/stocktaking";
-import { ItemTransferSlice } from "../data/itemTransfer";
+import systemReducer from "./shared/systemSlice";
 
 const authSlice = createAuthSlice<User, Setting>();
 export const {
@@ -52,7 +53,8 @@ export const store = configureStore({
     currency: currencyReducer,
     auth: authSlice.reducer,
     system: systemReducer,
-    storeItems:storeItemsReducer,
+    storeItems: storeItemsReducer,
+    itemBarcode: itemBarcodeReducer,
     serviceIds: serviceIdsReducer,
     tax: taxReducer,
     taxDialog: taxDialogReducer,
@@ -87,7 +89,7 @@ export const store = configureStore({
     stocktaking: StocktakingSlice.entityReducer,
     stocktakingDialog: StocktakingSlice.dialogReducer,
     itemTransfer: ItemTransferSlice.entityReducer,
-    itemTransferDialog: ItemTransferSlice.dialogReducer,
+    itemTransferDialog: ItemTransferSlice.dialogReducer
   }
 });
 

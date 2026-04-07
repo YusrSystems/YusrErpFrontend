@@ -1,23 +1,8 @@
 import { BaseEntity, type ColumnName } from "@yusr_systems/core";
 import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
 import ItemTransferApiService from "../networking/itemTransferApiService";
-  
-export class ItemUnitPricingMethodDto extends BaseEntity {
-  public itemUnitPricingMethodName!: string;
-  public itemId!: number;
-  public unitId!: number;
-  public unitName!: string;
-  public pricingMethodId!: number;
-  public pricingMethodName!: string;
-  public quantityMultiplier!: number;
-  public price!: number;
-  public barcode?: string;
+import type { ItemUnitPricingMethod } from "./item";
 
-  constructor(init?: Partial<ItemUnitPricingMethodDto>) {
-    super();
-    Object.assign(this, init);
-  }
-}
 
 export class ItemTransfersItem extends BaseEntity {
   public itemTransferId!: number;
@@ -26,14 +11,11 @@ export class ItemTransfersItem extends BaseEntity {
   public itemUnitPricingMethodId!: number;
   public itemUnitPricingMethodName!: string;
   public quantity!: number;
-  public itemUnitPricingMethods: ItemUnitPricingMethodDto[] = [];
+  public itemUnitPricingMethods: ItemUnitPricingMethod[] = [];
 
   constructor(init?: Partial<ItemTransfersItem>) {
     super();
     Object.assign(this, init);
-    if (init?.itemUnitPricingMethods) {
-      this.itemUnitPricingMethods = init.itemUnitPricingMethods.map(m => new ItemUnitPricingMethodDto(m));
-    }
   }
 }
 
