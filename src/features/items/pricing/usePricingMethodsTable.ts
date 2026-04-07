@@ -25,6 +25,12 @@ export default function usePricingMethodsTable()
       updates.pricingMethodName || iupm.pricingMethodName || ""
     }`;
     iupm.itemUnitPricingMethodName = updates.itemUnitPricingMethodName || suggestName;
+
+    if (updates.unitId === formData.sellUnitId)
+    {
+      updates.quantityMultiplier = 1;
+    }
+
     list[index] = { ...list[index], ...updates };
     handleChange({ itemUnitPricingMethods: list });
   };
@@ -46,6 +52,6 @@ export default function usePricingMethodsTable()
     updatePricingMethod,
     removePricingMethod,
     isInvalid,
-    getError   
+    getError
   };
 }
