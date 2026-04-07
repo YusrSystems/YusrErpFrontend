@@ -1,6 +1,6 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { Button, ChangeDialog, Checkbox, FieldGroup, FormField, NumberField, SearchableSelect, SelectField, StorageFileField, TextAreaField, TextField, useEntityForm, useStorageFile } from "@yusr_systems/ui";
+import { Button, ChangeDialog, Checkbox, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FormField, Loading, NumberField, SearchableSelect, SelectField, StorageFileField, TextAreaField, TextField, useEntityForm, useStorageFile } from "@yusr_systems/ui";
 import { Box, Database, DollarSign, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import Item, { ItemStore, ItemTax, ItemType, ItemUnitPricingMethod } from "../../core/data/item";
@@ -39,6 +39,7 @@ export default function ChangeItemDialog({
   const [activeTab, setActiveTab] = useState<"basic" | "pricing" | "storage">(
     "basic"
   );
+  const [initLoading, setInitLoading] = useState(false);
 
   const unitState = useAppSelector((state) => state.unit);
   const pricingMethodState = useAppSelector((state) => state.pricingMethod);
@@ -97,12 +98,29 @@ export default function ChangeItemDialog({
     dispatch(fetchServiceIds());
   }, [dispatch]);
 
+  useEffect(() =>
+  {
+    if (mode === "update" && entity?.id)
+    {
+      setInitLoading(true);
+
+      const getItem = async () =>
+      {
+        const res = await service.Get(entity.id);
+        handleChange({ ...res.data });
+        setInitLoading(false);
+      };
+
+      getItem();
+    }
+  }, [entity?.id, mode]);
+
   // 1. الضرائب
   const addTax = () => handleChange({ itemTaxes: [...(formData.itemTaxes || []), new ItemTax()] });
   const updateTax = (index: number, field: keyof ItemTax, value: any) =>
   {
     const list = [...(formData.itemTaxes || [])];
-    list[index] = { ...list[index], [field]: value };
+    list[index] = { ...list[index], [field]: value }; 
     handleChange({ itemTaxes: list });
   };
   const removeTax = (index: number) =>
@@ -166,6 +184,19 @@ export default function ChangeItemDialog({
     );
     handleChange({ itemStores: list, initialQuantity: totalInitial });
   };
+
+  if (initLoading)
+  {
+    return (
+      <DialogContent dir="rtl">
+        <DialogHeader>
+          <DialogTitle>{ mode === "create" ? "إضافة" : "تعديل" } مادة</DialogTitle>
+          <DialogDescription></DialogDescription>
+        </DialogHeader>
+        <Loading entityName="المادة" />
+      </DialogContent>
+    );
+  }
 
   return (
     <ChangeDialog<Item>

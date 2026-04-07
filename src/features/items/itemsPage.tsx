@@ -34,6 +34,7 @@ export default function ItemsPage()
       columnsToFilter={ ItemFilterColumns.columnsNames }
       tableHeadRows={ [
         { rowName: "", rowStyles: "text-left w-12.5" },
+        { rowName: "رقم المادة", rowStyles: "w-12.5" },
         { rowName: "النوع", rowStyles: "w-24" },
         { rowName: "اسم الصنف", rowStyles: "w-48" },
         { rowName: "التصنيف", rowStyles: "w-32" },

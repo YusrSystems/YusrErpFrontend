@@ -56,7 +56,6 @@ export class ItemStore extends BaseEntity
   }
 }
 
-// دمجنا DetailedItemDto مع ItemDto لتسهيل التعامل في الواجهة
 export default class Item extends BaseEntity
 {
   public type!: ItemType;
@@ -80,7 +79,6 @@ export default class Item extends BaseEntity
   public notes?: string;
   public totalTaxes!: number;
 
-  // القوائم المرتبطة (DetailedItemDto)
   public itemUnitPricingMethods: ItemUnitPricingMethod[] = [];
   public itemTaxes: ItemTax[] = [];
   public itemStores: ItemStore[] = [];
@@ -106,6 +104,20 @@ export default class Item extends BaseEntity
     {
       this.itemImages = init.itemImages;
     }
+  }
+}
+
+export class DetailedItem
+{
+  public item!: Item;
+  public itemUnitPricingMethods: ItemUnitPricingMethod[] = [];
+  public itemTaxes: ItemTax[] = [];
+  public itemStores: ItemStore[] = [];
+  public itemImages: StorageFile[] = [];
+
+  constructor(init?: Partial<DetailedItem>)
+  {
+    Object.assign(this, init);
   }
 }
 
