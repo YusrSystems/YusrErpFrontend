@@ -1,12 +1,10 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import {
-  ChangeDialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  FieldGroup,
   Loading,
   useEntityForm,
   useStorageFile,
@@ -24,21 +22,7 @@ import { ItemContext } from "./itemContext";
 import BasicTab from "./basic/basicTab";
 import StorageTab from "./storage/storageTab";
 import PricingTab from "./pricing/pricingTab";
-
-const TabButton = ({ active, icon: Icon, label, onClick }: any) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-      active
-        ? "border-primary text-primary bg-primary/10 font-extrabold text-base"
-        : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium text-sm"
-    }`}
-  >
-    <Icon className="w-4 h-4" />
-    {label}
-  </button>
-);
+import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 
 export default function ChangeItemDialog({
   entity,
@@ -47,9 +31,6 @@ export default function ChangeItemDialog({
   onSuccess,
 }: CommonChangeDialogProps<Item>) {
   const dispatch = useAppDispatch();
-  const [activeTab, setActiveTab] = useState<"basic" | "pricing" | "storage">(
-    "basic",
-  );
   const [initLoading, setInitLoading] = useState(false);
 
   const validationRules: ValidationRule<Partial<Item>>[] = useMemo(
@@ -125,7 +106,7 @@ export default function ChangeItemDialog({
           <DialogTitle>
             {mode === "create" ? "إضافة" : "تعديل"} مادة
           </DialogTitle>
-          <DialogDescription></DialogDescription>
+          <DialogDescription />
         </DialogHeader>
         <Loading entityName="المادة" />
       </DialogContent>
@@ -149,50 +130,41 @@ export default function ChangeItemDialog({
         getFileSrc,
       }}
     >
-      <ChangeDialog<Item>
-        title={`${mode === "create" ? "إضافة" : "تعديل"} مادة`}
-        className="sm:max-w-7xl"
-        formData={formData}
-        dialogMode={mode}
-        service={service}
-        onSuccess={(data) => onSuccess?.(data, mode)}
-        validate={validate}
-      >
-        <div className="flex flex-col h-[80vh]">
-          <div className="flex justify-start border-b mb-4 shrink-0 bg-muted/20 rounded-t-lg">
-            <TabButton
-              active={activeTab === "basic"}
-              icon={Box}
-              label="المعلومات الأساسية"
-              onClick={() => setActiveTab("basic")}
-            />
-
-            {formData.type !== ItemType.Service && (
-              <TabButton
-                active={activeTab === "storage"}
-                icon={Database}
-                label="التخزين"
-                onClick={() => setActiveTab("storage")}
-              />
-            )}
-
-            <TabButton
-              active={activeTab === "pricing"}
-              icon={DollarSign}
-              label="التسعير"
-              onClick={() => setActiveTab("pricing")}
-            />
-          </div>
-
-          <div className="flex-1 overflow-y-auto px-2 pb-2">
-            <FieldGroup>
-              {activeTab === "basic" && <BasicTab />}
-              {activeTab === "storage" && <StorageTab />}
-              {activeTab === "pricing" && <PricingTab />}
-            </FieldGroup>
-          </div>
-        </div>
-      </ChangeDialog>
+      <ChangeDialogTabbed<Item>
+        changeDialogProps={{
+          title: `${mode === "create" ? "إضافة" : "تعديل"} مادة`,
+          className: "sm:max-w-7xl",
+          formData,
+          dialogMode: mode,
+          service,
+          onSuccess: (data) => onSuccess?.(data, mode),
+          validate,
+        }}
+        tabs={[
+          {
+            label: "المعلومات الأساسية",
+            icon: Box,
+            active: true,
+            content: <BasicTab />,
+          },
+          ...(formData.type !== ItemType.Service
+            ? [
+                {
+                  label: "التخزين",
+                  icon: Database,
+                  active: false,
+                  content: <StorageTab />,
+                },
+              ]
+            : []),
+          {
+            label: "التسعير",
+            icon: DollarSign,
+            active: false,
+            content: <PricingTab />,
+          },
+        ]}
+      />
     </ItemContext.Provider>
   );
 }
