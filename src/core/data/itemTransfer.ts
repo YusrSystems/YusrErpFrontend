@@ -1,7 +1,7 @@
 import { BaseEntity, type ColumnName } from "@yusr_systems/core";
 import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
-import ItemTransferApiService from "../networking/ItemTransferApiService";
- 
+import ItemTransferApiService from "../networking/itemTransferApiService";
+  
 export class ItemUnitPricingMethodDto extends BaseEntity {
   public itemUnitPricingMethodName!: string;
   public itemId!: number;
