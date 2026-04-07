@@ -8,7 +8,7 @@ import "./index.css";
 import { store } from "./core/state/store";
 
 ApiConstants.initialize("https://yusrerp.runasp.net/api");
-// ApiConstants.initialize("https://localhost:7142/api");
+ApiConstants.initialize("https://localhost:7142/api");
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
