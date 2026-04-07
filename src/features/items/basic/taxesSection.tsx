@@ -11,10 +11,11 @@ export default function TaxesSection()
 {
   const dispatch = useAppDispatch();
   const taxState = useAppSelector((state) => state.tax);
-  const { formData, handleChange } = useItemContext();
+  const { formData, handleChange, mode } = useItemContext();
   useEffect(() =>
   {
-    handleTaxableChange(formData.taxable ?? false);
+    if(mode === "create")
+      handleTaxableChange(formData.taxable ?? false);
   }, [taxState.entities?.data]);
 
   const handleTaxableChange = (isTaxable: boolean) =>
@@ -51,10 +52,10 @@ export default function TaxesSection()
   };
 
   const addTax = () => handleChange({ itemTaxes: [...(formData.itemTaxes || []), new ItemTax()] });
-  const updateTax = (index: number, field: keyof ItemTax, value: any) =>
+  const updateTax = (index: number, updates: Partial<ItemTax>) =>
   {
     const list = [...(formData.itemTaxes || [])];
-    list[index] = { ...list[index], [field]: value };
+    list[index] = { ...list[index], ...updates };
     handleChange({ itemTaxes: list });
   };
   const removeTax = (index: number) =>
@@ -145,13 +146,11 @@ export default function TaxesSection()
                               );
                               if (selectedTax)
                               {
-                                updateTax(index, "taxId", selectedTax.id);
-                                updateTax(index, "taxName", selectedTax.name);
-                                updateTax(
-                                  index,
-                                  "taxPercentage",
-                                  selectedTax.percentage
-                                );
+                                updateTax(index, {
+                                  taxId: selectedTax.id,
+                                  taxName: selectedTax.name,
+                                  taxPercentage: selectedTax.percentage
+                                });
                               }
                             } }
                           />
@@ -161,7 +160,7 @@ export default function TaxesSection()
                             label=""
                             value={ tax.taxPercentage || 0 }
                             disabled
-                            onChange={ (val) => updateTax(index, "taxPercentage", val) }
+                            onChange={ (val) => updateTax(index, { taxPercentage: val }) }
                           />
                         </td>
                         <td className="p-3 text-center">
