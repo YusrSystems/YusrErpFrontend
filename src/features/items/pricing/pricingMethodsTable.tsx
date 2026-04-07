@@ -6,10 +6,8 @@ import {
   TextField,
 } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
-import { useItemContext } from "../itemContext";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
 import { UnitFilterColumns, UnitSlice } from "../../../core/data/unit";
-import { ItemType, type ItemUnitPricingMethod } from "../../../core/data/item";
+import { ItemType } from "../../../core/data/item";
 import {
   PricingMethodFilterColumns,
   PricingMethodSlice,
