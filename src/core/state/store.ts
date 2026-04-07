@@ -26,6 +26,7 @@ import countryReducer from "./shared/countrySlice";
 import currencyReducer from "./shared/currencySlice";
 import serviceIdsReducer from "./shared/serviceIdsSlice";
 import systemReducer from "./shared/systemSlice";
+import storeItemsReducer from "./shared/storeItemsSlice";
 import { StocktakingSlice } from "../data/stocktaking";
 import { ItemTransferSlice } from "../data/itemTransfer";
 
@@ -51,6 +52,7 @@ export const store = configureStore({
     currency: currencyReducer,
     auth: authSlice.reducer,
     system: systemReducer,
+    storeItems:storeItemsReducer,
     serviceIds: serviceIdsReducer,
     tax: taxReducer,
     taxDialog: taxDialogReducer,
