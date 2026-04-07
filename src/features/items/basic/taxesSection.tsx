@@ -7,26 +7,16 @@ import {
 } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect } from "react";
-import type Item from "../../core/data/item";
-import { ItemTax } from "../../core/data/item";
-import { type Tax, TaxFilterColumns } from "../../core/data/tax";
-import { useAppDispatch, useAppSelector } from "../../core/state/store";
-import { filterTaxes } from "../taxes/logic/taxSlice";
+import { ItemTax } from "../../../core/data/item";
+import { type Tax, TaxFilterColumns } from "../../../core/data/tax";
+import { useAppDispatch, useAppSelector } from "../../../core/state/store";
+import { filterTaxes } from "../../taxes/logic/taxSlice";
+import { useItemContext } from "../itemContext";
 
-export type TaxesSectionProps = {
-  handleChange: (
-    update: Partial<Item> | ((prev: Partial<Item>) => Partial<Item>),
-  ) => void;
-  formData: Partial<Item>;
-};
-
-export default function TaxesSection({
-  handleChange,
-  formData,
-}: TaxesSectionProps) {
+export default function TaxesSection() {
   const dispatch = useAppDispatch();
   const taxState = useAppSelector((state) => state.tax);
-
+  const { formData, handleChange } = useItemContext();
   useEffect(() => {
     handleTaxableChange(formData.taxable ?? false);
   }, [taxState.entities?.data]);
