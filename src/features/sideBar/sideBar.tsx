@@ -131,6 +131,14 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
           SystemPermissionsActions.Get
         )
       }, {
+        title: appLangSections.itemTransfers,
+        url: "/itemTransfers",
+        hasAuth: SystemPermissions.hasAuth(
+          permissions,
+          SystemPermissionsResources.ItemTransfers,
+          SystemPermissionsActions.Get
+        )
+      }, {
         title: appLangSections.pricingMethods,
         url: "/pricingMethods",
         hasAuth: SystemPermissions.hasAuth(
