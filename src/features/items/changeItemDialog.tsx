@@ -13,9 +13,6 @@ import {
   Loading,
   NumberField,
   SearchableSelect,
-  SelectField,
-  StorageFileField,
-  TextAreaField,
   TextField,
   useEntityForm,
   useStorageFile,
@@ -24,7 +21,6 @@ import { Box, Database, DollarSign, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import Item, {
   ItemStore,
-  ItemTax,
   ItemType,
   ItemUnitPricingMethod,
 } from "../../core/data/item";
@@ -38,7 +34,6 @@ import { fetchServiceIds } from "../../core/state/shared/serviceIdsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import { filterTaxes } from "../taxes/logic/taxSlice";
-import TaxesSection from "./basic/taxesSection";
 import { ItemContext } from "./itemContext";
 import BasicTab from "./basic/basicTab";
 
@@ -72,7 +67,6 @@ export default function ChangeItemDialog({
   const unitState = useAppSelector((state) => state.unit);
   const pricingMethodState = useAppSelector((state) => state.pricingMethod);
   const storeState = useAppSelector((state) => state.store);
-  const serviceIdsState = useAppSelector((state) => state.serviceIds);
 
   const validationRules: ValidationRule<Partial<Item>>[] = useMemo(
     () => [
