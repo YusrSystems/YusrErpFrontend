@@ -1,5 +1,5 @@
 import { FilterCondition } from "@yusr_systems/core";
-import { cn, SearchableSelect } from "@yusr_systems/ui";
+import { cn, SearchableSelect, SelectInput } from "@yusr_systems/ui";
 import { Lock, ScanBarcode, ShoppingCart, Trash2 } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ItemFilterColumns, ItemType, type StoreItem } from "../../core/data/item";
@@ -79,12 +79,35 @@ export default function TransferItemAdder({ fromStoreId, value = [], onChange }:
       ) || [];
 
       const defaultMethod = methodsDto.find((m) => m.id === preSelectedMethodId) || methodsDto[0];
+      const methodIdToUse = defaultMethod?.id || 0;
 
+      // 1. التحقق من وجود المادة مسبقاً في القائمة (بنفس طريقة التسعير)
+      const existingItemIndex = value.findIndex(
+        (item) => item.itemId === storeItem.item.id && item.itemUnitPricingMethodId === methodIdToUse
+      );
+
+      if (existingItemIndex >= 0)
+      {
+        // إذا كانت موجودة، نزيد الكمية فقط
+        const updatedValue = [...value];
+        updatedValue[existingItemIndex] = new ItemTransfersItem({
+          ...updatedValue[existingItemIndex],
+          quantity: (updatedValue[existingItemIndex].quantity || 0) + 1
+        });
+
+        if (onChange)
+        {
+          onChange(updatedValue);
+        }
+        return;
+      }
+
+      // 2. إذا لم تكن موجودة، نضيفها كسطر جديد
       const newItem = new ItemTransfersItem({
         id: Math.floor(Math.random() * 1000000),
         itemId: storeItem.item.id,
         itemName: storeItem.item.name,
-        itemUnitPricingMethodId: defaultMethod?.id || 0,
+        itemUnitPricingMethodId: methodIdToUse,
         itemUnitPricingMethodName: defaultMethod?.itemUnitPricingMethodName || "غير محدد",
         quantity: 1,
         itemUnitPricingMethods: methodsDto
@@ -226,7 +249,7 @@ export default function TransferItemAdder({ fromStoreId, value = [], onChange }:
               <tr>
                 <th className="p-4 font-semibold w-16 text-center text-muted-foreground">الرقم</th>
                 <th className="p-4 font-semibold">المادة</th>
-                <th className="p-4 font-semibold text-center">طريقة التسعير والوحدة</th>
+                <th className="p-4 font-semibold text-center w-64">طريقة التسعير والوحدة</th>
                 <th className="p-4 font-semibold text-center w-32">الكمية</th>
                 <th className="p-4 font-semibold w-16 text-center"></th>
               </tr>
@@ -251,30 +274,24 @@ export default function TransferItemAdder({ fromStoreId, value = [], onChange }:
                         <div className="font-semibold text-foreground">{ row.itemName }</div>
                       </td>
                       <td className="p-4 text-center">
-                        <select
-                          value={ row.itemUnitPricingMethodId }
-                          onChange={ (e) =>
+                        { /* استخدام SelectInput الخاص بإطار العمل بدلاً من <select> */ }
+                        <SelectInput
+                          value={ row.itemUnitPricingMethodId?.toString() || "" }
+                          onValueChange={ (val) =>
                           {
-                            const methodId = Number(e.target.value);
+                            const methodId = Number(val);
                             const method = row.itemUnitPricingMethods.find((m) => m.id === methodId);
                             updateRow(row.id, {
                               itemUnitPricingMethodId: methodId,
                               itemUnitPricingMethodName: method?.itemUnitPricingMethodName || ""
                             });
                           } }
-                          className="h-10 w-full max-w-[250px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                          { row.itemUnitPricingMethods?.map((m) => (
-                            <option key={ m.id } value={ m.id }>
-                              { m.pricingMethodName } - { m.unitName }
-                            </option>
-                          )) }
-                          { (!row.itemUnitPricingMethods || row.itemUnitPricingMethods.length === 0) && (
-                            <option value={ row.itemUnitPricingMethodId } disabled>
-                              لا توجد طرق تسعير
-                            </option>
-                          ) }
-                        </select>
+                          options={ row.itemUnitPricingMethods?.map((m) => ({
+                            label: `${m.pricingMethodName} - ${m.unitName}`,
+                            value: m.id.toString()
+                          })) || [] }
+                          placeholder="اختر طريقة التسعير"
+                        />
                       </td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center">
