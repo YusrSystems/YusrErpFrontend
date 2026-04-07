@@ -121,6 +121,29 @@ export class DetailedItem
   }
 }
 
+export class StoreItem
+{
+  public item!: Item;
+  public itemUnitPricingMethods!: ItemUnitPricingMethod[];
+  public StoreQuantity!: number;
+
+  constructor(init?: Partial<StoreItem>)
+  {
+    Object.assign(this, init);
+  }
+}
+
+export class BarcodeResult
+{
+  public storeItem!: StoreItem;
+  public selectedIupm!: ItemUnitPricingMethod;
+
+  constructor(init?: Partial<BarcodeResult>)
+  {
+    Object.assign(this, init);
+  }
+}
+
 export class ItemFilterColumns
 {
   public static columnsNames: ColumnName[] = [{ label: "رقم الصنف", value: "Id" }, {

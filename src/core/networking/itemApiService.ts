@@ -1,5 +1,5 @@
-import { ApiConstants, BaseApiService, YusrApiHelper } from "@yusr_systems/core";
-import Item, { DetailedItem } from "../data/item";
+import { ApiConstants, BaseApiService, FilterCondition, type FilterResult, type RequestResult, YusrApiHelper } from "@yusr_systems/core";
+import Item, { BarcodeResult, DetailedItem, ItemType, StoreItem } from "../data/item";
 
 export default class ItemsApiService extends BaseApiService<Item>
 {
@@ -13,6 +13,28 @@ export default class ItemsApiService extends BaseApiService<Item>
       undefined,
       "تم حفظ البيانات بنجاح"
     );
+  }
+
+  async FilterStoreItems(
+    pageNumber: number,
+    rowsPerPage: number,
+    itemType: ItemType,
+    storeId: number,
+    condition?: FilterCondition
+  ): Promise<RequestResult<FilterResult<StoreItem>>>
+  {
+    return await YusrApiHelper.Post(
+      `${ApiConstants.baseUrl}/${this.routeName}/FilterStoreItems?pageNumber=${pageNumber}&rowsPerPage=${rowsPerPage}&itemType=${itemType}&storeId=${storeId}`,
+      condition
+    );
+  }
+
+  async GetByBarcode(
+    barcode: string,
+    storeId: number
+  ): Promise<RequestResult<BarcodeResult>>
+  {
+    return await YusrApiHelper.Get(`${ApiConstants.baseUrl}/${this.routeName}/GetByBarcode/${barcode}/${storeId}`);
   }
 
   override async Update(entity: Item)
