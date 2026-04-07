@@ -13,13 +13,13 @@ export default function AccountsPage({
   slice,
   stateKey,
   dialogStateKey,
-  fixedType,  
+  fixedType
 }: {
   title: string;
   slice: ReturnType<typeof AccountSlice.create>;
   stateKey: keyof RootState;
   dialogStateKey: keyof RootState;
-  fixedType?: AccountType;  
+  fixedType?: AccountType;
 })
 {
   const dispatch = useAppDispatch();
@@ -71,9 +71,9 @@ export default function AccountsPage({
           entity={ accountDialogState.selectedRow || undefined }
           mode={ accountDialogState.selectedRow ? "update" : "create" }
           service={ service }
-          slice={slice}
-          stateKey={stateKey}
-          fixedType={fixedType}
+          slice={ slice }
+          stateKey={ stateKey }
+          fixedType={ fixedType }
           onSuccess={ (data, mode) =>
           {
             dispatch(slice.entityActions.refresh({ data: data }));

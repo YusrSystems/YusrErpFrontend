@@ -9,7 +9,7 @@ export default function ClientsAccountsPage()
       slice={ ClientsSlice }
       stateKey="clients"
       dialogStateKey="clientsDialog"
-      fixedType={AccountType.Client}
+      fixedType={ AccountType.Client }
     />
   );
 }

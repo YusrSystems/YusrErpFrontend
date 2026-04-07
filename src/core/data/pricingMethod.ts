@@ -1,37 +1,38 @@
 import { BaseEntity, type ColumnName } from "@yusr_systems/core";
-import {
-  createGenericDialogSlice,
-  createGenericEntitySlice,
-} from "@yusr_systems/ui";
+import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
 import PricingMethodsApiService from "../networking/PricingMethodsApiService";
 
-export default class PricingMethod extends BaseEntity {
+export default class PricingMethod extends BaseEntity
+{
   public pricingMethodName!: string;
 
-  constructor(init?: Partial<PricingMethod>) {
+  constructor(init?: Partial<PricingMethod>)
+  {
     super();
     Object.assign(this, init);
   }
 }
 
-export class PricingMethodFilterColumns {
-  public static columnsNames: ColumnName[] = [
-    { label: "رقم الطريقة", value: "Id" },
-    { label: "اسم طريقة التسعير", value: "PricingMethodName" },
-  ];
+export class PricingMethodFilterColumns
+{
+  public static columnsNames: ColumnName[] = [{ label: "رقم الطريقة", value: "Id" }, {
+    label: "اسم طريقة التسعير",
+    value: "PricingMethodName"
+  }];
 }
 
-export class PricingMethodSlice {
+export class PricingMethodSlice
+{
   private static entitySliceInstance = createGenericEntitySlice(
     "pricingMethod",
-    new PricingMethodsApiService(),
+    new PricingMethodsApiService()
   );
 
   public static entityActions = PricingMethodSlice.entitySliceInstance.actions;
   public static entityReducer = PricingMethodSlice.entitySliceInstance.reducer;
 
   private static dialogSliceInstance = createGenericDialogSlice<PricingMethod>(
-    "pricingMethodDialog",
+    "pricingMethodDialog"
   );
 
   public static dialogActions = PricingMethodSlice.dialogSliceInstance.actions;

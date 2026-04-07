@@ -6,7 +6,7 @@ import type { RootState } from "../state/store";
 
 const selectRawPermissions = (state: RootState) => state.auth.loggedInUser?.role?.permissions || [];
 
-export const selectPermissionsByResource : PermissionSelector<RootState> = createSelector([
+export const selectPermissionsByResource: PermissionSelector<RootState> = createSelector([
   selectRawPermissions,
   (_state: RootState, resource: string) => resource
 ], (permissions, resource) =>

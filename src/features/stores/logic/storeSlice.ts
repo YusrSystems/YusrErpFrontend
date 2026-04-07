@@ -3,13 +3,13 @@ import StoresApiService from "../../../core/networking/storeApiService";
 
 const { reducer, actions } = createGenericEntitySlice(
   "store",
-  new StoresApiService(),
+  new StoresApiService()
 );
 
 export const {
   setCurrentPage: setCurrentStoresPage,
   refresh: refreshStores,
-  filter: filterStores,
+  filter: filterStores
 } = actions;
 
 export default reducer;

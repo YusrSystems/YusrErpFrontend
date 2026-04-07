@@ -1,43 +1,21 @@
-import { Button, Checkbox, FormField, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
-import { Plus, Trash2 } from "lucide-react";
+import { Button, Checkbox, FormField, NumberField, SearchableSelect } from "@yusr_systems/ui";
+import { Plus } from "lucide-react";
 import { ItemType, ItemUnitPricingMethod } from "../../../core/data/item";
-import { PricingMethodFilterColumns, PricingMethodSlice } from "../../../core/data/pricingMethod";
 import { UnitFilterColumns, UnitSlice } from "../../../core/data/unit";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
 import { useItemContext } from "../itemContext";
+import PricingMethodsTable from "./pricingMethodsTable";
 
 export default function PricingTab()
 {
-  const { formData, handleChange, isInvalid, getError, mode } = useItemContext();
+  const { formData, handleChange, isInvalid, getError } = useItemContext();
   const unitState = useAppSelector((state) => state.unit);
   const dispatch = useAppDispatch();
-
-  const pricingMethodState = useAppSelector((state) => state.pricingMethod);
 
   const addPricingMethod = () =>
     handleChange({
       itemUnitPricingMethods: [...(formData.itemUnitPricingMethods || []), new ItemUnitPricingMethod()]
     });
-  const updatePricingMethod = (
-    index: number,
-    updates: Partial<ItemUnitPricingMethod>
-  ) =>
-  {
-    const list = [...(formData.itemUnitPricingMethods || [])];
-    let iupm = list[index];
-    let suggestName = `${updates.unitName || iupm.unitName || ""} ${
-      updates.pricingMethodName || iupm.pricingMethodName || ""
-    }`;
-    iupm.itemUnitPricingMethodName = updates.itemUnitPricingMethodName || suggestName;
-    list[index] = { ...list[index], ...updates };
-    handleChange({ itemUnitPricingMethods: list });
-  };
-  const removePricingMethod = (index: number) =>
-  {
-    const list = [...(formData.itemUnitPricingMethods || [])];
-    list.splice(index, 1);
-    handleChange({ itemUnitPricingMethods: list });
-  };
 
   return (
     <div className="space-y-6 animate-in fade-in">

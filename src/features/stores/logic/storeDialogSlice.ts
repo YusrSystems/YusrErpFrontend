@@ -7,7 +7,7 @@ export const {
   openChangeDialog: openStoreChangeDialog,
   openDeleteDialog: openStoreDeleteDialog,
   setIsChangeDialogOpen: setIsStoreChangeDialogOpen,
-  setIsDeleteDialogOpen: setIsStoreDeleteDialogOpen,
+  setIsDeleteDialogOpen: setIsStoreDeleteDialogOpen
 } = storeDialogSlice.actions;
 
 export default storeDialogSlice.reducer;

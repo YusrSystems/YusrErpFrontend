@@ -1,4 +1,4 @@
-import { Country, CountriesApiService } from "@yusr_systems/core";
+import { CountriesApiService, Country } from "@yusr_systems/core";
 import { createGenericEntitySlice } from "@yusr_systems/ui";
 
 const countrySlice = createGenericEntitySlice<Country>("country", new CountriesApiService());

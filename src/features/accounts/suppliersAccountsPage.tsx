@@ -9,7 +9,7 @@ export default function SuppliersAccountsPage()
       slice={ SuppliersSlice }
       stateKey="suppliers"
       dialogStateKey="suppliersDialog"
-      fixedType={AccountType.Supplier}
+      fixedType={ AccountType.Supplier }
     />
   );
 }

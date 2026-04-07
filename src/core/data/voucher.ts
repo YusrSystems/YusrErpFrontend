@@ -1,7 +1,7 @@
 import { BaseEntity, type ColumnName } from "@yusr_systems/core";
 import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
-import type PaymentMethod from "./paymentMethod";
 import VouchersApiService from "../networking/voucherApiService";
+import type PaymentMethod from "./paymentMethod";
 
 export const VoucherType = {
   Payment: 1, // سند صرف

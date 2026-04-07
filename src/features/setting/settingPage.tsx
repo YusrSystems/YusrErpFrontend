@@ -6,25 +6,24 @@ import { useEffect, useMemo, useState } from "react";
 import type { Setting } from "../../core/data/setting";
 import SettingsApiService from "../../core/networking/settingsApiService";
 import { filterCurrencies } from "../../core/state/shared/currencySlice";
-import { useAppSelector, useAppDispatch, updateSetting } from "../../core/state/store";
+import { updateSetting, useAppDispatch, useAppSelector } from "../../core/state/store";
 
 export default function SettingPage()
 {
   const validationRules: ValidationRule<Partial<Setting>>[] = useMemo(
-    () => [
-      {
-        field: "companyName",
-        selector: (d) => d.companyName,
-        validators: [Validators.required("اسم الشركة مطلوب")]
-      },
-      { field: "companyPhone", selector: (d) => d.companyPhone, validators: [Validators.required("رقم الهاتف مطلوب")] },
-      {
-        field: "email",
-        selector: (d) => d.email,
-        validators: [Validators.required("البريد الإلكتروني مطلوب")]
-      },
-      { field: "currencyId", selector: (d) => d.currencyId, validators: [Validators.required("العملة مطلوبة")] }
-    ],
+    () => [{
+      field: "companyName",
+      selector: (d) => d.companyName,
+      validators: [Validators.required("اسم الشركة مطلوب")]
+    }, {
+      field: "companyPhone",
+      selector: (d) => d.companyPhone,
+      validators: [Validators.required("رقم الهاتف مطلوب")]
+    }, {
+      field: "email",
+      selector: (d) => d.email,
+      validators: [Validators.required("البريد الإلكتروني مطلوب")]
+    }, { field: "currencyId", selector: (d) => d.currencyId, validators: [Validators.required("العملة مطلوبة")] }],
     []
   );
   const INITIAL_STATE = useMemo(() => ({}), []);
