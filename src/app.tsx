@@ -26,6 +26,7 @@ import TaxesPage from "./features/taxes/presentation/taxesPage";
 import UnitsPage from "./features/units/unitsPage";
 import UsersPage from "./features/users/presentation/usersPage";
 import VouchersPage from "./features/vouchers/vouchersPage";
+import StocktakingsPage from "./features/stocktakings/stocktakingsPage";
 
 function App()
 {
@@ -94,6 +95,7 @@ function AppRoutes()
             <Route path="/items" element={ <ItemsPage /> } />
             <Route path="/pricingMethods" element={ <PricingMethodsPage /> } />
             <Route path="/itemTransfers" element={ <ItemTransfersPage /> } />
+            <Route path="/stocktakings" element={ <StocktakingsPage /> } />
           </Route>
         </Route>
 

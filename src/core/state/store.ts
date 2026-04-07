@@ -26,6 +26,7 @@ import countryReducer from "./shared/countrySlice";
 import currencyReducer from "./shared/currencySlice";
 import serviceIdsReducer from "./shared/serviceIdsSlice";
 import systemReducer from "./shared/systemSlice";
+import { StocktakingSlice } from "../data/stocktaking";
 
 const authSlice = createAuthSlice<User, Setting>();
 export const {
@@ -79,7 +80,9 @@ export const store = configureStore({
     item: ItemSlice.entityReducer,
     itemDialog: ItemSlice.dialogReducer,
     pricingMethod: PricingMethodSlice.entityReducer,
-    pricingMethodDialog: PricingMethodSlice.dialogReducer
+    pricingMethodDialog: PricingMethodSlice.dialogReducer,
+    stocktaking: StocktakingSlice.entityReducer,
+    stocktakingDialog: StocktakingSlice.dialogReducer
   }
 });
 
