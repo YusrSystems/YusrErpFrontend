@@ -132,7 +132,7 @@ export default function StorageTab() {
                   <td className="p-3">
                     <NumberField
                       label=""
-                      value={store.initialQuantity || 0}
+                      value={store.initialQuantity || ""}
                       onChange={(val) =>
                         updateStore(index, {
                           initialQuantity: val,
@@ -143,7 +143,7 @@ export default function StorageTab() {
                   <td className="p-3">
                     <NumberField
                       label=""
-                      value={store.quantity || 0}
+                      value={store.quantity || ""}
                       disabled
                     />
                   </td>
