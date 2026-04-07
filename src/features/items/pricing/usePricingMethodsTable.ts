@@ -1,4 +1,4 @@
-import type { ItemUnitPricingMethod } from "../../../core/data/item";
+import { ItemUnitPricingMethod } from "../../../core/data/item";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
 import { useItemContext } from "../itemContext";
 
@@ -8,6 +8,11 @@ export default function usePricingMethodsTable()
   const { formData, handleChange } = useItemContext();
   const unitState = useAppSelector((state) => state.unit);
   const pricingMethodState = useAppSelector((state) => state.pricingMethod);
+
+  const addPricingMethod = () =>
+    handleChange({
+      itemUnitPricingMethods: [...(formData.itemUnitPricingMethods || []), new ItemUnitPricingMethod()]
+    });
 
   const updatePricingMethod = (
     index: number,
@@ -37,6 +42,7 @@ export default function usePricingMethodsTable()
     handleChange,
     unitState,
     pricingMethodState,
+    addPricingMethod,
     updatePricingMethod,
     removePricingMethod
   };
