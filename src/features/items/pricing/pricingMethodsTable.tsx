@@ -14,8 +14,14 @@ export default function PricingMethodsTable()
     pricingMethodState,
     addPricingMethod,
     updatePricingMethod,
-    removePricingMethod
+    removePricingMethod,
+    isInvalid,
+    getError
   } = usePricingMethodsTable();
+
+  const hasError = isInvalid("itemUnitPricingMethods");
+  const errorMessage = getError("itemUnitPricingMethods");
+  const isService = formData.type === ItemType.Service;
 
   return (
     <div className="pt-4">
@@ -26,7 +32,11 @@ export default function PricingMethodsTable()
         </Button>
       </div>
 
-      <div className="bg-muted/20 rounded-lg border overflow-hidden overflow-x-auto">
+      <div
+        className={ `bg-muted/20 rounded-lg border overflow-hidden overflow-x-auto transition-colors ${
+          hasError ? "border-red-500/50" : ""
+        }` }
+      >
         <table className="w-full text-sm text-right min-w-200">
           <thead className="bg-muted/50 text-muted-foreground">
             <tr>
@@ -45,7 +55,10 @@ export default function PricingMethodsTable()
               <tr key={ index } className="border-t border-muted">
                 <td className="p-3 font-bold">{ index + 1 }</td>
                 <td className="p-3">
-                  <FormField label="">
+                  <FormField
+                    label=""
+                    isInvalid={ hasError && !isService && !method.unitId }
+                  >
                     <SearchableSelect
                       items={ unitState.entities.data ?? [] }
                       itemLabelKey="unitName"
@@ -65,12 +78,15 @@ export default function PricingMethodsTable()
                       columnsNames={ UnitFilterColumns.columnsNames }
                       onSearch={ (condition) =>
                         dispatch(UnitSlice.entityActions.filter(condition)) }
-                      disabled={ unitState.isLoading || formData.type === ItemType.Service }
+                      disabled={ unitState.isLoading || isService }
                     />
                   </FormField>
                 </td>
                 <td className="p-3">
-                  <FormField label="">
+                  <FormField
+                    label=""
+                    isInvalid={ hasError && !isService && !method.pricingMethodId }
+                  >
                     <SearchableSelect
                       items={ pricingMethodState.entities.data ?? [] }
                       itemLabelKey="pricingMethodName"
@@ -87,12 +103,8 @@ export default function PricingMethodsTable()
                         });
                       } }
                       columnsNames={ PricingMethodFilterColumns.columnsNames }
-                      onSearch={ (condition) =>
-                        dispatch(
-                          PricingMethodSlice.entityActions.filter(condition)
-                        ) }
-                      disabled={ pricingMethodState.isLoading
-                        || formData.type === ItemType.Service }
+                      onSearch={ (condition) => dispatch(PricingMethodSlice.entityActions.filter(condition)) }
+                      disabled={ pricingMethodState.isLoading || isService }
                     />
                   </FormField>
                 </td>
@@ -102,38 +114,31 @@ export default function PricingMethodsTable()
                     min={ 1 }
                     disabled={ method.unitId === formData.sellUnitId }
                     value={ method.quantityMultiplier || 1 }
-                    onChange={ (val) =>
-                      updatePricingMethod(index, {
-                        quantityMultiplier: val
-                      }) }
+                    onChange={ (val) => updatePricingMethod(index, { quantityMultiplier: val }) }
+                    isInvalid={ hasError && (!method.quantityMultiplier || method.quantityMultiplier <= 0) }
                   />
                 </td>
                 <td className="p-3">
                   <NumberField
                     label=""
                     min={ 0 }
-                    value={ method.price || 0 }
+                    value={ method.price ?? "0" }
                     onChange={ (val) => updatePricingMethod(index, { price: val }) }
+                    isInvalid={ hasError && (method.price === undefined || method.price === null || method.price < 0) }
                   />
                 </td>
                 <td className="p-3">
                   <TextField
                     label=""
                     value={ method.barcode || "" }
-                    onChange={ (e) =>
-                      updatePricingMethod(index, {
-                        barcode: e.target.value
-                      }) }
+                    onChange={ (e) => updatePricingMethod(index, { barcode: e.target.value }) }
                   />
                 </td>
                 <td className="p-3">
                   <TextField
                     label=""
                     value={ method.itemUnitPricingMethodName || "" }
-                    onChange={ (e) =>
-                      updatePricingMethod(index, {
-                        itemUnitPricingMethodName: e.target.value
-                      }) }
+                    onChange={ (e) => updatePricingMethod(index, { itemUnitPricingMethodName: e.target.value }) }
                   />
                 </td>
                 <td className="p-3 text-center">
@@ -157,6 +162,12 @@ export default function PricingMethodsTable()
           </div>
         ) }
       </div>
+
+      { hasError && errorMessage && (
+        <div className="text-xs font-medium text-red-500 mt-2 animate-in fade-in slide-in-from-top-1">
+          { errorMessage }
+        </div>
+      ) }
     </div>
   );
 }

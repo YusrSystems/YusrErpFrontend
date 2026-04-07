@@ -16,9 +16,9 @@ export default function PricingTab()
       <div className="grid grid-cols-3 gap-6">
         <FormField
           label="الوحدة الأساسية للمادة"
-          required
-          isInvalid={ isInvalid("storeId") }
-          error={ getError("storeId") }
+          required={ formData.type !== ItemType.Service }
+          isInvalid={ isInvalid("sellUnitId") }
+          error={ getError("sellUnitId") }
         >
           <SearchableSelect
             items={ unitState.entities.data ?? [] }
@@ -45,13 +45,15 @@ export default function PricingTab()
           label="التكلفة المبدئية"
           required
           disabled={ mode === "update" }
-          value={ formData.initialCost || 0 }
+          value={ formData.initialCost ?? "0" }
           onChange={ (val) => handleChange({ initialCost: val }) }
+          isInvalid={ isInvalid("initialCost") }
+          error={ getError("initialCost") }
         />
         <NumberField
           label="التكلفة"
           disabled
-          value={ formData.cost || 0 }
+          value={ formData.cost || "0" }
           onChange={ (val) => handleChange({ cost: val }) }
         />
       </div>

@@ -35,6 +35,58 @@ export default function ChangeItemDialog({
       field: "type",
       selector: (d) => d.type,
       validators: [Validators.required("يرجى اختيار نوع المادة")]
+    }, {
+      field: "itemUnitPricingMethods",
+      selector: (d) => d.itemUnitPricingMethods,
+      validators: [
+        Validators.arrayMinLength(1, "يرجى إضافة طريقة تسعير واحدة على الأقل"),
+        Validators.custom(
+          (methods: any[], form) =>
+          {
+            if (!methods || methods.length === 0)
+            {
+              return true;
+            }
+
+            const isService = form.type === ItemType.Service;
+
+            for (let i = 0; i < methods.length; i++)
+            {
+              const m = methods[i];
+              if (!isService && !m.unitId)
+              {
+                return false;
+              }
+              if (!isService && !m.pricingMethodId)
+              {
+                return false;
+              }
+
+              if (m.quantityMultiplier === undefined || m.quantityMultiplier === null || m.quantityMultiplier <= 0)
+              {
+                return false;
+              }
+              if (m.price === undefined || m.price === null || m.price < 0)
+              {
+                return false;
+              }
+            }
+            return true;
+          },
+          "يرجى تعبئة جميع الحقول المطلوبة في جدول طرق التسعير (الوحدة، طريقة التسعير، الكمية، السعر)"
+        )
+      ]
+    }, {
+      field: "sellUnitId",
+      selector: (d) => d.sellUnitId,
+      validators: [Validators.custom(
+        (val, form) => form.type === ItemType.Service || (val !== null && val !== undefined && val !== ""),
+        "يرجى اختيار الوحدة الأساسية للمادة"
+      )]
+    }, {
+      field: "initialCost",
+      selector: (d) => d.initialCost,
+      validators: [Validators.required("يرجى إدخال التكلفة المبدئية")]
     }],
     []
   );

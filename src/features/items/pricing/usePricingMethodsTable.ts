@@ -5,7 +5,7 @@ import { useItemContext } from "../itemContext";
 export default function usePricingMethodsTable()
 {
   const dispatch = useAppDispatch();
-  const { formData, handleChange } = useItemContext();
+  const { formData, handleChange, isInvalid, getError } = useItemContext();
   const unitState = useAppSelector((state) => state.unit);
   const pricingMethodState = useAppSelector((state) => state.pricingMethod);
 
@@ -44,6 +44,8 @@ export default function usePricingMethodsTable()
     pricingMethodState,
     addPricingMethod,
     updatePricingMethod,
-    removePricingMethod
+    removePricingMethod,
+    isInvalid,
+    getError   
   };
 }
