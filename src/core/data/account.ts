@@ -99,4 +99,4 @@ export const EmployeesSlice = AccountSlice.create("employees", [AccountType.Empl
 export const BanksSlice = AccountSlice.create("banks", [AccountType.Bank]);
 export const BoxesSlice = AccountSlice.create("boxes", [AccountType.Box]);
 export const BanksAndBoxesSlice = AccountSlice.create("banksAndBoxes", [AccountType.Box, AccountType.Bank]);
-export const VoucherAccountsSlice = AccountSlice.create("banksAndBoxes", [AccountType.Client, AccountType.Supplier]);
+export const ClientsAndSuppliersSlice = AccountSlice.create("clientsAndSuppliers", [AccountType.Client, AccountType.Supplier]);

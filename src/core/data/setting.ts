@@ -10,44 +10,58 @@ export const EInvoicingEnvironmentType = {
 
 export type EInvoicingEnvironmentType = typeof EInvoicingEnvironmentType[keyof typeof EInvoicingEnvironmentType];
 
-export class Setting
-{
+export const InvoicePrintSize = {
+  A4: 0,
+  ThermalPrinter: 1
+} as const;
+
+export type InvoicePrintSize = typeof InvoicePrintSize[keyof typeof InvoicePrintSize];
+
+export class Setting {
+  public email!: string;
   public companyName!: string;
   public companyPhone!: string;
   public companyBusinessCategory?: string;
-  public email!: string;
-
   public crn?: string;
   public vatNumber?: string;
+  
+  public currencyId!: number;
+  public currency?: Currency;
+  
+  public logo?: StorageFile;
+  
+  public startDate!: Date;
+  public endDate!: Date;
 
   public branchId!: number;
   public branch?: Branch;
-
-  public currencyId!: number;
-  public currency!: Currency;
-
+  
   public mainTaxId!: number;
   public mainTax?: Tax;
 
-  public logo?: StorageFile;
+  public sellAccountId?: number;
+  public sellAccountName?: string;
+  
+  public purchaseAccountId?: number;
+  public purchaseAccountName?: string;
+  
+  public mainPaymentMethodId?: number;
+  public mainPaymentMethodName?: string;
+  
+  public mainStoreId?: number;
+  public mainStoreName?: string;
+  
   public invoicePolicy?: string;
-  public invoicePrintSize!: number;
-
-  public startDate!: Date;
-  public endDate!: Date;
+  public invoicePrintSize!: InvoicePrintSize;
   public eInvoicingEnvironmentType!: EInvoicingEnvironmentType;
 
-  constructor(init?: Partial<Setting>)
-  {
+  constructor(init?: Partial<Setting>) {
     Object.assign(this, init);
 
-    // Ensure dates are actual Date objects if passed as strings
-    if (this.startDate)
-    {
+    if (this.startDate) {
       this.startDate = new Date(this.startDate);
     }
-    if (this.endDate)
-    {
+    if (this.endDate) {
       this.endDate = new Date(this.endDate);
     }
   }

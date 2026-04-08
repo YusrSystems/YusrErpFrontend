@@ -2,7 +2,7 @@ import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, SelectField, TextAreaField, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
-import { AccountFilterColumns, VoucherAccountsSlice } from "../../core/data/account";
+import { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../core/data/account";
 import { CommissionType, PaymentMethodFilterColumns, PaymentMethodSlice } from "../../core/data/paymentMethod";
 import Voucher, { VoucherType } from "../../core/data/voucher";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from "../../core/state/store";
 export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<Voucher>)
 {
   const dispatch = useAppDispatch();
-  const accountState = useAppSelector((state) => state.voucherAccounts);
+  const accountState = useAppSelector((state) => state.clientsAndSuppliers);
   const paymentMethodState = useAppSelector((state) => state.paymentMethod);
 
   const validationRules: ValidationRule<Partial<Voucher>>[] = useMemo(
@@ -48,7 +48,7 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
 
   useEffect(() =>
   {
-    dispatch(VoucherAccountsSlice.entityActions.filter(undefined));
+    dispatch(ClientsAndSuppliersSlice.entityActions.filter(undefined));
     dispatch(PaymentMethodSlice.entityActions.filter(undefined));
   }, [dispatch]);
 
@@ -177,7 +177,7 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
                 placeholder="اختر الحساب"
                 value={ formData.accountId?.toString() || "" }
                 columnsNames={ AccountFilterColumns.columnsNames }
-                onSearch={ (condition) => dispatch(VoucherAccountsSlice.entityActions.filter(condition)) }
+                onSearch={ (condition) => dispatch(ClientsAndSuppliersSlice.entityActions.filter(condition)) }
                 disabled={ accountState.isLoading }
                 errorInputClass={ errorInputClass("accountId") }
                 onValueChange={ (val) =>
