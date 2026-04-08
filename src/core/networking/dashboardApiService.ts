@@ -1,14 +1,14 @@
 import { ApiConstants, BaseFilterableApiService, YusrApiHelper } from "@yusr_systems/core";
-import { Dashboard } from "../data/dashboard";
+import type DashboardData from "../data/dashboardData";
 import type { RequestResult } from "../data/requestResult";
 
-export default class DashboardApiService extends BaseFilterableApiService<Dashboard>
+export default class DashboardApiService extends BaseFilterableApiService<DashboardData>
 {
   routeName: string = "dashboard";
 
-  async get(): Promise<RequestResult<Dashboard>>
+  async get(): Promise<RequestResult<DashboardData>>
   {
     const url = `${ApiConstants.baseUrl}/${this.routeName}`;
-    return await YusrApiHelper.Get<Dashboard>(url);
+    return await YusrApiHelper.Get<DashboardData>(url);
   }
 }

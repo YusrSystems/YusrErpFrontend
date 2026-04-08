@@ -4,6 +4,7 @@ import { setupAuthListeners } from "@yusr_systems/ui";
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import branchDialogReducer from "../../features/branches/logic/branchDialogSlice";
 import branchReducer from "../../features/branches/logic/branchSlice";
+import dashboardReducer from "../../features/dashboard/logic/dashboardSlice";
 import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTransferSlice";
 import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
 import roleReducer from "../../features/roles/logic/roleSlice";
@@ -13,7 +14,7 @@ import taxDialogReducer from "../../features/taxes/logic/taxDialogSlice";
 import taxReducer from "../../features/taxes/logic/taxSlice";
 import userDialogReducer from "../../features/users/logic/userDialogSlice";
 import userReducer from "../../features/users/logic/userSlice";
-import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsSlice, EmployeesSlice, SuppliersSlice, ClientsAndSuppliersSlice } from "../data/account";
+import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsAndSuppliersSlice, ClientsSlice, EmployeesSlice, SuppliersSlice } from "../data/account";
 import { BalanceTransferSlice } from "../data/balanceTransfer";
 import { InvoiceSlice } from "../data/invoice";
 import { ItemSlice } from "../data/item";
@@ -32,7 +33,6 @@ import itemBarcodeReducer from "./shared/itemBarcodeSlice";
 import serviceIdsReducer from "./shared/serviceIdsSlice";
 import storeItemsReducer from "./shared/storeItemsSlice";
 import systemReducer from "./shared/systemSlice";
-
 const authSlice = createAuthSlice<User, Setting>();
 export const {
   login,
@@ -94,7 +94,8 @@ export const store = configureStore({
     itemTransferDialog: ItemTransferSlice.dialogReducer,
     itemsSettlement: ItemsSettlementSlice.entityReducer,
     itemsSettlementDialog: ItemsSettlementSlice.dialogReducer,
-    itemTransferUI: itemTransferReducer
+    itemTransferUI: itemTransferReducer,
+    dashboard: dashboardReducer
   }
 });
 
