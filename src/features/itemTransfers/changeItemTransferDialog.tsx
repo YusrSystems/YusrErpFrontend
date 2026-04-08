@@ -192,6 +192,7 @@ export default function ChangeItemTransferDialog({
           ) }
           <StoreItemSelector
             storeId={ formData.fromStoreId }
+            itemType={ItemType.Product}
             onSelect={ (storeItem, selectedIupm) =>
               handleChange(
                 {

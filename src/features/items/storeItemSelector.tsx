@@ -1,8 +1,9 @@
 import { SearchableSelect } from "@yusr_systems/ui";
+import debounce from "lodash/debounce";
 import { ScanBarcode, ShoppingCart } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ItemFilterColumns, ItemType, ItemUnitPricingMethod, type StoreItem } from "../../core/data/item";
-import { GetItemByBarcode } from "../../core/state/shared/itemBarcodeSlice";
+import { clearBarcodeResult, GetItemByBarcode } from "../../core/state/shared/itemBarcodeSlice";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 
@@ -16,21 +17,47 @@ interface StoreItemSelectorProps
 export default function StoreItemSelector({ storeId, itemType, onSelect }: StoreItemSelectorProps)
 {
   const dispatch = useAppDispatch();
+  const [barcode, setBarcode] = useState("");
   const storeItemsState = useAppSelector((state) => state.storeItems);
   const itemBarcodeState = useAppSelector((state) => state.itemBarcode);
 
-  const items = () => {
-    console.log(storeItemsState.storeItems)
-    return storeItemsState.storeItems.map((i) => i.item)
-  };
+  const items = () => storeItemsState.storeItems.map((i) => i.item);
 
   useEffect(() =>
   {
     if (itemBarcodeState.barcodeResult)
     {
+      console.log(itemBarcodeState.barcodeResult);
       onSelect?.(itemBarcodeState.barcodeResult.storeItem, itemBarcodeState.barcodeResult.selectedIupm);
+      dispatch(clearBarcodeResult());
     }
   }, [itemBarcodeState.barcodeResult]);
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value, storeId, itemType) =>
+      {
+        if (value && storeId && itemType)
+        {
+          console.log(value, storeId, itemType);
+          dispatch(GetItemByBarcode({ barcode: value, storeId: storeId }));
+          setBarcode("");
+        }
+      }, 500),
+    [dispatch]
+  );
+
+  useEffect(() =>
+  {
+    return () => debouncedSearch.cancel();
+  }, [debouncedSearch]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) =>
+  {
+    const val = e.target.value;
+    setBarcode(val);
+    debouncedSearch(val, storeId, itemType);
+  };
 
   return (
     <div className="flex items-center justify-start gap-6 p-4 rounded-lg border border-border bg-muted/10 shadow-sm">
@@ -43,15 +70,8 @@ export default function StoreItemSelector({ storeId, itemType, onSelect }: Store
         <input
           type="text"
           placeholder="اقرأ الباركود..."
-          onChange={ (e) =>
-          {
-            if (itemType && storeId)
-            {
-              dispatch(
-                GetItemByBarcode({ barcode: e.target.value, storeId: storeId })
-              );
-            }
-          } }
+          value={ barcode }
+          onChange={ handleChange }
           disabled={ storeItemsState.isLoading }
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10"
         />
