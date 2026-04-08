@@ -1,9 +1,9 @@
-import { cn, SelectInput } from "@yusr_systems/ui";
+import { cn, type DialogMode, InputField, SelectField } from "@yusr_systems/ui";
 import { AlertCircle, Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { ItemTransferActions } from "./logic/itemTransferActions";
 
-export default function SelectedItemsTable()
+export default function SelectedItemsTable({ mode }: { mode: DialogMode; })
 {
   const dispatch = useAppDispatch();
   const { items, errors } = useAppSelector((state) => state.itemTransferUI);
@@ -56,7 +56,8 @@ export default function SelectedItemsTable()
 
               { /* العمود الثاني: طريقة التسعير (Select) */ }
               <td className="p-4 text-center align-top">
-                <SelectInput
+                <SelectField
+                  label=""
                   value={ row.selectedPricingMethodId?.toString() || "" }
                   onValueChange={ (val) => ItemTransferActions.updatePricingMethod(dispatch, row.id, Number(val)) }
                   options={ row.itemUnitPricingMethods?.map((m) => ({
@@ -65,6 +66,7 @@ export default function SelectedItemsTable()
                   })) || [] }
                   placeholder="اختر طريقة التسعير"
                   isInvalid={ !!errors[`${row.id}_method`] }
+                  disabled={ mode === "update" }
                 />
                 { errors[`${row.id}_method`] && (
                   <span className="text-xs text-red-500 mt-1 block animate-in fade-in">
@@ -76,13 +78,14 @@ export default function SelectedItemsTable()
               { /* العمود الثالث: الكمية (Number) */ }
               <td className="p-4 text-center align-top">
                 <div className="flex flex-col items-center justify-center gap-1">
-                  <input
-                    type="number"
+                  <InputField
+                    label=""
                     min={ 1 }
                     value={ row.quantity || "" }
                     onChange={ (e) => ItemTransferActions.updateQuantity(dispatch, row.id, Number(e.target.value)) }
+                    disabled={ mode === "update" }
                     className={ cn(
-                      "flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm text-center ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors",
+                      "flex w-full rounded-md border bg-background px-3 py-2 text-sm text-center ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors",
                       errors[row.id] ? "border-red-500 focus-visible:ring-red-500" : "border-input"
                     ) }
                   />
@@ -96,14 +99,16 @@ export default function SelectedItemsTable()
 
               { /* زر الحذف */ }
               <td className="p-4 text-center align-top pt-5">
-                <button
-                  type="button"
-                  onClick={ () => ItemTransferActions.removeItem(dispatch, row.id) }
-                  className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
-                  aria-label="حذف المادة"
-                >
-                  <Trash2 className="h-5 w-5" />
-                </button>
+                { mode === "create" && (
+                  <button
+                    type="button"
+                    onClick={ () => ItemTransferActions.removeItem(dispatch, row.id) }
+                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
+                    aria-label="حذف المادة"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                ) }
               </td>
             </tr>
           )) }

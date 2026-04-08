@@ -52,7 +52,7 @@ export default function ChangeItemTransferDialog({
   const initialValues = useMemo(
     () => ({
       ...entity,
-      transferDate: entity?.transferDate,
+      transferDate: entity?.transferDate ? new Date(entity.transferDate) : new Date(),
       itemTransfersItems: entity?.itemTransfersItems || []
     }),
     [entity]
@@ -174,7 +174,7 @@ export default function ChangeItemTransferDialog({
               columnsNames={ StoreFilterColumns.columnsNames }
               onSearch={ (condition) => dispatch(filterStores(condition)) }
               errorInputClass={ errorInputClass("fromStoreId") }
-              disabled={ storeState.isLoading }
+              disabled={ storeState.isLoading || mode === "update" }
               onValueChange={ (val) =>
               {
                 const selected = availableFromStores.find((s) => s.id.toString() === val);
@@ -202,7 +202,7 @@ export default function ChangeItemTransferDialog({
               columnsNames={ StoreFilterColumns.columnsNames }
               onSearch={ (condition) => dispatch(filterStores(condition)) }
               errorInputClass={ errorInputClass("toStoreId") }
-              disabled={ storeState.isLoading }
+              disabled={ storeState.isLoading || mode === "update" }
               onValueChange={ (val) =>
               {
                 const selected = availableToStores.find((s) => s.id.toString() === val);
@@ -223,7 +223,7 @@ export default function ChangeItemTransferDialog({
           />
         </FieldsSection>
 
-        <FieldsSection title="المواد المحولة" columns={ 1 }>
+        <FieldsSection columns={ 1 }>
           { isInvalid("itemTransfersItems") && (
             <div className="text-sm text-red-500 mb-2 font-medium">
               { getError("itemTransfersItems") }
@@ -232,16 +232,18 @@ export default function ChangeItemTransferDialog({
 
           { formData.fromStoreId && (
             <>
-              <StoreItemSelector
-                itemType={ ItemType.Product }
-                storeId={ formData.fromStoreId }
-                onSelect={ (storeItem, selectedIupm) =>
-                {
-                  ItemTransferActions.addItem(dispatch, storeItem, selectedIupm);
-                } }
-              />
+              { mode === "create" && (
+                <StoreItemSelector
+                  itemType={ ItemType.Product }
+                  storeId={ formData.fromStoreId }
+                  onSelect={ (storeItem, selectedIupm) =>
+                  {
+                    ItemTransferActions.addItem(dispatch, storeItem, selectedIupm);
+                  } }
+                />
+              ) }
 
-              <SelectedItemsTable />
+              <SelectedItemsTable mode={mode} />
             </>
           ) }
         </FieldsSection>
