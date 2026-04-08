@@ -1,6 +1,6 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
-import { ChangeDialog, type CommonChangeDialogProps, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
-import { useEffect, useMemo } from "react";
+import { ChangeDialog, type CommonChangeDialogProps, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, FormField, Loading, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
+import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
 import ItemTransfer, { ItemTransfersItem } from "../../core/data/itemTransfer";
 import { StoreFilterColumns } from "../../core/data/store";
@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import StoreItemSelector from "../items/storeItemSelector";
 import { filterStores } from "../stores/logic/storeSlice";
 import { ItemTransferActions } from "./logic/itemTransferActions";
+import { initializeItems } from "./logic/itemTransferSlice";
 import SelectedItemsTable from "./selectedItemsTable";
 
 export default function ChangeItemTransferDialog({
@@ -19,6 +20,7 @@ export default function ChangeItemTransferDialog({
 }: CommonChangeDialogProps<ItemTransfer>)
 {
   const dispatch = useAppDispatch();
+  const [initLoading, setInitLoading] = useState(false);
   const storeState = useAppSelector((state) => state.store);
   const { items } = useAppSelector((state) => state.itemTransferUI);
 
@@ -94,6 +96,23 @@ export default function ChangeItemTransferDialog({
     handleChange({ itemTransfersItems: mappedItems });
   }, [items]);
 
+  useEffect(() =>
+  {
+    if (mode === "update" && entity?.id)
+    {
+      setInitLoading(true);
+      const getItem = async () =>
+      {
+        const res = await service.Get(entity.id);
+        console.log(res);
+        handleChange({ ...res.data });
+        dispatch(initializeItems(res.data?.itemTransfersItems ?? []));
+        setInitLoading(false);
+      };
+      getItem();
+    }
+  }, [entity?.id, mode]);
+
   const handleValidate = () =>
   {
     const isFormValid = validate();
@@ -137,6 +156,21 @@ export default function ChangeItemTransferDialog({
     }
     return storeState.entities.data.filter((s) => s.id !== formData.fromStoreId);
   }, [storeState.entities.data, formData.fromStoreId]);
+
+  if (initLoading)
+  {
+    return (
+      <DialogContent dir="rtl">
+        <DialogHeader>
+          <DialogTitle>
+            { mode === "create" ? "إضافة" : "تعديل" } نقل مواد
+          </DialogTitle>
+          <DialogDescription />
+        </DialogHeader>
+        <Loading entityName="المادة" />
+      </DialogContent>
+    );
+  }
 
   return (
     <ChangeDialog<ItemTransfer>
@@ -243,7 +277,7 @@ export default function ChangeItemTransferDialog({
                 />
               ) }
 
-              <SelectedItemsTable mode={mode} />
+              <SelectedItemsTable mode={ mode } />
             </>
           ) }
         </FieldsSection>
