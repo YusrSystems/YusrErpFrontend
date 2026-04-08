@@ -2,7 +2,26 @@ import { BaseEntity, type ColumnName } from "@yusr_systems/core";
 import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
 import StocktakingsApiService from "../networking/stocktakingApiService";
 
-export class StocktakingItem extends BaseEntity {
+export interface IStocktakingItem extends BaseEntity {
+  itemId: number;
+  itemName: string;
+  itemUnitPricingMethodId: number;
+  itemUnitPricingMethodName: string;
+  quantityMultiplier: number;
+  systemQuantity: number;
+  variance: number;
+  actualQuantity: number;
+}
+
+export interface IStocktaking extends BaseEntity {
+  description?: string;
+  date: string | Date;
+  storeId: number;
+  storeName: string;
+  stocktakingItems: IStocktakingItem[];
+}
+
+export class StocktakingItem extends BaseEntity implements IStocktakingItem {
   public stocktakingId!: number;
   public itemId!: number;
   public itemName!: string;
@@ -19,7 +38,7 @@ export class StocktakingItem extends BaseEntity {
   }
 }
 
-export default class Stocktaking extends BaseEntity {
+export default class Stocktaking extends BaseEntity implements IStocktaking {
   public description?: string;
   public date!: string | Date;
   public storeId!: number;

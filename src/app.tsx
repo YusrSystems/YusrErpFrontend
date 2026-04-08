@@ -13,6 +13,7 @@ import BranchesPage from "./features/branches/presentation/branchesPage";
 import DashboardPage from "./features/dashboard/dashboardPage";
 import InvoicesPage from "./features/invoices/invoicesPage";
 import ItemsPage from "./features/items/itemsPage";
+import ItemsSettlementsPage from "./features/itemsSettlements/itemsSettlementsPage";
 import ItemTransfersPage from "./features/itemTransfers/itemTransfersPage";
 import LandingPage from "./features/landing/landingPage";
 import LoginPage from "./features/login/loginPage";
@@ -21,12 +22,12 @@ import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 import PricingMethodsPage from "./features/pricingMethods/pricingMethodsPage";
 import RolesPage from "./features/roles/presentation/rolesPage";
 import SettingPage from "./features/setting/settingPage";
+import StocktakingsPage from "./features/stocktakings/stocktakingsPage";
 import StoresPage from "./features/stores/presentation/storePage";
 import TaxesPage from "./features/taxes/presentation/taxesPage";
 import UnitsPage from "./features/units/unitsPage";
 import UsersPage from "./features/users/presentation/usersPage";
 import VouchersPage from "./features/vouchers/vouchersPage";
-import StocktakingsPage from "./features/stocktakings/stocktakingsPage";
 
 function App()
 {
@@ -96,6 +97,7 @@ function AppRoutes()
             <Route path="/pricingMethods" element={ <PricingMethodsPage /> } />
             <Route path="/itemTransfers" element={ <ItemTransfersPage /> } />
             <Route path="/stocktakings" element={ <StocktakingsPage /> } />
+            <Route path="/itemsSettlements" element={ <ItemsSettlementsPage /> } />
           </Route>
         </Route>
 

@@ -33,6 +33,7 @@
       "pricingMethods": "طرق التسعير",
       "itemTransfers": "نقل المواد",
       "stocktakings": "جرد المواد",
+      "itemsSettlements": "تسوية المواد",
       "settings": "الإعدادات"
     },
     "sideBarUserData": {

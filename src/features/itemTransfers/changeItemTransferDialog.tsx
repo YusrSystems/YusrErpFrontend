@@ -52,7 +52,7 @@ export default function ChangeItemTransferDialog({
   const initialValues = useMemo(
     () => ({
       ...entity,
-      transferDate: entity?.transferDate || new Date().toISOString(),
+      transferDate: entity?.transferDate,
       itemTransfersItems: entity?.itemTransfersItems || []
     }),
     [entity]
@@ -230,17 +230,20 @@ export default function ChangeItemTransferDialog({
             </div>
           ) }
 
-          <StoreItemSelector
-            itemType={ ItemType.Product }
-            storeId={ formData.fromStoreId }
-            itemType={ItemType.Product}
-            onSelect={ (storeItem, selectedIupm) =>
-            {
-              ItemTransferActions.addItem(dispatch, storeItem, selectedIupm);
-            } }
-          />
+          { formData.fromStoreId && (
+            <>
+              <StoreItemSelector
+                itemType={ ItemType.Product }
+                storeId={ formData.fromStoreId }
+                onSelect={ (storeItem, selectedIupm) =>
+                {
+                  ItemTransferActions.addItem(dispatch, storeItem, selectedIupm);
+                } }
+              />
 
-          <SelectedItemsTable />
+              <SelectedItemsTable />
+            </>
+          ) }
         </FieldsSection>
       </FieldGroup>
     </ChangeDialog>

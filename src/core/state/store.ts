@@ -17,6 +17,7 @@ import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsSlice, EmployeesSlic
 import { BalanceTransferSlice } from "../data/balanceTransfer";
 import { InvoiceSlice } from "../data/invoice";
 import { ItemSlice } from "../data/item";
+import { ItemsSettlementSlice } from "../data/itemsSettlement";
 import { ItemTransferSlice } from "../data/itemTransfer";
 import { PaymentMethodSlice } from "../data/paymentMethod";
 import { PricingMethodSlice } from "../data/pricingMethod";
@@ -91,6 +92,8 @@ export const store = configureStore({
     stocktakingDialog: StocktakingSlice.dialogReducer,
     itemTransfer: ItemTransferSlice.entityReducer,
     itemTransferDialog: ItemTransferSlice.dialogReducer,
+    itemsSettlement: ItemsSettlementSlice.entityReducer,
+    itemsSettlementDialog: ItemsSettlementSlice.dialogReducer,
     itemTransferUI: itemTransferReducer
   }
 });

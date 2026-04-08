@@ -2,27 +2,27 @@ import { Button, type DialogMode, NumberField, SearchableSelect } from "@yusr_sy
 import { ShoppingCart, Trash2, X } from "lucide-react";
 import { useMemo } from "react";
 import { ItemType, ItemUnitPricingMethod, StoreItem } from "../../core/data/item";
-import type Stocktaking from "../../core/data/stocktaking";
-import { StocktakingItem } from "../../core/data/stocktaking";
+import type { IStocktaking, IStocktakingItem } from "../../core/data/stocktaking";
 import { useAppSelector } from "../../core/state/store";
 import StoreItemSelector from "../items/storeItemSelector";
 
 export interface StocktakingItemsTableProps
 {
-  formData: Partial<Stocktaking>;
-  handleChange: (update: Partial<Stocktaking> | ((prev: Partial<Stocktaking>) => Partial<Stocktaking>)) => void;
+  formData: Partial<IStocktaking>;
+  handleChange: (update: Partial<IStocktaking> | ((prev: Partial<IStocktaking>) => Partial<IStocktaking>)) => void;
+  createInstance: () => IStocktakingItem;
   mode: DialogMode;
 }
 
 export default function StocktakingItemsTable(
-  { formData, handleChange, mode }: StocktakingItemsTableProps
+  { formData, handleChange, createInstance, mode }: StocktakingItemsTableProps
 )
 {
   const storeItemsState = useAppSelector((state) => state.storeItems);
 
   const groupedItems = useMemo(() =>
   {
-    const groups = new Map<number, StocktakingItem[]>();
+    const groups = new Map<number, IStocktakingItem[]>();
     formData.stocktakingItems?.forEach((item) =>
     {
       if (!groups.has(item.itemId))
@@ -39,7 +39,7 @@ export default function StocktakingItemsTable(
     const existingRow = formData.stocktakingItems?.find((i) => i.itemId === itemId);
     if (existingRow)
     {
-      return existingRow.systemQuantity * existingRow.quantityMultiplier;
+      return existingRow.systemQuantity * (mode === "create" ? 1 : existingRow.quantityMultiplier);
     }
     return 0;
   };
@@ -52,18 +52,18 @@ export default function StocktakingItemsTable(
     return storeItem?.itemUnitPricingMethods?.filter((u) => !usedUnitIds.includes(u.id)) || [];
   };
 
-  const getCalculatedActual = (group: StocktakingItem[]) =>
+  const getCalculatedActual = (group: IStocktakingItem[]) =>
   {
     return group.reduce((sum, item) => sum + ((item.actualQuantity || 0) * (item.quantityMultiplier || 1)), 0);
   };
 
-  const getVariance = (group: StocktakingItem[]) =>
+  const getVariance = (group: IStocktakingItem[]) =>
   {
     const systemQty = getSystemQuantity(group[0]?.itemId);
     return getCalculatedActual(group) - systemQty;
   };
 
-  const updateActualQuantity = (item: StocktakingItem, newQty: number | undefined) =>
+  const updateActualQuantity = (item: IStocktakingItem, newQty: number | undefined) =>
   {
     if (!newQty)
     {
@@ -83,7 +83,7 @@ export default function StocktakingItemsTable(
     }
   };
 
-  const removeUnit = (item: StocktakingItem) =>
+  const removeUnit = (item: IStocktakingItem) =>
   {
     const list =
       formData.stocktakingItems?.filter((i) =>
@@ -111,16 +111,15 @@ export default function StocktakingItemsTable(
 
     const systemQty = getSystemQuantity(itemId);
 
-    const newItem = new StocktakingItem({
-      itemId: storeItem.item.id,
-      itemName: storeItem.item.name,
-      itemUnitPricingMethodId: unitDetails.id,
-      itemUnitPricingMethodName: unitDetails.itemUnitPricingMethodName,
-      quantityMultiplier: unitDetails.quantityMultiplier,
-      systemQuantity: systemQty,
-      actualQuantity: 0,
-      variance: -systemQty
-    });
+    const newItem = createInstance();
+    newItem.itemId = storeItem.item.id;
+    newItem.itemName = storeItem.item.name;
+    newItem.itemUnitPricingMethodId = unitDetails.id;
+    newItem.itemUnitPricingMethodName = unitDetails.itemUnitPricingMethodName;
+    newItem.quantityMultiplier = unitDetails.quantityMultiplier;
+    newItem.systemQuantity = systemQty;
+    newItem.actualQuantity = 0;
+    newItem.variance = -systemQty;
 
     handleChange({ stocktakingItems: [...(formData.stocktakingItems || []), newItem] });
   };
@@ -149,16 +148,15 @@ export default function StocktakingItemsTable(
       const systemQty = storeItem.storeQuantity || 0;
       const initialActualQty = selectedIupm ? 1 : 0;
 
-      const newItem = new StocktakingItem({
-        itemId: item.id,
-        itemName: item.name,
-        itemUnitPricingMethodId: unit.id,
-        itemUnitPricingMethodName: unit.itemUnitPricingMethodName,
-        quantityMultiplier: unit.quantityMultiplier,
-        systemQuantity: systemQty,
-        actualQuantity: initialActualQty,
-        variance: (initialActualQty * unit.quantityMultiplier) - systemQty
-      });
+      const newItem = createInstance();
+      newItem.itemId = item.id;
+      newItem.itemName = item.name;
+      newItem.itemUnitPricingMethodId = unit.id;
+      newItem.itemUnitPricingMethodName = unit.itemUnitPricingMethodName;
+      newItem.quantityMultiplier = unit.quantityMultiplier;
+      newItem.systemQuantity = systemQty;
+      newItem.actualQuantity = initialActualQty;
+      newItem.variance = (initialActualQty * unit.quantityMultiplier) - systemQty;
 
       handleChange({ stocktakingItems: [...list, newItem] });
     }

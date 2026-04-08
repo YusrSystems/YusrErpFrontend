@@ -3,22 +3,23 @@ import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, Loading, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
-import Stocktaking, { StocktakingItem } from "../../core/data/stocktaking";
+import ItemsSettlement, { ItemsSettlementItem } from "../../core/data/itemsSettlement";
+import type { IStocktaking } from "../../core/data/stocktaking";
 import { StoreFilterColumns } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import StocktakingItemsTable from "../stocktakings/stocktakingItemsTable";
 import { filterStores } from "../stores/logic/storeSlice";
-import StocktakingItemsTable from "./stocktakingItemsTable";
 
-export default function ChangeStocktakingDialog(
-  { entity, mode, service, onSuccess }: CommonChangeDialogProps<Stocktaking>
+export default function ChangeItemsSettlementDialog(
+  { entity, mode, service, onSuccess }: CommonChangeDialogProps<ItemsSettlement>
 )
 {
   const dispatch = useAppDispatch();
   const [initLoading, setInitLoading] = useState(false);
   const storeState = useAppSelector((state) => state.store);
 
-  const validationRules: ValidationRule<Partial<Stocktaking>>[] = useMemo(
+  const validationRules: ValidationRule<Partial<ItemsSettlement>>[] = useMemo(
     () => [
       { field: "storeId", selector: (d) => d.storeId, validators: [Validators.required("يرجى اختيار المستودع")] },
       { field: "date", selector: (d) => d.date, validators: [Validators.required("يرجى اختيار التاريخ")] }
@@ -29,17 +30,17 @@ export default function ChangeStocktakingDialog(
   const initialValues = useMemo(() => ({
     ...entity,
     date: entity?.date ? new Date(entity.date) : new Date(),
-    stocktakingItems: entity?.stocktakingItems || []
+    itemsSettlementItems: entity?.itemsSettlementItems || []
   }), [entity]);
 
-  const { formData, handleChange, getError, isInvalid, validate, clearError } = useEntityForm<Stocktaking>(
+  const { formData, handleChange, getError, isInvalid, validate, clearError } = useEntityForm<ItemsSettlement>(
     initialValues,
     validationRules
   );
 
   useEffect(() =>
   {
-    dispatch(filterStores(undefined));
+    dispatch(filterStores());
   }, [dispatch]);
 
   useEffect(() =>
@@ -77,9 +78,50 @@ export default function ChangeStocktakingDialog(
     handleChange({
       storeId: selected?.id,
       storeName: selected?.storeName,
-      stocktakingItems: []
+      itemsSettlementItems: []
     });
     clearError("storeId");
+  };
+
+  // ==========================================
+  // Adapter Logic (لربط الجدول بكيان التسوية)
+  // ==========================================
+
+  // 1. تجهيز البيانات للجدول بالاسم الذي يتوقعه (stocktakingItems)
+  const tableFormData = useMemo(() => ({
+    ...formData,
+    stocktakingItems: formData.itemsSettlementItems
+  }), [formData]);
+
+  // 2. اعتراض التحديثات القادمة من الجدول وتحويلها للاسم الصحيح
+  const handleTableChange = (update: any) =>
+  {
+    if (typeof update === "function")
+    {
+      // في حال تم تمرير دالة (Callback)
+      handleChange((prev) =>
+      {
+        const mappedPrev = { ...prev, stocktakingItems: prev.itemsSettlementItems };
+        const result = update(mappedPrev);
+        if (result.stocktakingItems !== undefined)
+        {
+          return { ...prev, itemsSettlementItems: result.stocktakingItems as ItemsSettlementItem[] };
+        }
+        return { ...prev, ...result };
+      });
+    }
+    else
+    {
+      // في حال تم تمرير كائن مباشر
+      if (update.stocktakingItems !== undefined)
+      {
+        handleChange({ itemsSettlementItems: update.stocktakingItems as ItemsSettlementItem[] });
+      }
+      else
+      {
+        handleChange(update);
+      }
+    }
   };
 
   if (initLoading)
@@ -88,18 +130,18 @@ export default function ChangeStocktakingDialog(
       <DialogContent dir="rtl">
         <DialogHeader>
           <DialogTitle>
-            { mode === "create" ? "إضافة" : "تعديل" } جرد مواد
+            { mode === "create" ? "إضافة" : "تعديل" } تسوية مواد
           </DialogTitle>
           <DialogDescription />
         </DialogHeader>
-        <Loading entityName="المادة" />
+        <Loading entityName="التسوية" />
       </DialogContent>
     );
   }
 
   return (
-    <ChangeDialog<Stocktaking>
-      title={ `${mode === "create" ? "إضافة" : "تعديل"} جرد مواد` }
+    <ChangeDialog<ItemsSettlement>
+      title={ `${mode === "create" ? "إضافة" : "تعديل"} تسوية مواد` }
       className="sm:max-w-6xl"
       formData={ formData }
       dialogMode={ mode }
@@ -112,7 +154,7 @@ export default function ChangeStocktakingDialog(
         <FieldGroup>
           <FieldsSection columns={ 2 }>
             <TextField
-              label="تاريخ الجرد"
+              label="تاريخ التسوية"
               required
               value={ formData.date ? new Date(formData.date).toISOString().split("T")[0] : "" }
               isInvalid={ isInvalid("date") }
@@ -145,12 +187,12 @@ export default function ChangeStocktakingDialog(
             onChange={ (e) => handleChange({ description: e.target.value }) }
           />
 
+          { /* استدعاء الجدول المشترك مع تمرير الـ Adapter والـ Factory */ }
           { formData.storeId && (
             <StocktakingItemsTable
-              formData={ formData }
-              handleChange={ (update) =>
-                handleChange(update as Partial<Stocktaking> | ((prev: Partial<Stocktaking>) => Partial<Stocktaking>)) }
-              createInstance={ () => new StocktakingItem() }
+              formData={ tableFormData as Partial<IStocktaking> }
+              handleChange={ handleTableChange }
+              createInstance={ () => new ItemsSettlementItem() } // إنشاء كائن تسوية جديد
               mode={ mode }
             />
           ) }
