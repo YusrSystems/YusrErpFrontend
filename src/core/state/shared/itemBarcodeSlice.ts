@@ -32,7 +32,12 @@ const initialState: ItemBarcodeState = {
 const itemBarcodeSlice = createSlice({
   name: "itemBarcode",
   initialState,
-  reducers: {},
+  reducers: {
+    clearBarcodeResult: (state) =>
+    {
+      state.barcodeResult = undefined;
+    }
+  },
   extraReducers: (builder) =>
   {
     builder.addCase(GetItemByBarcode.pending, (state) =>
@@ -52,3 +57,5 @@ const itemBarcodeSlice = createSlice({
 });
 
 export default itemBarcodeSlice.reducer;
+
+export const { clearBarcodeResult } = itemBarcodeSlice.actions;

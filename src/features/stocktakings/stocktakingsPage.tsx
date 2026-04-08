@@ -37,6 +37,7 @@ export default function StocktakingsPage() {
       columnsToFilter={StocktakingFilterColumns.columnsNames}
       tableHeadRows={[
         { rowName: "", rowStyles: "text-left w-12.5" },
+        { rowName: "رقم الجرد", rowStyles: "w-32" },
         { rowName: "التاريخ", rowStyles: "w-32" },
         { rowName: "المستودع", rowStyles: "w-48" },
         { rowName: "الوصف", rowStyles: "" }

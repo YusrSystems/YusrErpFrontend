@@ -233,6 +233,7 @@ export default function ChangeItemTransferDialog({
           <StoreItemSelector
             itemType={ ItemType.Product }
             storeId={ formData.fromStoreId }
+            itemType={ItemType.Product}
             onSelect={ (storeItem, selectedIupm) =>
             {
               ItemTransferActions.addItem(dispatch, storeItem, selectedIupm);

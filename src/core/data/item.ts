@@ -125,7 +125,7 @@ export class StoreItem
 {
   public item!: Item;
   public itemUnitPricingMethods!: ItemUnitPricingMethod[];
-  public StoreQuantity!: number;
+  public storeQuantity!: number;
 
   constructor(init?: Partial<StoreItem>)
   {
