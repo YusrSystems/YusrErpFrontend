@@ -67,7 +67,7 @@ export const itemTransferSlice = createSlice({
           itemUnitPricingMethods: storeItem.itemUnitPricingMethods || [],
           selectedPricingMethodId: methodId,
           quantity: 1,
-          maxQuantity: storeItem.StoreQuantity || 0
+          maxQuantity: storeItem.storeQuantity || 0
         });
       }
 
