@@ -20,4 +20,44 @@ export class SystemPermissionsResources
   public static Branches: string = "Branches";
   public static Users: string = "Users";
   public static Roles: string = "Roles";
+
+  // Invoice Permission Settings
+  public static InvoiceAddDiscount: string = "InvoiceAddDiscount";
+  public static InvoiceAddAdditionalAmount: string = "InvoiceAddAdditionalAmount";
+  public static InvoiceShowProfit: string = "InvoiceShowProfit";
+  public static InvoiceShowItemProfit: string = "InvoiceShowItemProfit";
+  public static InvoiceSellBelowSellingPrice: string = "InvoiceSellBelowSellingPrice";
+  public static InvoiceSellBeyondAvailableQuantity: string = "InvoiceSellBeyondAvailableQuantity";
+
+  // Allowed Invoice Types
+  public static InvoiceSell: string = "InvoiceSell";
+  public static InvoicePurchase: string = "InvoicePurchase";
+  public static InvoiceSellReturn: string = "InvoiceSellReturn";
+  public static InvoiceQuotation: string = "InvoiceQuotation";
+  public static InvoicePurchaseReturn: string = "InvoicePurchaseReturn";
+
+  // Allowed Account Types
+  public static AccountShowBalance: string = "AccountShowBalance";
+  public static AccountCustomer: string = "AccountCustomer";
+  public static AccountSupplier: string = "AccountSupplier";
+  public static AccountEmployee: string = "AccountEmployee";
+  public static AccountBank: string = "AccountBank";
+  public static AccountCashBox: string = "AccountCashBox";
+
+  // Report Permissions
+  public static ReportInvoice: string = "ReportInvoice";
+  public static ReportInvoiceList: string = "ReportInvoiceList";
+  public static ReportVoucher: string = "ReportVoucher";
+  public static ReportVoucherList: string = "ReportVoucherList";
+  public static ReportAccountStatement: string = "ReportAccountStatement";
+  public static ReportAccountList: string = "ReportAccountList";
+  public static ReportBalanceTransfer: string = "ReportBalanceTransfer";
+  public static ReportItemStatement: string = "ReportItemStatement";
+  public static ReportItemList: string = "ReportItemList";
+  public static ReportItemMovement: string = "ReportItemMovement";
+  public static ReportItemTaxStatement: string = "ReportItemTaxStatement";
+  public static ReportItemTransfer: string = "ReportItemTransfer";
+  public static ReportBalanceSheet: string = "ReportBalanceSheet";
+  public static ReportTaxDeclaration: string = "ReportTaxDeclaration";
+  public static ReportProfitAndLoss: string = "ReportProfitAndLoss";
 }

@@ -1,17 +1,16 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, Skeleton, TextField, useEntityForm } from "@yusr_systems/ui";
+import { categorizePermissions, ChangeDialog, FieldGroup, PermissionCard, PermissionSkeleton, Skeleton, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
 import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
 import type { Role } from "../../../core/data/role";
 import { fetchSystemPermissions } from "../../../core/state/shared/systemSlice";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { categorizePermissions, PermissionCard } from "./permissionCard";
 import { ActionIcons, ArabicLabels, PERMISSION_SECTIONS } from "./permissionConfig";
-import { PermissionSkeleton } from "./permissionSkeleton";
 
 export default function ChangeRoleDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<Role>)
 {
+  const delimiter: string = ".";
   const validationRules: ValidationRule<Partial<Role>>[] = useMemo(
     () => [{ field: "name", selector: (d) => d.name, validators: [Validators.required("يرجى اختيار اسم للدور")] }],
     []
@@ -35,7 +34,7 @@ export default function ChangeRoleDialog({ entity, mode, service, onSuccess }: C
   {
     return PERMISSION_SECTIONS.map((section) => ({
       ...section,
-      data: categorizePermissions(systemState.permissions, section.resources)
+      data: categorizePermissions(systemState.permissions, section.resources, delimiter)
     }));
   }, [systemState.permissions]);
 
@@ -93,8 +92,8 @@ export default function ChangeRoleDialog({ entity, mode, service, onSuccess }: C
                           onToggle={ (updated) => handleChange({ permissions: updated }) }
                           actions={ item.actions.map((perm) => ({
                             id: perm,
-                            label: ArabicLabels[perm.split(":")[1]] || perm.split(":")[1],
-                            icon: ActionIcons[perm.split(":")[1]]
+                            label: ArabicLabels[perm.split(delimiter)[1]] || perm.split(delimiter)[1],
+                            icon: ActionIcons[perm.split(delimiter)[1]]
                           })) }
                         />
                       )) }
