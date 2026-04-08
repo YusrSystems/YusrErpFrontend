@@ -1,5 +1,5 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
-import { ChangeDialog, type CommonChangeDialogProps, DateField, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, type CommonChangeDialogProps, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
 import { ItemType } from "../../core/data/item";
 import ItemTransfer, { ItemTransfersItem } from "../../core/data/itemTransfer";
@@ -8,6 +8,8 @@ import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import StoreItemSelector from "../items/storeItemSelector";
 import { filterStores } from "../stores/logic/storeSlice";
+import { ItemTransferActions } from "./logic/itemTransferActions";
+import SelectedItemsTable from "./selectedItemsTable";
 
 export default function ChangeItemTransferDialog({
   entity,
@@ -18,6 +20,7 @@ export default function ChangeItemTransferDialog({
 {
   const dispatch = useAppDispatch();
   const storeState = useAppSelector((state) => state.store);
+  const { items } = useAppSelector((state) => state.itemTransferUI);
 
   const validationRules: ValidationRule<Partial<ItemTransfer>>[] = useMemo(
     () => [{
@@ -49,7 +52,7 @@ export default function ChangeItemTransferDialog({
   const initialValues = useMemo(
     () => ({
       ...entity,
-      transferDate: entity?.transferDate,
+      transferDate: entity?.transferDate || new Date().toISOString(),
       itemTransfersItems: entity?.itemTransfersItems || []
     }),
     [entity]
@@ -59,6 +62,44 @@ export default function ChangeItemTransferDialog({
     initialValues,
     validationRules
   );
+
+  useEffect(() =>
+  {
+    if (mode === "update" && entity?.itemTransfersItems)
+    {
+      ItemTransferActions.initialize(dispatch, entity.itemTransfersItems);
+    }
+    return () =>
+    {
+      ItemTransferActions.clear(dispatch);
+    };
+  }, [dispatch, entity, mode]);
+
+  useEffect(() =>
+  {
+    const mappedItems = items.map(
+      (item) =>
+        new ItemTransfersItem({
+          id: isNaN(Number(item.id)) ? Math.floor(Math.random() * 1000000) : Number(item.id),
+          itemId: item.itemId,
+          itemName: item.itemName,
+          itemUnitPricingMethodId: item.selectedPricingMethodId,
+          itemUnitPricingMethodName: item.itemUnitPricingMethods.find((m) =>
+            m.id === item.selectedPricingMethodId
+          )?.itemUnitPricingMethodName || "",
+          quantity: item.quantity,
+          itemUnitPricingMethods: item.itemUnitPricingMethods as any
+        })
+    );
+    handleChange({ itemTransfersItems: mappedItems });
+  }, [items]);
+
+  const handleValidate = () =>
+  {
+    const isFormValid = validate();
+    const isTableValid = ItemTransferActions.validate(dispatch, items);
+    return isFormValid && isTableValid;
+  };
 
   useEffect(() =>
   {
@@ -79,7 +120,6 @@ export default function ChangeItemTransferDialog({
     dispatch(filterStores());
   }, [dispatch]);
 
-  // فلترة المستودعات المتاحة لحقل "من مستودع" (إخفاء المستودع المختار في "إلى")
   const availableFromStores = useMemo(() =>
   {
     if (!storeState.entities.data)
@@ -89,7 +129,6 @@ export default function ChangeItemTransferDialog({
     return storeState.entities.data.filter((s) => s.id !== formData.toStoreId);
   }, [storeState.entities.data, formData.toStoreId]);
 
-  // فلترة المستودعات المتاحة لحقل "إلى مستودع" (إخفاء المستودع المختار في "من")
   const availableToStores = useMemo(() =>
   {
     if (!storeState.entities.data)
@@ -108,19 +147,18 @@ export default function ChangeItemTransferDialog({
       service={ service }
       disable={ () => storeState.isLoading }
       onSuccess={ (data) => onSuccess?.(data, mode) }
-      validate={ validate }
+      validate={ handleValidate }
     >
       <FieldGroup>
         <FieldsSection title="بيانات التحويل" columns={ 3 }>
-          <DateField
-            label="تاريخ التحويل"
+          <TextField
+            label="تاريخ الجرد"
             required
-            value={ formData.transferDate ? new Date(formData.transferDate) : undefined }
-            onChange={ (date) => handleChange({ transferDate: date }) }
-            isInvalid={ isInvalid("transferDate") }
-            error={ getError("transferDate") }
+            value={ formData.transferDate ? new Date(formData.transferDate).toISOString().split("T")[0] : "" }
+            isInvalid={ isInvalid("date") }
+            error={ getError("date") }
+            disabled
           />
-
           <FormField
             label="من مستودع"
             required
@@ -142,6 +180,7 @@ export default function ChangeItemTransferDialog({
                 const selected = availableFromStores.find((s) => s.id.toString() === val);
                 if (selected)
                 {
+                  ItemTransferActions.clear(dispatch);
                   handleChange({ fromStoreId: selected.id, fromStoreName: selected.storeName });
                 }
               } }
@@ -155,7 +194,7 @@ export default function ChangeItemTransferDialog({
             error={ getError("toStoreId") }
           >
             <SearchableSelect
-              items={ availableToStores } // استخدام القائمة المفلترة
+              items={ availableToStores }
               itemLabelKey="storeName"
               itemValueKey="id"
               placeholder="اختر المستودع"
@@ -190,25 +229,17 @@ export default function ChangeItemTransferDialog({
               { getError("itemTransfersItems") }
             </div>
           ) }
+
           <StoreItemSelector
+            itemType={ ItemType.Product }
             storeId={ formData.fromStoreId }
             onSelect={ (storeItem, selectedIupm) =>
-              handleChange(
-                {
-                  itemTransfersItems: [
-                    ...(formData.itemTransfersItems ?? []),
-                    new ItemTransfersItem({
-                      itemId: storeItem.item.id,
-                      itemName: storeItem.item.name,
-                      itemUnitPricingMethodId: selectedIupm?.id,
-                      itemUnitPricingMethodName: selectedIupm?.itemUnitPricingMethodName,
-                      quantity: 1,
-                      itemUnitPricingMethods: storeItem.item.itemUnitPricingMethods
-                    })
-                  ]
-                }
-              ) }
+            {
+              ItemTransferActions.addItem(dispatch, storeItem, selectedIupm);
+            } }
           />
+
+          <SelectedItemsTable />
         </FieldsSection>
       </FieldGroup>
     </ChangeDialog>

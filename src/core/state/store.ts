@@ -4,6 +4,7 @@ import { setupAuthListeners } from "@yusr_systems/ui";
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import branchDialogReducer from "../../features/branches/logic/branchDialogSlice";
 import branchReducer from "../../features/branches/logic/branchSlice";
+import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTransferSlice";
 import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
 import roleReducer from "../../features/roles/logic/roleSlice";
 import storeDialogReducer from "../../features/stores/logic/storeDialogSlice";
@@ -89,7 +90,8 @@ export const store = configureStore({
     stocktaking: StocktakingSlice.entityReducer,
     stocktakingDialog: StocktakingSlice.dialogReducer,
     itemTransfer: ItemTransferSlice.entityReducer,
-    itemTransferDialog: ItemTransferSlice.dialogReducer
+    itemTransferDialog: ItemTransferSlice.dialogReducer,
+    itemTransferUI: itemTransferReducer
   }
 });
 
