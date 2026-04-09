@@ -76,7 +76,7 @@ export function DashboardSectionCards({ data }: DashboardSectionCardsProps)
       { cards.map((card) => (
         <Card
           key={ card.id }
-          className="@container group relative overflow-hidden border-border/40 bg-secondary-foreground shadow-sm transition-all hover:shadow-md hover:border-border/80"
+          className="@container group relative overflow-hidden border-border/40  shadow-sm transition-all hover:shadow-md hover:border-border/80"
         >
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
