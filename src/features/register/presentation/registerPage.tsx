@@ -9,7 +9,7 @@ export default function RegisterPage()
 {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { formData, currentStep, loading, errors } = useAppSelector((state) => state.register);
+  const { formData } = useAppSelector((state) => state.register);
 
   const handleSubmit = async () =>
   {
@@ -23,10 +23,6 @@ export default function RegisterPage()
       <YusrBusBackground />
       <div className="w-full max-w-sm md:max-w-4xl">
         <RegisterForm
-          formData={ formData }
-          loading={ loading }
-          currentStep={ currentStep }
-          errors={ errors }
           onNextStep={ () => dispatch(nextStep()) }
           onPrevStep={ () => dispatch(prevStep()) }
           onSubmit={ handleSubmit }

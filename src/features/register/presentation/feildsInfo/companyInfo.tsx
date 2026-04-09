@@ -1,8 +1,8 @@
 import { SelectField, TextField } from "@yusr_systems/ui";
 import { useEffect } from "react";
-import type Registration from "../../../core/data/registration";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { fetchCurrenciesAsync, updateField } from "../logic/registerSlice";
+import type Registration from "../../../../core/data/registration";
+import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
+import { fetchCurrenciesAsync, updateField } from "../../logic/registerSlice";
 
 export default function CompanyInfo()
 {
@@ -87,17 +87,18 @@ export default function CompanyInfo()
         onChange={ (e) => onFieldChange({ vatNumber: e.target.value }) }
         required
       />
-
-      <SelectField
-        label="العملة"
-        id="currencyId"
-        value={ formData.currencyId?.toString() ?? "" }
-        isInvalid={ !!errors.currencyId }
-        error={ errors.currencyId }
-        onValueChange={ (val) => onFieldChange({ currencyId: Number(val) }) }
-        required
-        options={ currencies.map((c) => ({ label: c.name, value: c.id.toString() })) }
-      />
+      { currencies
+        && (
+          <SelectField
+            label="العملة"
+            value={ formData.currencyId?.toString() ?? "" }
+            isInvalid={ !!errors.currencyId }
+            error={ errors.currencyId }
+            onValueChange={ (val) => onFieldChange({ currencyId: Number(val) }) }
+            required
+            options={ currencies.map((c) => ({ label: c.name, value: c.id.toString() })) }
+          />
+        ) }
     </>
   );
 }
