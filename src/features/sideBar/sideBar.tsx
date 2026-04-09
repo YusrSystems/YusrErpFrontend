@@ -11,7 +11,6 @@ import logoFullDark from "@/assets/yusrBusLogoRTL_Dark.png";
 import logoFullLight from "@/assets/yusrBusLogoRTL_Light.png";
 import logoOnlyDark from "@/assets/yusrLogoOnly_Dark.png";
 import logoOnlyLight from "@/assets/yusrLogoOnly_Light.png";
-import type { has } from "lodash";
 
 const appLang = ApplicationLanguages.getAppLanguageText();
 const appLangSections = appLang.sections;
@@ -33,7 +32,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
       title: appLangSections.dashboard,
       url: "/dashboard",
       icon: <LayoutDashboardIcon />,
-      hasAuth: false
+      hasAuth: true
     }, {
       title: appLangSections.invoices,
       url: "/invoices",
