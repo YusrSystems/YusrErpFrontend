@@ -17,6 +17,9 @@ export default function LandingHeader()
           <Link to="/login">
             <Button size="lg" variant="default">تسجيل الدخول</Button>
           </Link>
+          <Link to="/register">
+            <Button size="lg" variant="default">إنشاء حساب</Button>
+          </Link>
         </div>
       </div>
     </header>

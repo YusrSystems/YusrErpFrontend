@@ -6,6 +6,7 @@ import branchDialogReducer from "../../features/branches/logic/branchDialogSlice
 import branchReducer from "../../features/branches/logic/branchSlice";
 import dashboardReducer from "../../features/dashboard/logic/dashboardSlice";
 import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTransferSlice";
+import registerReducer from "../../features/register/logic/registerSlice";
 import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
 import roleReducer from "../../features/roles/logic/roleSlice";
 import storeDialogReducer from "../../features/stores/logic/storeDialogSlice";
@@ -33,6 +34,7 @@ import itemBarcodeReducer from "./shared/itemBarcodeSlice";
 import serviceIdsReducer from "./shared/serviceIdsSlice";
 import storeItemsReducer from "./shared/storeItemsSlice";
 import systemReducer from "./shared/systemSlice";
+
 const authSlice = createAuthSlice<User, Setting>();
 export const {
   login,
@@ -95,7 +97,8 @@ export const store = configureStore({
     itemsSettlement: ItemsSettlementSlice.entityReducer,
     itemsSettlementDialog: ItemsSettlementSlice.dialogReducer,
     itemTransferUI: itemTransferReducer,
-    dashboard: dashboardReducer
+    dashboard: dashboardReducer,
+    register: registerReducer
   }
 });
 

@@ -20,6 +20,7 @@ import LoginPage from "./features/login/loginPage";
 import NotFoundPage from "./features/notFound/notFoundPage";
 import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 import PricingMethodsPage from "./features/pricingMethods/pricingMethodsPage";
+import RegisterPage from "./features/register/presentation/registerPage";
 import RolesPage from "./features/roles/presentation/rolesPage";
 import SettingPage from "./features/setting/settingPage";
 import StocktakingsPage from "./features/stocktakings/stocktakingsPage";
@@ -73,6 +74,7 @@ function AppRoutes()
       <Routes>
         <Route path="/" element={ <LandingPage /> } />
         <Route path="/login" element={ <LoginPage /> } />
+        <Route path="/register" element={ <RegisterPage /> } />
 
         <Route element={ <ProtectedRoute isAuthenticated={ isAuthenticated } /> }>
           <Route element={ <AppLayout /> }>

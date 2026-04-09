@@ -3,7 +3,7 @@ import { ApiConstants, LoginRequest, User, type ValidationRule, Validators, Yusr
 import { Button, Card, CardContent, Checkbox, cn, Field, FieldDescription, FieldGroup, PasswordField, TextField, useEntityForm } from "@yusr_systems/ui";
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { Setting } from "../../core/data/setting";
 import { login, updateLoggedInUser, useAppDispatch } from "../../core/state/store";
 
@@ -176,7 +176,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">)
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                لا تملك حسابًا بعد؟ <a href="#">سجل معنا</a>
+                لا تملك حسابًا بعد؟ <Link to="/register">سجل معنا</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
