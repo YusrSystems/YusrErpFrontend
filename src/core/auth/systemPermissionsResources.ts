@@ -58,6 +58,9 @@ export class SystemPermissionsResources
   public static ReportItemTaxStatement: string = "ReportItemTaxStatement";
   public static ReportItemTransfer: string = "ReportItemTransfer";
   public static ReportBalanceSheet: string = "ReportBalanceSheet";
-  public static ReportTaxDeclaration: string = "ReportTaxDeclaration";
+  public static ReportTaxReturn: string = "ReportTaxReturn";
   public static ReportProfitAndLoss: string = "ReportProfitAndLoss";
+  public static ReportStocktaking: string = "ReportStocktaking";
+  public static ReportItemSettlement: string = "ReportItemSettlement";
+  public static ReportItemBarcode: string = "ReportItemBarcode";
 }
