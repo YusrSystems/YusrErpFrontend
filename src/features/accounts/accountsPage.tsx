@@ -50,13 +50,24 @@ export default function AccountsPage({
       tableHeadRows={ [{ rowName: "", rowStyles: "text-left w-12.5" }, { rowName: "رقم الحساب", rowStyles: "w-24" }, {
         rowName: "اسم الحساب",
         rowStyles: "w-40"
-      }, { rowName: "الرصيد", rowStyles: "w-32" }] }
+      }, { rowName: "الرصيد", rowStyles: "w-32" }, { rowName: "", rowStyles: "w-32" }] }
       tableRowMapper={ (
         account: Account
-      ) => [{ rowName: `#${account.id}`, rowStyles: "" }, { rowName: account.name, rowStyles: "font-semibold" }, {
-        rowName: account.balance?.toLocaleString() ?? "0",
-        rowStyles: "font-mono"
-      }] }
+      ) =>
+      {
+        const isBoxOrBank = account.type === AccountType.Box || account.type === AccountType.Bank;
+        const isCredit = isBoxOrBank ? account.balance >= 0 : account.balance <= 0;
+        const label = isCredit ? "دائن" : "مدين";
+        const colorStyle = isCredit ? "text-green-600" : "text-red-600";
+
+        return [{ rowName: `#${account.id}`, rowStyles: "" }, { rowName: account.name, rowStyles: "font-semibold" }, {
+          rowName: Math.abs(account.balance ?? 0).toLocaleString(),
+          rowStyles: `font-mono ${colorStyle}`
+        }, {
+          rowName: label,
+          rowStyles: `font-semibold ${colorStyle}`
+        }];
+      } }
       actions={ {
         filter: slice.entityActions.filter,
         openChangeDialog: (entity) => slice.dialogActions.openChangeDialog(entity),
