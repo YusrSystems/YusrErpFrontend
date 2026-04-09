@@ -1,7 +1,7 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
+import { NumbertoWordsService, type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, SelectField, TextAreaField, TextField, useEntityForm } from "@yusr_systems/ui";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../core/data/account";
 import { CommissionType, PaymentMethodFilterColumns, PaymentMethodSlice } from "../../core/data/paymentMethod";
 import Voucher, { VoucherType } from "../../core/data/voucher";
@@ -12,6 +12,8 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
   const dispatch = useAppDispatch();
   const accountState = useAppSelector((state) => state.clientsAndSuppliers);
   const paymentMethodState = useAppSelector((state) => state.paymentMethod);
+  const authState = useAppSelector((state) => state.auth);
+  const [amountToWords, setAmountToWords] = useState("");
 
   const validationRules: ValidationRule<Partial<Voucher>>[] = useMemo(
     () => [
@@ -51,6 +53,14 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
     dispatch(ClientsAndSuppliersSlice.entityActions.filter(undefined));
     dispatch(PaymentMethodSlice.entityActions.filter(undefined));
   }, [dispatch]);
+
+  useEffect(() =>
+  {
+    if (formData.amount !== undefined && authState.setting?.currency)
+    {
+      setAmountToWords(NumbertoWordsService.ConvertAmount(formData.amount, authState.setting.currency));
+    }
+  }, [formData.amount, authState.setting?.currency]);
 
   // --- دوال تطبيق قواعد الأعمال (Business Rules) ---
 
@@ -163,6 +173,14 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
               isInvalid={ isInvalid("amount") }
               error={ getError("amount") }
             />
+
+            <div className="col-span-full">
+              <TextField
+                label={ "التفقيط" }
+                value={ amountToWords }
+                onChange={ () => undefined }
+              />
+            </div>
           </FieldsSection>
 
           <FieldsSection title="الحساب وطريقة الدفع" columns={ 2 }>
