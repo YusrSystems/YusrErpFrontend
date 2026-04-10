@@ -2,13 +2,14 @@ import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
+import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
 import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import { useAppDispatch } from "../../core/state/store";
+import { filterStores } from "../stores/logic/storeSlice";
 import InvoiceBasicInfo from "./invoiceBasicInfo";
 import { InvoiceContext } from "./invoiceContext";
-import { ClientsAndSuppliersSlice } from "../../core/data/account";
-import { filterStores } from "../stores/logic/storeSlice";
+import InvoiceItemsSummary from "./invoiceItemsSummary";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -124,69 +125,9 @@ export default function ChangeInvoiceDialog({
         <div className="flex flex-col gap-6">
           <InvoiceBasicInfo />
 
-          {
-            /* <FieldsSection title="التفاصيل المالية" columns={ 3 }>
-            <NumberField
-              label="مبلغ الخصم"
-              value={ formData.discountAmount || 0 }
-              onChange={ (e) => handleChange({ discountAmount: Number(e) }) }
-            />
-            <NumberField
-              label="المبلغ المضاف"
-              value={ formData.addedAmount || 0 }
-              onChange={ (e) => handleChange({ addedAmount: Number(e) }) }
-            />
-            <NumberField
-              label="المبلغ المدفوع"
-              value={ formData.paidAmount || 0 }
-              onChange={ (e) => handleChange({ paidAmount: Number(e) }) }
-            />
-          </FieldsSection>
-
-          <FieldsSection title="معلومات إضافية" columns={ 2 }>
-            <TextField
-              label="المندوب"
-              value={ formData.delegateEmp || "" }
-              onChange={ (e) => handleChange({ delegateEmp: e.target.value }) }
-            />
-
-            <SelectField
-              label="نوع الاستيراد / التصدير"
-              value={ formData.importExportType?.toString() || "" }
-              onValueChange={ (val) =>
-                handleChange({
-                  importExportType: Number(val) as ImportExportType
-                }) }
-              options={ [{ label: "محلي", value: ImportExportType.Local.toString() }, {
-                label: "تصدير",
-                value: ImportExportType.Export.toString()
-              }, {
-                label: "استيراد (آلية الاحتساب العكسي)",
-                value: ImportExportType.ImportAccordingToTheReverseChargeMechanism.toString()
-              }, {
-                label: "استيراد (مدفوع للجمارك)",
-                value: ImportExportType.ImportPaidForCustoms.toString()
-              }] }
-            />
-
-            <div className="col-span-2">
-              <TextField
-                label="السياسة / الشروط"
-                value={ formData.policy || "" }
-                onChange={ (e) => handleChange({ policy: e.target.value }) }
-              />
-            </div>
-
-            <div className="col-span-2">
-              <TextAreaField
-                label="ملاحظات"
-                value={ formData.notes || "" }
-                onChange={ (e) => handleChange({ notes: e.target.value }) }
-                rows={ 3 }
-              />
-            </div>
-          </FieldsSection> */
-          }
+          <div className="flex">
+            <InvoiceItemsSummary />
+          </div>
         </div>
       </ChangeDialog>
     </InvoiceContext.Provider>
