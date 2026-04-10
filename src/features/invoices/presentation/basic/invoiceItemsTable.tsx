@@ -2,12 +2,17 @@ import { cn, InputField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
 import { removeItem, updateItem } from "../../logic/invoiceSliceUI";
+import EmptyTable from "./emptyTable";
 
 export default function InvoiceItemsTable()
 {
   const dispatch = useAppDispatch();
   const { items, errors, mode } = useAppSelector((state) => state.invoiceUI);
-  
+
+  if (items.length === 0)
+  {
+    return <EmptyTable />;
+  }
   return (
     <div className="w-full overflow-x-auto border border-border rounded-lg shadow-sm bg-background" dir="rtl">
       <table className="w-full text-sm text-right">
