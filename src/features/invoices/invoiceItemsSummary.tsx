@@ -9,7 +9,7 @@ export default function InvoiceItemsSummary()
     <div className="flex flex-wrap gap-3 sm:flex-nowrap ">
       <TextField label="الإجمالي قبل الضريبة" value={ formData.fullAmount } disabled />
       <TextField label="الإجمالي بعد الضريبة" value={ formData.discountAmount } disabled />
-      <TextField label="إجمالي الضرايب" value={ formData.addedAmount } disabled />
+      <TextField label="إجمالي الضرائب" value={ formData.addedAmount } disabled />
       <TextField
         label="المبلغ المدفوع"
         value={ formData.paidAmount }
