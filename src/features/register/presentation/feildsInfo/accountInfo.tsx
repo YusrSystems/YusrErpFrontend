@@ -1,4 +1,4 @@
-import { PasswordField, SelectField, TextField } from "@yusr_systems/ui";
+import { PasswordField, TextField } from "@yusr_systems/ui";
 import type Registration from "../../../../core/data/registration";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
 import { updateField } from "../../logic/registerSlice";

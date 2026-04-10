@@ -62,7 +62,7 @@ export const ArabicLabels: Record<string, string> = {
   [SystemPermissionsResources.ReportItemTaxStatement]: "تقرير كشف ضريبة مادة",
   [SystemPermissionsResources.ReportItemTransfer]: "تقرير نقل مادة",
   [SystemPermissionsResources.ReportBalanceSheet]: "تقرير الميزانية العمومية",
-  [SystemPermissionsResources.ReportTaxDeclaration]: "تقرير الإقرار الضريبي",
+  [SystemPermissionsResources.ReportTaxReturn]: "تقرير الإقرار الضريبي",
   [SystemPermissionsResources.ReportProfitAndLoss]: "تقرير الربح والخسارة",
 
   // Actions
@@ -153,7 +153,7 @@ export const PERMISSION_SECTIONS = [{
     SystemPermissionsResources.ReportItemTaxStatement,
     SystemPermissionsResources.ReportItemTransfer,
     SystemPermissionsResources.ReportBalanceSheet,
-    SystemPermissionsResources.ReportTaxDeclaration,
+    SystemPermissionsResources.ReportTaxReturn,
     SystemPermissionsResources.ReportProfitAndLoss
   ]
 }];

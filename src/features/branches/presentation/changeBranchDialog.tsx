@@ -1,7 +1,6 @@
-import { CityFilterColumns, type ValidationRule, Validators } from "@yusr_systems/core";
+import { Branch, CityFilterColumns, type ValidationRule, Validators } from "@yusr_systems/core";
 import { ChangeDialog, type CommonChangeDialogProps, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
-import type Branch from "../../../core/data/branch";
 import { filterCities } from "../../../core/state/shared/citySlice";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
 

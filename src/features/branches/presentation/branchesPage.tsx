@@ -41,7 +41,7 @@ export default function BranchesPage()
       tableRowMapper={ (
         branch: Branch
       ) => [{ rowName: `#${branch.id}`, rowStyles: "" }, { rowName: branch.name, rowStyles: "font-semibold" }, {
-        rowName: branch.cityName,
+        rowName: branch.city?.name,
         rowStyles: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800"
       }] }
       actions={ {
