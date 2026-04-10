@@ -36,9 +36,11 @@ export const invoiceSliceUI = createSlice({
     removeVoucher: InvoiceVouchersActions.removeVoucher,
     updateVoucher: InvoiceVouchersActions.updateVoucher,
     resetVouchers: InvoiceVouchersActions.resetVouchers,
+    resetPaymentVouchers: InvoiceVouchersActions.resetPaymentVouchers,
+    resetCostVouchers: InvoiceVouchersActions.resetCostVouchers,
 
     // items tax
-    totalAfterDiscountChanges: ItemsMathActions.priceAfterTaxChanges,
+    totalAfterDiscountChanges: ItemsMathActions.priceAfterTaxChanges
   }
 });
 
@@ -52,6 +54,8 @@ export const {
   removeVoucher,
   updateVoucher,
   resetVouchers,
+  resetPaymentVouchers,
+  resetCostVouchers,
   totalAfterDiscountChanges
 } = invoiceSliceUI.actions;
 

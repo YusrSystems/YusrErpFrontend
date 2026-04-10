@@ -1,14 +1,13 @@
-import { Button, FormField, NumberField, SearchableSelect } from "@yusr_systems/ui";
+import { Button, FormField, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect } from "react";
+import { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../../../core/data/account";
 import { InvoiceRelationType, InvoiceVoucher } from "../../../../core/data/invoice";
 import { PaymentMethodFilterColumns, PaymentMethodSlice } from "../../../../core/data/paymentMethod";
 import { useAppSelector } from "../../../../core/state/store";
 import { useInvoiceContext } from "../../logic/invoiceContext";
-import { addVoucher, removeVoucher, resetPaymentVouchers, updateVoucher } from "../../logic/invoiceSliceUI";
-import { selectInvoiceTotalPrice, selectInvoiceUnpaidPrice } from "../../logic/itemsMathActions";
+import { addVoucher, removeVoucher, updateVoucher } from "../../logic/invoiceSliceUI";
 
-export default function InvoicePaymentsTab()
+export default function InvoiceCostsTab()
 {
   const {
     mode,
@@ -16,33 +15,10 @@ export default function InvoicePaymentsTab()
     authState,
     dispatch
   } = useInvoiceContext();
-  const { vouchers, items } = useAppSelector((state) => state.invoiceUI);
+  const { vouchers } = useAppSelector((state) => state.invoiceUI);
+  const clientsAndSuppliersState = useAppSelector((state) => state.clientsAndSuppliers);
   const paymentMethodState = useAppSelector((state) => state.paymentMethod);
-  const paymentVouchers = () => vouchers.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment);
-  const totalPrice = useAppSelector(selectInvoiceTotalPrice);
-  const unpaidPrice = useAppSelector(selectInvoiceUnpaidPrice);
-
-  useEffect(() =>
-  {
-    if (items == undefined || items.length >= 1)
-    {
-      dispatch(resetPaymentVouchers());
-      dispatch(addVoucher(
-        new InvoiceVoucher({
-          voucherId: 0,
-          invoiceId: formData.id,
-          paymentMethodId: authState.setting?.mainPaymentMethodId,
-          paymentMethodName: authState.setting?.mainPaymentMethodName,
-          accountId: undefined,
-          accountName: undefined,
-          invoiceRelationType: InvoiceRelationType.Payment,
-          amount: totalPrice,
-          amountReceived: totalPrice,
-          description: undefined
-        })
-      ));
-    }
-  }, [items]);
+  const costVouchers = () => vouchers.filter((v) => v.invoiceRelationType == InvoiceRelationType.Cost);
 
   return (
     <div className="flex flex-col gap-2 items-end">
@@ -59,7 +35,7 @@ export default function InvoicePaymentsTab()
               paymentMethodName: authState.setting?.mainPaymentMethodName,
               accountId: undefined,
               accountName: undefined,
-              invoiceRelationType: InvoiceRelationType.Payment,
+              invoiceRelationType: InvoiceRelationType.Cost,
               amount: 0,
               amountReceived: 0,
               description: undefined
@@ -74,20 +50,49 @@ export default function InvoicePaymentsTab()
           <thead className="bg-muted/40 border-b border-border">
             <tr>
               <th className="p-3 font-semibold w-16 text-center text-muted-foreground">الرقم</th>
+              <th className="p-3 font-semibold">الحساب</th>
               <th className="p-3 font-semibold">طريقة الدفع</th>
               <th className="p-3 font-semibold text-center">المبلغ</th>
-              <th className="p-3 font-semibold">المبلغ المستلم</th>
-              <th className="p-3 font-semibold text-center">المبلغ المسترد</th>
+              <th className="p-3 font-semibold text-center">الوصف</th>
               <th className="p-4 font-semibold w-16 text-center"></th>
             </tr>
           </thead>
           <tbody>
-            { paymentVouchers().map((row, index) => (
+            { costVouchers().map((row, index) => (
               <tr
                 key={ row.voucherId }
                 className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
               >
                 <td className="p-2 text-center font-bold text-muted-foreground">{ index + 1 }</td>
+
+                <td className="p-2">
+                  <FormField label="">
+                    <SearchableSelect
+                      items={ clientsAndSuppliersState.entities.data ?? [] }
+                      itemLabelKey="name"
+                      itemValueKey="id"
+                      value={ row.accountId?.toString() }
+                      columnsNames={ AccountFilterColumns.columnsNames }
+                      onSearch={ (condition) => dispatch(ClientsAndSuppliersSlice.entityActions.filter(condition)) }
+                      disabled={ clientsAndSuppliersState.isLoading || mode === "update" }
+                      onValueChange={ (val) =>
+                      {
+                        const selected = clientsAndSuppliersState.entities.data?.find((a) => a.id.toString() === val);
+                        if (selected)
+                        {
+                          dispatch(updateVoucher({
+                            index: index,
+                            voucher: {
+                              ...row,
+                              accountId: selected?.id,
+                              accountName: selected?.name
+                            }
+                          }));
+                        }
+                      } }
+                    />
+                  </FormField>
+                </td>
 
                 <td className="p-2">
                   <FormField label="">
@@ -121,8 +126,6 @@ export default function InvoicePaymentsTab()
                 <td className="p-2">
                   <NumberField
                     label=""
-                    min={ 0 }
-                    max={ unpaidPrice + (row.amount ?? 0) }
                     value={ row.amount || "0" }
                     onChange={ (val) =>
                     {
@@ -135,21 +138,11 @@ export default function InvoicePaymentsTab()
                 </td>
 
                 <td className="p-2">
-                  <NumberField
+                  <TextField
                     label=""
-                    value={ row.amountReceived || "0" }
-                    onChange={ (val) =>
-                      dispatch(updateVoucher({ index: index, voucher: { ...row, amountReceived: val } })) }
-                  />
-                </td>
-
-                <td className="p-2">
-                  <NumberField
-                    disabled
-                    label=""
-                    value={ (row.amountReceived ?? 0) - (row.amount ?? 0) || "0" }
-                    onChange={ () =>
-                    {} }
+                    value={ row.description || "" }
+                    onChange={ (e) =>
+                      dispatch(updateVoucher({ index: index, voucher: { ...row, description: e.target.value } })) }
                   />
                 </td>
 

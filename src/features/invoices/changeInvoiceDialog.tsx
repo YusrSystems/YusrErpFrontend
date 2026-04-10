@@ -1,7 +1,7 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
-import { BanknoteArrowDown, Box, FolderKanban, Siren } from "lucide-react";
+import { BanknoteArrowDown, BanknoteArrowUp, Box, FolderKanban, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
@@ -13,10 +13,12 @@ import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import { InvoiceContext } from "./logic/invoiceContext";
+import { resetItems, resetVouchers } from "./logic/invoiceSliceUI";
 import InvoiceBasicTab from "./presentation/basic/invoiceBasicTab";
 import InvoiceFilesTab from "./presentation/files/invoiceFilesTab";
 import InvoicePaymentsTab from "./presentation/payments/invoicePaymentsTab";
 import InvoicePolicyTab from "./presentation/policy/invoicePolicyTab";
+import InvoiceCostsTab from "./presentation/costs/invoiceCostsTab";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -90,6 +92,9 @@ export default function ChangeInvoiceDialog({
 
   useEffect(() =>
   {
+    dispatch(resetItems());
+    dispatch(resetVouchers());
+
     if (formData.statusId)
     {
       dispatch(fetchStoreItems({
@@ -167,6 +172,11 @@ export default function ChangeInvoiceDialog({
           icon: BanknoteArrowDown,
           active: false,
           content: <InvoicePaymentsTab />
+        }, {
+          label: "تكاليف الفاتورة",
+          icon: BanknoteArrowUp,
+          active: false,
+          content: <InvoiceCostsTab />
         }, {
           label: "سياسة الفاتورة",
           icon: Siren,

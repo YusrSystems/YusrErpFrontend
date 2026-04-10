@@ -1,5 +1,5 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { InvoiceVoucher } from "../../../core/data/invoice";
+import { InvoiceRelationType, InvoiceVoucher } from "../../../core/data/invoice";
 import type { InvoiceState } from "./invoiceSliceUI";
 
 export default class InvoiceVouchersActions
@@ -45,5 +45,15 @@ export default class InvoiceVouchersActions
   public static resetVouchers(state: InvoiceState)
   {
     state.vouchers = [];
+  }
+
+  public static resetPaymentVouchers(state: InvoiceState)
+  {
+    state.vouchers = state.vouchers.filter((v) => v.invoiceRelationType !== InvoiceRelationType.Payment);
+  }
+
+  public static resetCostVouchers(state: InvoiceState)
+  {
+    state.vouchers = state.vouchers.filter((v) => v.invoiceRelationType !== InvoiceRelationType.Cost);
   }
 }
