@@ -145,7 +145,7 @@ export default function InvoiceItemsTable()
                 <TextField label="" value={ ((row.priceAtferTax ?? 0) * row.quantity) - row.discount || "" } disabled />
               </td>
 
-              <td className="p-4 text-center align-top pt-5">
+              <td className="p-4   ">
                 { mode === "create" && (
                   <button
                     type="button"
