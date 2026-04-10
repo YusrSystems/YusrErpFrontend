@@ -46,7 +46,7 @@ export default function InvoiceItemsTable()
               </td>
 
               { /* Pricing Method */ }
-              <td className="p-4 text-center align-top">
+              <td className="p-4 ">
                 <SelectField
                   label=""
                   value={ row.itemUnitPricingMethodId?.toString() || "" }
@@ -58,7 +58,7 @@ export default function InvoiceItemsTable()
                     }));
                   } }
                   options={ row.itemUnitPricingMethods?.map((m) => ({
-                    label: `${m.pricingMethodName || "بدون"} - ${m.unitName || "بدون"}`,
+                    label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
                     value: m.id.toString()
                   })) || [] }
                   placeholder="اختر طريقة التسعير"
@@ -78,32 +78,21 @@ export default function InvoiceItemsTable()
               </td>
 
               { /* quantity */ }
-              <td className="p-4 text-center align-top">
-                <div className="flex flex-col items-center justify-center gap-1">
-                  <NumberField
-                    label=""
-                    min={ 1 }
-                    value={ row.quantity ?? 1 }
-                    onChange={ (newValue) =>
-                    {
-                      dispatch(updateItem({ ...row, quantity: Number(newValue) }));
-                    } }
-                    disabled={ mode === "update" }
-                    className={ cn(
-                      "flex w-full rounded-md border bg-background px-3 py-2 text-sm text-center ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors",
-                      errors[row.id] ? "border-red-500 focus-visible:ring-red-500" : "border-input"
-                    ) }
-                  />
-                  { errors[row.id] && (
-                    <span className="text-xs text-red-500 animate-in fade-in text-center">
-                      { errors[row.id] }
-                    </span>
-                  ) }
-                </div>
+              <td className="p-4">
+                <NumberField
+                  label=""
+                  min={ 1 }
+                  value={ row.quantity ?? 1 }
+                  onChange={ (newValue) =>
+                  {
+                    dispatch(updateItem({ ...row, quantity: Number(newValue) }));
+                  } }
+                  disabled={ mode === "update" }
+                />
               </td>
 
               { /* total cost without tax */ }
-              <td>
+              <td className="p-4">
                 { /* price with only 2 fractional digits */ }
                 <NumberField
                   label=""
