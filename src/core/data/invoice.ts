@@ -1,6 +1,7 @@
-import { BaseEntity, type ColumnName } from "@yusr_systems/core";
+import { BaseEntity, StorageFile, type ColumnName } from "@yusr_systems/core";
 import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
 import InvoicesApiService from "../networking/invoiceApiService";
+import type { ItemUnitPricingMethod } from "./item";
 
 export const InvoiceType = {
   Sell: 1,
@@ -33,11 +34,61 @@ export const ImportExportType = {
   ImportAccordingToTheReverseChargeMechanism: 2,
   ImportPaidForCustoms: 3
 } as const;
+
+export const InvoiceRelationType = {
+  Payment: 1,
+  Cost: 2
+} as const;
+
 export type InvoiceType = (typeof InvoiceType)[keyof typeof InvoiceType];
 export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
 export type EInvoiceStatus = (typeof EInvoiceStatus)[keyof typeof EInvoiceStatus];
 export type InvoiceReturnStatus = (typeof InvoiceReturnStatus)[keyof typeof InvoiceReturnStatus];
 export type ImportExportType = (typeof ImportExportType)[keyof typeof ImportExportType];
+export type InvoiceRelationType = (typeof InvoiceRelationType)[keyof typeof InvoiceRelationType];
+
+export class InvoiceItem extends BaseEntity
+{
+  public invoiceId!: number;
+  public itemId!: number;
+  public itemUnitPricingMethodId!: number;
+  public quantity!: number;
+  public cost!: number;
+  public price!: number;
+  public totalPrice!: number;
+  public discount!: number;
+  public taxable!: boolean;
+  public totalTaxesPerc!: number;
+  public notes?: string;
+  public itemName!: string;
+  public itemUnitPricingMethodName!: string;
+  public itemUnitPricingMethods: ItemUnitPricingMethod[] = [];
+
+  constructor(init?: Partial<InvoiceItem>)
+  {
+    super();
+    Object.assign(this, init);
+  }
+}
+
+export class InvoiceVoucher
+{
+  public invoiceId!: number;
+  public voucherId!: number;
+  public accountId!: number;
+  public accountName!: string;
+  public invoiceRelationType!: InvoiceRelationType;
+  public paymentMethodId!: number;
+  public paymentMethodName!: string;
+  public amount!: number;
+  public amountReceived?: number;
+  public description?: string;
+
+  constructor(init?: Partial<InvoiceVoucher>)
+  {
+    Object.assign(this, init);
+  }
+}
 
 export default class Invoice extends BaseEntity
 {
@@ -73,13 +124,23 @@ export default class Invoice extends BaseEntity
     Object.assign(this, init);
   }
 
-  // Translated C# Method to a TypeScript Getter
-  public get isReturnInvoice(): boolean
+  public isReturnInvoice(): boolean
   {
-    return (
-      this.type === InvoiceType.SellReturn
-      || this.type === InvoiceType.PurchaseReturn
-    );
+    return this.type === InvoiceType.SellReturn || this.type === InvoiceType.PurchaseReturn;
+  }
+}
+
+export class DetailedInvoice
+{
+  public invoice: Invoice = new Invoice();
+  public invoiceItems: InvoiceItem[] = [];
+  public invoiceVouchers: InvoiceVoucher[] = [];
+  public invoiceFiles: StorageFile[] = [];
+  public ignoreWarnings: boolean = false;
+
+  constructor(init?: Partial<DetailedInvoice>)
+  {
+    Object.assign(this, init);
   }
 }
 
