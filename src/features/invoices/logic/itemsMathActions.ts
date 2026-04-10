@@ -1,6 +1,6 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { InvoiceState } from "./invoiceSliceUI";
 import type { RootState } from "../../../core/state/store";
+import type { InvoiceState } from "./invoiceSliceUI";
 
 export default class ItemsMathActions
 {
@@ -13,9 +13,30 @@ export default class ItemsMathActions
 
     const taxes = state.items[index].totalTaxesPerc;
     const dividedTaxes = (100 + taxes) / 100;
-    // state.items[index].price = Number((priceAfterTax / dividedTaxes).toFixed(2));
 
-    // TODO: implement this
+    console.log();
+
+    state.items[index].price = Number((priceAfterTax / dividedTaxes).toFixed(2));
+    state.items[index].priceAtferTax = priceAfterTax;
+  }
+
+  public static priceChanges(state: InvoiceState, action: PayloadAction<{ index: number; price: number; }>)
+  {
+    const { index, price } = action.payload;
+    state.items[index].price = price;
+    state.items[index].priceAtferTax = price * (100 + state.items[index].totalTaxesPerc) / 100;
+  }
+  public static recalculatePrices(state: InvoiceState, action: PayloadAction<{ index: number; }>)
+  {
+    // const index = action.payload.index;
+    // state.items[index].price = state.items[index].quantity * state.items[index].cost;
+    // state.items[index].priceAtferTax = state.items[index].price * (100 + state.items[index].totalTaxesPerc) / 100;
+  }
+
+  public static discountChanges(state: InvoiceState, action: PayloadAction<{ index: number; discount: number; }>)
+  {
+    const { index, discount } = action.payload;
+    state.items[index].discount = discount;
   }
 }
 

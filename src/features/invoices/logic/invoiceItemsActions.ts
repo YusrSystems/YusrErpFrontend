@@ -1,6 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { StoreItem } from "../../../core/data/item";
 import type { InvoiceState } from "./invoiceSliceUI";
+import ItemsMathActions from "./itemsMathActions";
 
 export default class InvoiceItemsActions
 {
@@ -10,22 +11,11 @@ export default class InvoiceItemsActions
     state.items.splice(index, 1);
   }
 
-  public static changeQuantity(state: InvoiceState, action: PayloadAction<{ id: number; quantity: number; }>)
-  {
-    const { id, quantity } = action.payload;
-
-    const item = state.items.find((item) => item.id === id);
-    if (item)
-    {
-      item.quantity = quantity;
-      delete state.errors[id];
-    }
-  }
-
   public static updateItem(state: InvoiceState, action: PayloadAction<InvoiceState["items"][0]>)
   {
     const item = action.payload;
     state.items = state.items.map((i) => (i.id === item.id ? item : i));
+    ItemsMathActions.recalculatePrices(state, { payload: { index: item.id } } as PayloadAction<{ index: number; }>);
   }
 
   public static addItem(state: InvoiceState, action: PayloadAction<StoreItem>)
@@ -42,6 +32,11 @@ export default class InvoiceItemsActions
           ? { ...item, quantity: item.quantity + 1 }
           : item
       ); //  existingItem.totalPrice = (existingItem.quantity * existingItem.price) - (existingItem.discount || 0);
+
+      ItemsMathActions.recalculatePrices(
+        state,
+        { payload: { index: existingItem.id } } as PayloadAction<{ index: number; }>
+      );
 
       return;
     }
@@ -68,6 +63,7 @@ export default class InvoiceItemsActions
       price: priceBeforeTax,
       discount: 0,
       totalPrice: priceBeforeTax,
+      priceAtferTax: priceBeforeTax * (100 + baseItem.totalTaxes) / 100,
 
       // Taxes
       taxable: baseItem.taxable || false,

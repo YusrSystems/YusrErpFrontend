@@ -1,7 +1,7 @@
 import { cn, NumberField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
-import { removeItem, totalAfterDiscountChanges, updateItem } from "../../logic/invoiceSliceUI";
+import { discountChanges, priceAfterTaxChanges, priceChanges, removeItem, updateItem } from "../../logic/invoiceSliceUI";
 import EmptyTable from "./emptyTable";
 
 export default function InvoiceItemsTable()
@@ -105,7 +105,11 @@ export default function InvoiceItemsTable()
               { /* total cost without tax */ }
               <td>
                 { /* price with only 2 fractional digits */ }
-                <TextField label="" value={ row.price || "" } disabled />
+                <NumberField
+                  label=""
+                  value={ row.price || "0" }
+                  onChange={ (newValue) => dispatch(priceChanges({ index, price: Number(newValue) })) }
+                />
               </td>
 
               { /* tax percentage */ }
@@ -117,17 +121,31 @@ export default function InvoiceItemsTable()
               <td className="p-4">
                 <NumberField
                   label=""
-                  value={ row.price * ((100 + row.totalTaxesPerc) / 100) || 0 }
-                  onChange={ (newVal) => dispatch(totalAfterDiscountChanges({ index, priceAfterTax: Number(newVal) })) }
+                  value={ row.priceAtferTax || row.price * ((100 + row.totalTaxesPerc) / 100) || 0 }
+                  onChange={ (newVal) => dispatch(priceAfterTaxChanges({ index, priceAfterTax: Number(newVal) })) }
                 />
               </td>
 
+              { /* discount */ }
               <td className="p-4">
-                <TextField label="" value={ row.discount || "" } disabled />
+                <NumberField
+                  label=""
+                  value={ row.discount || "0" }
+                  onChange={ (newValue) =>
+                  {
+                    dispatch(discountChanges({ index, discount: Number(newValue) }));
+                  } }
+                />
               </td>
 
+              { /* final cost */ }
               <td className="p-4">
-                <TextField label="" value={ row.totalPrice || "" } disabled />
+                <TextField label="" value={ row.cost * row.quantity || "" } disabled />
+              </td>
+
+              { /* final price */ }
+              <td className="p-4">
+                <TextField label="" value={ ((row.priceAtferTax ?? 0) * row.quantity) - row.discount || "" } disabled />
               </td>
 
               <td className="p-4 text-center align-top pt-5">

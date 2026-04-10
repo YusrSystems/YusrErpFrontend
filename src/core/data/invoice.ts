@@ -1,4 +1,4 @@
-import { BaseEntity, StorageFile, type ColumnName } from "@yusr_systems/core";
+import { BaseEntity, type ColumnName, StorageFile } from "@yusr_systems/core";
 import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
 import InvoicesApiService from "../networking/invoiceApiService";
 import type { ItemUnitPricingMethod } from "./item";
@@ -63,6 +63,7 @@ export class InvoiceItem extends BaseEntity
   public itemName!: string;
   public itemUnitPricingMethodName!: string;
   public itemUnitPricingMethods: ItemUnitPricingMethod[] = [];
+  public priceAtferTax?: number = 0;
 
   constructor(init?: Partial<InvoiceItem>)
   {

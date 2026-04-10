@@ -27,7 +27,6 @@ export const invoiceSliceUI = createSlice({
     // items
     addItem: InvoiceItemsActions.addItem,
     removeItem: InvoiceItemsActions.removeItem,
-    changeQuantity: InvoiceItemsActions.changeQuantity,
     updateItem: InvoiceItemsActions.updateItem,
     resetItems: InvoiceItemsActions.resetItems,
 
@@ -40,14 +39,15 @@ export const invoiceSliceUI = createSlice({
     resetCostVouchers: InvoiceVouchersActions.resetCostVouchers,
 
     // items tax
-    totalAfterDiscountChanges: ItemsMathActions.priceAfterTaxChanges
+    priceAfterTaxChanges: ItemsMathActions.priceAfterTaxChanges,
+    priceChanges: ItemsMathActions.priceChanges,
+    discountChanges: ItemsMathActions.discountChanges
   }
 });
 
 export const {
   addItem,
   removeItem,
-  changeQuantity,
   updateItem,
   resetItems,
   addVoucher,
@@ -56,7 +56,9 @@ export const {
   resetVouchers,
   resetPaymentVouchers,
   resetCostVouchers,
-  totalAfterDiscountChanges
+  priceAfterTaxChanges,
+  priceChanges,
+  discountChanges
 } = invoiceSliceUI.actions;
 
 export default invoiceSliceUI.reducer;
