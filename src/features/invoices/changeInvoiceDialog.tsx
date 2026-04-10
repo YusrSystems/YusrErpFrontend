@@ -1,11 +1,14 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DateField, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldsSection, Loading, NumberField, SelectField, TextAreaField, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import type Invoice from "../../core/data/invoice";
-import { ImportExportType, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
-import { InvoiceContext } from "./invoiceContext";
+import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
+import { useAppDispatch } from "../../core/state/store";
 import InvoiceBasicInfo from "./invoiceBasicInfo";
+import { InvoiceContext } from "./invoiceContext";
+import { ClientsAndSuppliersSlice } from "../../core/data/account";
+import { filterStores } from "../stores/logic/storeSlice";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -15,6 +18,7 @@ export default function ChangeInvoiceDialog({
 }: CommonChangeDialogProps<Invoice>)
 {
   const [initLoading, setInitLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
   const validationRules: ValidationRule<Partial<Invoice>>[] = useMemo(
     () => [{
@@ -57,6 +61,12 @@ export default function ChangeInvoiceDialog({
     initialValues,
     validationRules
   );
+
+  useEffect(() =>
+  {
+    dispatch(ClientsAndSuppliersSlice.entityActions.filter());
+    dispatch(filterStores());
+  }, [dispatch]);
 
   useEffect(() =>
   {
@@ -103,7 +113,7 @@ export default function ChangeInvoiceDialog({
     >
       <ChangeDialog<Invoice>
         title={ `${mode === "create" ? "إنشاء" : "تعديل"} فاتورة` }
-        className="sm:max-w-3xl"
+        className="sm:max-w-[90vw]"
         dialogMode={ mode }
         formData={ formData }
         service={ service }
@@ -112,10 +122,10 @@ export default function ChangeInvoiceDialog({
         validate={ validate }
       >
         <div className="flex flex-col gap-6">
-          <InvoiceBasicInfo/>
-          
+          <InvoiceBasicInfo />
 
-          {/* <FieldsSection title="التفاصيل المالية" columns={ 3 }>
+          {
+            /* <FieldsSection title="التفاصيل المالية" columns={ 3 }>
             <NumberField
               label="مبلغ الخصم"
               value={ formData.discountAmount || 0 }
@@ -175,8 +185,8 @@ export default function ChangeInvoiceDialog({
                 rows={ 3 }
               />
             </div>
-          </FieldsSection> */}
-
+          </FieldsSection> */
+          }
         </div>
       </ChangeDialog>
     </InvoiceContext.Provider>
