@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
 import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
-import { useAppDispatch } from "../../core/state/store";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import InvoiceBasicInfo from "./invoiceBasicInfo";
 import { InvoiceContext } from "./invoiceContext";
@@ -20,6 +20,7 @@ export default function ChangeInvoiceDialog({
 {
   const [initLoading, setInitLoading] = useState(false);
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
 
   const validationRules: ValidationRule<Partial<Invoice>>[] = useMemo(
     () => [{
@@ -46,6 +47,16 @@ export default function ChangeInvoiceDialog({
     () => ({
       ...entity,
       type: entity?.type ?? InvoiceType.Sell,
+      actionAccountId: entity?.actionAccountId
+        ?? (entity?.type === InvoiceType.Purchase
+          ? authState.setting?.purchaseAccountId
+          : authState.setting?.sellAccountId),
+      actionAccountName: entity?.actionAccountName
+        ?? (entity?.type === InvoiceType.Purchase
+          ? authState.setting?.purchaseAccountName
+          : authState.setting?.sellAccountName),
+      storeId: entity?.storeId ?? authState.setting?.mainStoreId,
+      storeName: entity?.storeName ?? authState.setting?.mainStoreName,
       statusId: entity?.statusId ?? InvoiceStatus.Valid,
       date: entity?.date
         ? new Date(entity.date).toISOString().split("T")[0]

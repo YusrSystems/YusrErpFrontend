@@ -13,8 +13,7 @@ export default function InvoiceBasicInfo()
     formData,
     handleChange,
     isInvalid,
-    getError,
-    clearError
+    getError
   } = useInvoiceContext();
 
   const dispatch = useAppDispatch();
