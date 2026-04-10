@@ -28,7 +28,9 @@ export default function InvoiceItemsTable()
             <th className="p-3 font-semibold">السعر بعد الضريبة</th>
             <th className="p-3 font-semibold">الخصم</th>
             <th className="p-3 font-semibold">التكلفة النهائية</th>
-            <th className="p-3 font-semibold">السعر النهائي</th>
+            <th className="p-3 font-semibold">السعر النهائي بدون ضريبة</th>
+            <th className="p-3 font-semibold">السعر النهائي مع ضريبة</th>
+
             <th className="p-4 font-semibold w-16 text-center"></th>
           </tr>
         </thead>
@@ -122,6 +124,7 @@ export default function InvoiceItemsTable()
                   value={ row.discount || "0" }
                   onChange={ (newValue) =>
                   {
+                    newValue = Number(newValue) || 0;
                     dispatch(discountChanges({ index, discount: Number(newValue) }));
                   } }
                 />
@@ -132,7 +135,12 @@ export default function InvoiceItemsTable()
                 <TextField label="" value={ row.cost * row.quantity || "" } disabled />
               </td>
 
-              { /* final price */ }
+              { /* final price without tax */ }
+              <td className="p-4">
+                <TextField label="" value={ (row.price * row.quantity) - row.discount || "" } disabled />
+              </td>
+
+              { /* final price with tax */ }
               <td className="p-4">
                 <TextField label="" value={ ((row.priceAtferTax ?? 0) * row.quantity) - row.discount || "" } disabled />
               </td>
