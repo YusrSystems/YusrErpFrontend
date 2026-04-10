@@ -7,6 +7,8 @@ import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
 import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
+import { ItemType } from "../../core/data/item";
+import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import { InvoiceContext } from "./logic/invoiceContext";
@@ -82,6 +84,20 @@ export default function ChangeInvoiceDialog({
     dispatch(ClientsAndSuppliersSlice.entityActions.filter());
     dispatch(filterStores());
   }, [dispatch]);
+
+  useEffect(() =>
+  {
+    if (formData.statusId)
+    {
+      dispatch(fetchStoreItems({
+        pageNumber: 1,
+        rowsPerPage: 100,
+        itemType: ItemType.Product,
+        storeId: formData.storeId ?? 0,
+        condition: undefined
+      }));
+    }
+  }, [dispatch, formData.storeId]);
 
   useEffect(() =>
   {

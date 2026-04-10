@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { InvoiceItem } from "../../../core/data/invoice";
 import InvoiceItemsActions from "./invoiceItemsActions";
+import type { DialogMode } from "@yusr_systems/ui";
 
 export interface InvoiceState
 {
-  mode: "create" | "update";
+  mode: DialogMode;
   items: InvoiceItem[];
   errors: Record<string, string>;
 }

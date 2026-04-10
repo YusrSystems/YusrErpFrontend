@@ -7,6 +7,7 @@ export default function InvoiceItemsTable()
 {
   const dispatch = useAppDispatch();
   const { items, errors, mode } = useAppSelector((state) => state.invoiceUI);
+  
   return (
     <div className="w-full overflow-x-auto border border-border rounded-lg shadow-sm bg-background" dir="rtl">
       <table className="w-full text-sm text-right">

@@ -3,8 +3,8 @@ import { useInvoiceContext } from "../../logic/invoiceContext";
 
 export default function InvoiceItemsSummary()
 {
-  const invoiceContext = useInvoiceContext();
-  const formData = invoiceContext.formData;
+  const {formData} = useInvoiceContext();
+
   return (
     <div className="flex flex-wrap gap-3 sm:flex-nowrap ">
       <TextField label="الإجمالي قبل الضريبة" value={ formData.fullAmount } disabled />
