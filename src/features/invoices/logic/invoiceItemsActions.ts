@@ -1,7 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { StoreItem } from "../../../core/data/item";
+import InvoiceItemsMath from "./invoiceItemsMath";
 import type { InvoiceState } from "./invoiceSliceUI";
-import ItemsMathActions from "./itemsMathActions";
 
 export default class InvoiceItemsActions
 {
@@ -11,11 +11,13 @@ export default class InvoiceItemsActions
     state.items.splice(index, 1);
   }
 
-  public static updateItem(state: InvoiceState, action: PayloadAction<InvoiceState["items"][0]>)
+  public static updateItem(
+    state: InvoiceState,
+    action: PayloadAction<{ index: number; item: InvoiceState["items"][0]; }>
+  )
   {
-    const item = action.payload;
-    state.items = state.items.map((i) => (i.id === item.id ? item : i));
-    ItemsMathActions.recalculatePrices(state, { payload: { index: item.id } } as PayloadAction<{ index: number; }>);
+    const item = action.payload.item;
+    state.items[action.payload.index] = item;
   }
 
   public static addItem(state: InvoiceState, action: PayloadAction<StoreItem>)
@@ -31,11 +33,6 @@ export default class InvoiceItemsActions
         item.itemId === baseItem.id
           ? { ...item, quantity: item.quantity + 1 }
           : item
-      ); //  existingItem.totalPrice = (existingItem.quantity * existingItem.price) - (existingItem.discount || 0);
-
-      ItemsMathActions.recalculatePrices(
-        state,
-        { payload: { index: existingItem.id } } as PayloadAction<{ index: number; }>
       );
 
       return;
@@ -44,8 +41,11 @@ export default class InvoiceItemsActions
     const defaultPricingMethod = storeItem.itemUnitPricingMethods?.find((p) => p.unitId === baseItem.sellUnitId)
       || storeItem.itemUnitPricingMethods?.[0];
 
-    const price = defaultPricingMethod?.price || 0;
-    const priceBeforeTax = storeItem.item.taxIncluded ? price * (storeItem.item.totalTaxes / 100) : price;
+    const priceBeforeTax = InvoiceItemsMath.GetPriceBeforeTax(
+      baseItem.taxIncluded,
+      defaultPricingMethod?.price || 0,
+      baseItem.totalTaxes || 0
+    );
     state.items.push({
       id: 0,
       invoiceId: 0,
@@ -61,17 +61,91 @@ export default class InvoiceItemsActions
       quantity: 1,
       cost: baseItem.cost || 0,
       price: priceBeforeTax,
+      priceAfterTax: InvoiceItemsMath.CalcPriceAfterTax(priceBeforeTax, baseItem.totalTaxes || 0),
       discount: 0,
       totalPrice: priceBeforeTax,
-      priceAtferTax: priceBeforeTax * (100 + baseItem.totalTaxes) / 100,
 
       // Taxes
       taxable: baseItem.taxable || false,
+      taxIncluded: baseItem.taxIncluded || false,
       totalTaxesPerc: baseItem.totalTaxes || 0,
 
       // Misc
-      notes: baseItem.notes
+      notes: baseItem.description
     });
+  }
+
+  public static onInvoiceItemIupmChange(
+    state: InvoiceState,
+    action: PayloadAction<{ index: number; iupmId: number; }>
+  )
+  {
+    const { index, iupmId } = action.payload;
+    let row = state.items[index];
+    const selectedMethod = row.itemUnitPricingMethods?.find((p) => p.id === iupmId);
+    row.itemUnitPricingMethodId = iupmId;
+    row.itemUnitPricingMethodName = selectedMethod?.itemUnitPricingMethodName || "";
+    row.price = InvoiceItemsMath.GetPriceBeforeTax(
+      row.taxIncluded,
+      selectedMethod?.price || 0,
+      row.totalTaxesPerc || 0
+    );
+    row.priceAfterTax = InvoiceItemsMath.CalcPriceAfterTax(row.price, row.totalTaxesPerc);
+
+    InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
+  }
+
+  public static onInvoiceItemQuantityChange(
+    state: InvoiceState,
+    action: PayloadAction<{ index: number; newQtn: number | undefined; }>
+  )
+  {
+    if (action.payload.newQtn == undefined)
+    {
+      return;
+    }
+    const { index, newQtn } = action.payload;
+    let row = state.items[index];
+    row.quantity = newQtn!;
+    row.totalPrice = InvoiceItemsMath.CalcTotalPriceBeforeTax(row.price, row.discount, newQtn!, row.totalTaxesPerc);
+    InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
+  }
+
+  public static onInvoiceItemDiscountChange(
+    state: InvoiceState,
+    action: PayloadAction<{ index: number; newDiscount: number | undefined; }>
+  )
+  {
+    if (action.payload.newDiscount == undefined)
+    {
+      return;
+    }
+    const { index, newDiscount } = action.payload;
+    let row = state.items[index];
+    row.discount = newDiscount!;
+    InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
+  }
+
+  public static onInvoiceItemAfterTaxPriceChange(
+    state: InvoiceState,
+    action: PayloadAction<{ index: number; newPrice: number | undefined; }>
+  )
+  {
+    if (action.payload.newPrice == undefined)
+    {
+      return;
+    }
+    const { index, newPrice } = action.payload;
+    let row = state.items[index];
+    row.priceAfterTax = newPrice!;
+    row.price = InvoiceItemsMath.CalcPriceBeforeTax(newPrice!, row.totalTaxesPerc);
+    row.totalPrice = InvoiceItemsMath.CalcTotalPriceBeforeTax(
+      row.price,
+      row.discount,
+      row.quantity,
+      row.totalTaxesPerc
+    );
+    InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }
 
   public static resetItems(state: InvoiceState)

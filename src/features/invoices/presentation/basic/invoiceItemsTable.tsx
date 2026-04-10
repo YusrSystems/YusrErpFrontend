@@ -1,7 +1,8 @@
-import { cn, NumberField, SelectField, TextField } from "@yusr_systems/ui";
+import { NumberField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
-import { discountChanges, priceAfterTaxChanges, priceChanges, removeItem, updateItem } from "../../logic/invoiceSliceUI";
+import InvoiceItemsMath from "../../logic/invoiceItemsMath";
+import { onInvoiceItemAfterTaxPriceChange, onInvoiceItemDiscountChange, onInvoiceItemIupmChange, onInvoiceItemQuantityChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
 import EmptyTable from "./emptyTable";
 
 export default function InvoiceItemsTable()
@@ -18,18 +19,18 @@ export default function InvoiceItemsTable()
       <table className="w-full text-sm text-right">
         <thead className="bg-muted/40 border-b border-border">
           <tr>
-            <th className="p-3 font-semibold  w-16 text-center text-muted-foreground">الرقم</th>
-            <th className="p-3 font-semibold">المادة</th>
-            <th className="p-3 font-semibold text-center w-72">طريقة التسعير</th>
-            <th className="p-3 font-semibold">التكلفة</th>
-            <th className="p-3 font-semibold text-center w-40">الكمية</th>
-            <th className="p-3 font-semibold">السعر بدون ضريبة</th>
-            <th className="p-3 font-semibold">نسبة الضريبة</th>
-            <th className="p-3 font-semibold">السعر بعد الضريبة</th>
-            <th className="p-3 font-semibold">الخصم</th>
-            <th className="p-3 font-semibold">التكلفة النهائية</th>
-            <th className="p-3 font-semibold">السعر النهائي بدون ضريبة</th>
-            <th className="p-3 font-semibold">السعر النهائي مع ضريبة</th>
+            <th className="p-3 font-semibold w-16 text-center text-muted-foreground">الرقم</th>
+            <th className="p-3 font-semibold w-50 ">المادة</th>
+            <th className="p-3 font-semibold w-40">طريقة التسعير</th>
+            <th className="p-3 font-semibold w-30 ">التكلفة</th>
+            <th className="p-3 font-semibold w-30">الكمية</th>
+            <th className="p-3 font-semibold w-30 ">السعر بدون ضريبة</th>
+            <th className="p-3 font-semibold w-30 ">نسبة الضريبة</th>
+            <th className="p-3 font-semibold w-30 ">السعر بعد الضريبة</th>
+            <th className="p-3 font-semibold w-30 ">الخصم</th>
+            <th className="p-3 font-semibold w-30 ">التكلفة النهائية</th>
+            <th className="p-3 font-semibold w-30 ">السعر النهائي بدون ضريبة</th>
+            <th className="p-3 font-semibold w-24 ">السعر النهائي مع ضريبة</th>
 
             <th className="p-4 font-semibold w-16 text-center"></th>
           </tr>
@@ -39,27 +40,20 @@ export default function InvoiceItemsTable()
             <>
               <tr
                 key={ row.id }
-                className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
+                className="border-border last:border-0 hover:bg-muted/20 transition-colors"
               >
-                <td className="p-4 text-center font-bold text-muted-foreground">{ index + 1 }</td>
+                <td className="px-2 pt-2 text-center font-bold text-muted-foreground">{ index + 1 }</td>
 
-                { /* Name */ }
-                <td className="p-4">
+                <td className="px-2 pt-2">
                   <div className="font-semibold text-foreground">{ row.itemName }</div>
                 </td>
 
-                { /* Pricing Method */ }
-                <td className="p-4 ">
+                <td className="px-2 pt-2">
                   <SelectField
                     label=""
                     value={ row.itemUnitPricingMethodId?.toString() || "" }
                     onValueChange={ (val: string) =>
-                    {
-                      dispatch(updateItem({
-                        ...row,
-                        itemUnitPricingMethodId: Number(val)
-                      }));
-                    } }
+                      dispatch(onInvoiceItemIupmChange({ index: index, iupmId: Number(val) })) }
                     options={ row.itemUnitPricingMethods?.map((m) => ({
                       label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
                       value: m.id.toString()
@@ -68,89 +62,91 @@ export default function InvoiceItemsTable()
                     isInvalid={ !!errors[`${row.id}_method`] }
                     disabled={ mode === "update" }
                   />
-                  { errors[`${row.id}_method`] && (
-                    <span className="text-xs text-red-500 mt-1 block animate-in fade-in">
-                      { errors[`${row.id}_method`] }
-                    </span>
-                  ) }
                 </td>
 
-                { /* cost */ }
-                <td>
-                  <NumberField label="" value={ row.cost || "0" } />
+                <td className="px-2 pt-2">
+                  <NumberField disabled label="" value={ row.cost || "0" } />
                 </td>
 
-                { /* quantity */ }
-                <td className="p-4">
+                <td className="px-2 pt-2">
                   <NumberField
                     label=""
                     min={ 1 }
                     value={ row.quantity ?? 1 }
-                    onChange={ (newValue) =>
-                    {
-                      dispatch(updateItem({ ...row, quantity: Number(newValue) }));
-                    } }
+                    onChange={ (newValue) => dispatch(onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
                     disabled={ mode === "update" }
                   />
                 </td>
 
-                { /* total cost without tax */ }
-                <td className="p-4">
-                  { /* price with only 2 fractional digits */ }
+                <td className="px-2 pt-2">
                   <NumberField
                     label=""
+                    disabled
                     value={ row.price || "0" }
-                    onChange={ (newValue) => dispatch(priceChanges({ index, price: Number(newValue) })) }
+                    onChange={ () =>
+                    {} }
                   />
                 </td>
 
-                { /* tax percentage */ }
-                <td className="p-4">
-                  <TextField label="" value={ row.totalTaxesPerc || "" } disabled />
+                <td className="px-2 pt-2">
+                  <TextField label="" value={ row.totalTaxesPerc || "0" } disabled />
                 </td>
 
-                { /* total after tax */ }
-                <td className="p-4">
+                <td className="px-2 pt-2">
                   <NumberField
                     label=""
-                    value={ row.priceAtferTax || row.price * ((100 + row.totalTaxesPerc) / 100) || 0 }
-                    onChange={ (newVal) => dispatch(priceAfterTaxChanges({ index, priceAfterTax: Number(newVal) })) }
+                    value={ row.priceAfterTax || "0" }
+                    onChange={ (newVal) =>
+                      dispatch(onInvoiceItemAfterTaxPriceChange({ index: index, newPrice: Number(newVal) })) }
                   />
                 </td>
 
-                { /* discount */ }
-                <td className="p-4">
+                <td className="px-2 pt-2">
                   <NumberField
                     label=""
                     value={ row.discount || "0" }
                     onChange={ (newValue) =>
                     {
                       newValue = Number(newValue) || 0;
-                      dispatch(discountChanges({ index, discount: Number(newValue) }));
+                      dispatch(onInvoiceItemDiscountChange({ index: index, newDiscount: Number(newValue) }));
                     } }
                   />
                 </td>
 
-                { /* final cost */ }
-                <td className="p-4">
-                  <TextField label="" value={ row.cost * row.quantity || "" } disabled />
-                </td>
-
-                { /* final price without tax */ }
-                <td className="p-4">
-                  <TextField label="" value={ (row.price * row.quantity) - row.discount || "" } disabled />
-                </td>
-
-                { /* final price with tax */ }
-                <td className="p-4">
+                <td className="px-2 pt-2">
                   <TextField
                     label=""
-                    value={ ((row.priceAtferTax ?? 0) * row.quantity) - row.discount || "" }
+                    value={ InvoiceItemsMath.CalcTotalCost(row.cost, row.quantity) || "0" }
                     disabled
                   />
                 </td>
 
-                <td className="p-4   ">
+                <td className="px-2 pt-2">
+                  <TextField
+                    label=""
+                    value={ InvoiceItemsMath.CalcTotalPriceBeforeTax(
+                      row.price,
+                      row.discount,
+                      row.quantity,
+                      row.totalTaxesPerc
+                    ) || "0" }
+                    disabled
+                  />
+                </td>
+
+                <td className="px-2 pt-2">
+                  <TextField
+                    label=""
+                    value={ InvoiceItemsMath.CalcTotalPriceAfterTax(
+                      InvoiceItemsMath.CalcPriceAfterTax(row.price, row.totalTaxesPerc),
+                      row.discount,
+                      row.quantity
+                    ) || "0" }
+                    disabled
+                  />
+                </td>
+
+                <td className="px-2 pt-2">
                   { mode === "create" && (
                     <button
                       type="button"
@@ -166,15 +162,20 @@ export default function InvoiceItemsTable()
                   ) }
                 </td>
               </tr>
-              <tr className="bg-muted/10">
-                <td colSpan={ 13 } className="p-3">
+              <tr className="bg-muted/10 border-b">
+                <td colSpan={ 13 } className="px-5 pt-1 pb-3">
                   <TextField
                     label=""
                     placeholder="أضف ملاحظات..."
                     value={ row.notes || "" }
                     onChange={ (val) =>
                     {
-                      dispatch(updateItem({ ...row, notes: typeof val === 'string' ? val : val.target.value }));
+                      dispatch(
+                        updateItem({
+                          index: index,
+                          item: { ...row, notes: typeof val === "string" ? val : val.target.value }
+                        })
+                      );
                     } }
                   />
                 </td>

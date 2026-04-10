@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useAppSelector } from "../../../../core/state/store";
 import { useInvoiceContext } from "../../logic/invoiceContext";
-import ItemsMathActions from "../../logic/itemsMathActions";
+import { CalcInvoicePaidPrice, CalcInvoicePriceAfterTax, CalcInvoicePriceBeforeTax, CalcInvoiceUnpaidPrice } from "../../logic/invoiceItemsMath";
 
 interface SummaryCardProps
 {
@@ -113,21 +113,23 @@ function SummaryCard({ label, value, symbol, hint, variant = "default", delay = 
 export default function InvoiceItemsSummary()
 {
   const { formData } = useInvoiceContext();
-  const items = useAppSelector((state) => state.invoiceUI.items);
-  const { totalAfterTaxes, totalBeforeTaxes } = ItemsMathActions.summaryCalculate(items);
+  const priceBeforeTax = useAppSelector(CalcInvoicePriceBeforeTax);
+  const priceAfterTax = useAppSelector(CalcInvoicePriceAfterTax);
+  const paidPrice = useAppSelector(CalcInvoicePaidPrice);
+  const unpaidPrice = useAppSelector(CalcInvoiceUnpaidPrice);
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 rtl">
       <SummaryCard
         label="الإجمالي قبل الضريبة"
-        value={ totalBeforeTaxes }
+        value={ priceBeforeTax }
         symbol="∑"
         hint="قبل إضافة الضريبة"
         delay={ 50 }
       />
       <SummaryCard
         label="الإجمالي بعد الضريبة"
-        value={ totalAfterTaxes }
+        value={ priceAfterTax }
         symbol="Σ"
         hint="صافي المبلغ الكلي"
         delay={ 100 }
@@ -141,7 +143,7 @@ export default function InvoiceItemsSummary()
       />
       <SummaryCard
         label="المبلغ المدفوع"
-        value={ formData.paidAmount ?? 0 }
+        value={ paidPrice }
         symbol="✓"
         hint="تم استلامه"
         delay={ 200 }
@@ -149,7 +151,7 @@ export default function InvoiceItemsSummary()
       />
       <SummaryCard
         label="المبلغ المتبقي"
-        value={ formData.addedAmount ?? 0 }
+        value={ unpaidPrice }
         symbol="△"
         hint="غير مسدّد"
         delay={ 250 }

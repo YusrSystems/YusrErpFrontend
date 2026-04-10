@@ -55,15 +55,16 @@ export class InvoiceItem extends BaseEntity
   public quantity!: number;
   public cost!: number;
   public price!: number;
+  public priceAfterTax !: number;
   public totalPrice!: number;
   public discount!: number;
   public taxable!: boolean;
+  public taxIncluded!: boolean;
   public totalTaxesPerc!: number;
   public notes?: string;
   public itemName!: string;
   public itemUnitPricingMethodName!: string;
   public itemUnitPricingMethods: ItemUnitPricingMethod[] = [];
-  public priceAtferTax?: number = 0;
 
   constructor(init?: Partial<InvoiceItem>)
   {

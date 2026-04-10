@@ -11,7 +11,7 @@ export default function InvoiceFilesTab()
     <div className="w-full flex items-center justify-center shrink-0 bg-muted/10 p-4 rounded-lg border">
       <StorageFileField
         label=""
-        file={ formData.invoiceFiles }
+        file={ formData.invoiceFiles ?? [] }
         onFileChange={ handleFileChange }
         onRemove={ handleRemoveFile }
         onDownload={ handleDownload }

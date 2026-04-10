@@ -6,19 +6,20 @@ import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
-import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
+import { InvoiceRelationType, InvoiceStatus, InvoiceType, InvoiceVoucher } from "../../core/data/invoice";
 import { ItemType } from "../../core/data/item";
 import { PaymentMethodSlice } from "../../core/data/paymentMethod";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import { InvoiceContext } from "./logic/invoiceContext";
-import { resetItems, resetVouchers } from "./logic/invoiceSliceUI";
+import { CalcInvoicePriceAfterTax } from "./logic/invoiceItemsMath";
+import { addVoucher, resetItems, resetPaymentVouchers, resetVouchers } from "./logic/invoiceSliceUI";
 import InvoiceBasicTab from "./presentation/basic/invoiceBasicTab";
+import InvoiceCostsTab from "./presentation/costs/invoiceCostsTab";
 import InvoiceFilesTab from "./presentation/files/invoiceFilesTab";
 import InvoicePaymentsTab from "./presentation/payments/invoicePaymentsTab";
 import InvoicePolicyTab from "./presentation/policy/invoicePolicyTab";
-import InvoiceCostsTab from "./presentation/costs/invoiceCostsTab";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -30,6 +31,8 @@ export default function ChangeInvoiceDialog({
   const [initLoading, setInitLoading] = useState(false);
   const dispatch = useAppDispatch();
   const authState = useAppSelector((state) => state.auth);
+  const { items } = useAppSelector((state) => state.invoiceUI);
+  const totalPrice = useAppSelector(CalcInvoicePriceAfterTax);
 
   const validationRules: ValidationRule<Partial<Invoice>>[] = useMemo(
     () => [{
@@ -92,9 +95,6 @@ export default function ChangeInvoiceDialog({
 
   useEffect(() =>
   {
-    dispatch(resetItems());
-    dispatch(resetVouchers());
-
     if (formData.statusId)
     {
       dispatch(fetchStoreItems({
@@ -109,6 +109,31 @@ export default function ChangeInvoiceDialog({
 
   useEffect(() =>
   {
+    if (items == undefined || items.length >= 1)
+    {
+      dispatch(resetPaymentVouchers());
+      dispatch(addVoucher(
+        new InvoiceVoucher({
+          voucherId: 0,
+          invoiceId: formData.id,
+          paymentMethodId: authState.setting?.mainPaymentMethodId,
+          paymentMethodName: authState.setting?.mainPaymentMethodName,
+          accountId: undefined,
+          accountName: undefined,
+          invoiceRelationType: InvoiceRelationType.Payment,
+          amount: totalPrice,
+          amountReceived: totalPrice,
+          description: undefined
+        })
+      ));
+    }
+  }, [items]);
+
+  useEffect(() =>
+  {
+    dispatch(resetItems());
+    dispatch(resetVouchers());
+
     if (mode === "update" && entity?.id)
     {
       setInitLoading(true);

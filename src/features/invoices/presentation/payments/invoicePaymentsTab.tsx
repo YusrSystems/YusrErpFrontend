@@ -1,12 +1,11 @@
 import { Button, FormField, NumberField, SearchableSelect } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
-import { useEffect } from "react";
 import { InvoiceRelationType, InvoiceVoucher } from "../../../../core/data/invoice";
 import { PaymentMethodFilterColumns, PaymentMethodSlice } from "../../../../core/data/paymentMethod";
 import { useAppSelector } from "../../../../core/state/store";
 import { useInvoiceContext } from "../../logic/invoiceContext";
-import { addVoucher, removeVoucher, resetPaymentVouchers, updateVoucher } from "../../logic/invoiceSliceUI";
-import { selectInvoiceTotalPrice, selectInvoiceUnpaidPrice } from "../../logic/itemsMathActions";
+import { CalcInvoiceUnpaidPrice } from "../../logic/invoiceItemsMath";
+import { addVoucher, removeVoucher, updateVoucher } from "../../logic/invoiceSliceUI";
 
 export default function InvoicePaymentsTab()
 {
@@ -16,33 +15,10 @@ export default function InvoicePaymentsTab()
     authState,
     dispatch
   } = useInvoiceContext();
-  const { vouchers, items } = useAppSelector((state) => state.invoiceUI);
+  const { vouchers } = useAppSelector((state) => state.invoiceUI);
   const paymentMethodState = useAppSelector((state) => state.paymentMethod);
   const paymentVouchers = () => vouchers.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment);
-  const totalPrice = useAppSelector(selectInvoiceTotalPrice);
-  const unpaidPrice = useAppSelector(selectInvoiceUnpaidPrice);
-
-  useEffect(() =>
-  {
-    if (items == undefined || items.length >= 1)
-    {
-      dispatch(resetPaymentVouchers());
-      dispatch(addVoucher(
-        new InvoiceVoucher({
-          voucherId: 0,
-          invoiceId: formData.id,
-          paymentMethodId: authState.setting?.mainPaymentMethodId,
-          paymentMethodName: authState.setting?.mainPaymentMethodName,
-          accountId: undefined,
-          accountName: undefined,
-          invoiceRelationType: InvoiceRelationType.Payment,
-          amount: totalPrice,
-          amountReceived: totalPrice,
-          description: undefined
-        })
-      ));
-    }
-  }, [items]);
+  const unpaidPrice = useAppSelector(CalcInvoiceUnpaidPrice);
 
   return (
     <div className="flex flex-col gap-2 items-end">

@@ -3,7 +3,6 @@ import type { DialogMode } from "@yusr_systems/ui";
 import { InvoiceItem, InvoiceVoucher } from "../../../core/data/invoice";
 import InvoiceItemsActions from "./invoiceItemsActions";
 import InvoiceVouchersActions from "./invoiceVouchersActions";
-import ItemsMathActions from "./itemsMathActions";
 
 export interface InvoiceState
 {
@@ -29,6 +28,10 @@ export const invoiceSliceUI = createSlice({
     removeItem: InvoiceItemsActions.removeItem,
     updateItem: InvoiceItemsActions.updateItem,
     resetItems: InvoiceItemsActions.resetItems,
+    onInvoiceItemIupmChange: InvoiceItemsActions.onInvoiceItemIupmChange,
+    onInvoiceItemQuantityChange: InvoiceItemsActions.onInvoiceItemQuantityChange,
+    onInvoiceItemAfterTaxPriceChange: InvoiceItemsActions.onInvoiceItemAfterTaxPriceChange,
+    onInvoiceItemDiscountChange: InvoiceItemsActions.onInvoiceItemDiscountChange,
 
     // vouchers
     addVoucher: InvoiceVouchersActions.addVoucher,
@@ -36,12 +39,7 @@ export const invoiceSliceUI = createSlice({
     updateVoucher: InvoiceVouchersActions.updateVoucher,
     resetVouchers: InvoiceVouchersActions.resetVouchers,
     resetPaymentVouchers: InvoiceVouchersActions.resetPaymentVouchers,
-    resetCostVouchers: InvoiceVouchersActions.resetCostVouchers,
-
-    // items tax
-    priceAfterTaxChanges: ItemsMathActions.priceAfterTaxChanges,
-    priceChanges: ItemsMathActions.priceChanges,
-    discountChanges: ItemsMathActions.discountChanges
+    resetCostVouchers: InvoiceVouchersActions.resetCostVouchers
   }
 });
 
@@ -50,15 +48,16 @@ export const {
   removeItem,
   updateItem,
   resetItems,
+  onInvoiceItemIupmChange,
+  onInvoiceItemQuantityChange,
+  onInvoiceItemAfterTaxPriceChange,
+  onInvoiceItemDiscountChange,
   addVoucher,
   removeVoucher,
   updateVoucher,
   resetVouchers,
   resetPaymentVouchers,
-  resetCostVouchers,
-  priceAfterTaxChanges,
-  priceChanges,
-  discountChanges
+  resetCostVouchers
 } = invoiceSliceUI.actions;
 
 export default invoiceSliceUI.reducer;
