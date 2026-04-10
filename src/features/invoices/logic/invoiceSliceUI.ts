@@ -1,17 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { InvoiceItem } from "../../../core/data/invoice";
-import InvoiceItemsActions from "./invoiceItemsActions";
 import type { DialogMode } from "@yusr_systems/ui";
+import { InvoiceItem, InvoiceVoucher } from "../../../core/data/invoice";
+import InvoiceItemsActions from "./invoiceItemsActions";
+import InvoiceVouchersActions from "./invoiceVouchersActions";
 
 export interface InvoiceState
 {
   mode: DialogMode;
   items: InvoiceItem[];
+  vouchers: InvoiceVoucher[];
   errors: Record<string, string>;
 }
 
 const initialState: InvoiceState = {
   items: [],
+  vouchers: [],
   errors: {},
   mode: "create"
 };
@@ -25,9 +28,25 @@ export const invoiceSliceUI = createSlice({
     removeItem: InvoiceItemsActions.removeItem,
     changeQuantity: InvoiceItemsActions.changeQuantity,
     updateItem: InvoiceItemsActions.updateItem,
-    resetItems: InvoiceItemsActions.resetItems
+    resetItems: InvoiceItemsActions.resetItems,
+
+    // vouchers
+    addVoucher: InvoiceVouchersActions.addVoucher,
+    removeVoucher: InvoiceVouchersActions.removeVoucher,
+    updateVoucher: InvoiceVouchersActions.updateVoucher,
+    resetVouchers: InvoiceVouchersActions.resetVouchers
   }
 });
 
-export const { addItem, removeItem, changeQuantity, updateItem, resetItems } = invoiceSliceUI.actions;
+export const {
+  addItem,
+  removeItem,
+  changeQuantity,
+  updateItem,
+  resetItems,
+  addVoucher,
+  removeVoucher,
+  updateVoucher,
+  resetVouchers
+} = invoiceSliceUI.actions;
 export default invoiceSliceUI.reducer;

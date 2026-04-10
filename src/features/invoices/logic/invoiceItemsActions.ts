@@ -1,5 +1,4 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { InvoiceItem } from "../../../core/data/invoice";
 import type { StoreItem } from "../../../core/data/item";
 import type { InvoiceState } from "./invoiceSliceUI";
 
@@ -54,7 +53,9 @@ export default class InvoiceItemsActions
 
     const price = defaultPricingMethod?.price || 0;
 
-    const newItem = new InvoiceItem({
+    state.items.push({
+      id: 0,
+      invoiceId: 0,
       itemId: baseItem.id!,
       itemName: baseItem.name,
 
@@ -77,8 +78,6 @@ export default class InvoiceItemsActions
       // Misc
       notes: baseItem.notes
     });
-
-    state.items.push(newItem);
   }
 
   public static resetItems(state: InvoiceState)

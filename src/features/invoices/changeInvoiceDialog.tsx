@@ -1,19 +1,21 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
-import { Box, FolderKanban, Siren } from "lucide-react";
+import { BanknoteArrowDown, Box, FolderKanban, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
 import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import { ItemType } from "../../core/data/item";
+import { PaymentMethodSlice } from "../../core/data/paymentMethod";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import { InvoiceContext } from "./logic/invoiceContext";
 import InvoiceBasicTab from "./presentation/basic/invoiceBasicTab";
 import InvoiceFilesTab from "./presentation/files/invoiceFilesTab";
+import InvoicePaymentsTab from "./presentation/payments/invoicePaymentsTab";
 import InvoicePolicyTab from "./presentation/policy/invoicePolicyTab";
 
 export default function ChangeInvoiceDialog({
@@ -82,6 +84,7 @@ export default function ChangeInvoiceDialog({
   useEffect(() =>
   {
     dispatch(ClientsAndSuppliersSlice.entityActions.filter());
+    dispatch(PaymentMethodSlice.entityActions.filter());
     dispatch(filterStores());
   }, [dispatch]);
 
@@ -159,6 +162,11 @@ export default function ChangeInvoiceDialog({
           icon: Box,
           active: true,
           content: <InvoiceBasicTab />
+        }, {
+          label: "سندات الدفع",
+          icon: BanknoteArrowDown,
+          active: false,
+          content: <InvoicePaymentsTab />
         }, {
           label: "سياسة الفاتورة",
           icon: Siren,

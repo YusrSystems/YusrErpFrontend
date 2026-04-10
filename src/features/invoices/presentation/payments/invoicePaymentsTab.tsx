@@ -1,0 +1,175 @@
+import { Button, FormField, NumberField, SearchableSelect } from "@yusr_systems/ui";
+import { Plus, Trash2 } from "lucide-react";
+import { useEffect } from "react";
+import { InvoiceRelationType, InvoiceVoucher } from "../../../../core/data/invoice";
+import { PaymentMethodFilterColumns, PaymentMethodSlice } from "../../../../core/data/paymentMethod";
+import { useAppSelector } from "../../../../core/state/store";
+import { useInvoiceContext } from "../../logic/invoiceContext";
+import { addVoucher, removeVoucher, resetVouchers, updateVoucher } from "../../logic/invoiceSliceUI";
+
+export default function InvoicePaymentsTab()
+{
+  const {
+    mode,
+    formData,
+    authState,
+    dispatch
+  } = useInvoiceContext();
+  const { vouchers, items } = useAppSelector((state) => state.invoiceUI);
+  const paymentMethodState = useAppSelector((state) => state.paymentMethod);
+
+  useEffect(() =>
+  {
+    const amount = items?.reduce((sum, i) => sum + (i.totalPrice ?? 0), 0) ?? 0;
+    if (items == undefined || items.length == 0 || items.length == 1)
+    {
+      dispatch(resetVouchers());
+      dispatch(addVoucher(
+        new InvoiceVoucher({
+          voucherId: 0,
+          invoiceId: formData.id,
+          paymentMethodId: authState.setting?.mainPaymentMethodId,
+          paymentMethodName: authState.setting?.mainPaymentMethodName,
+          accountId: undefined,
+          accountName: undefined,
+          invoiceRelationType: InvoiceRelationType.Payment,
+          amount: amount,
+          amountReceived: amount,
+          description: undefined
+        })
+      ));
+    }
+  }, [items]);
+
+  return (
+    <div className="flex flex-col gap-2 items-end">
+      <Button
+        type="button"
+        className="max-w-40"
+        size="lg"
+        onClick={ () =>
+          dispatch(addVoucher(
+            new InvoiceVoucher({
+              voucherId: 0,
+              invoiceId: formData.id,
+              paymentMethodId: undefined,
+              paymentMethodName: undefined,
+              accountId: undefined,
+              accountName: undefined,
+              invoiceRelationType: InvoiceRelationType.Payment,
+              amount: 0,
+              amountReceived: 0,
+              description: undefined
+            })
+          )) }
+      >
+        <Plus className="w-4 h-4 ml-2" /> إضافة طريقة تخزين
+      </Button>
+
+      <div className="w-full overflow-x-auto border border-border rounded-lg shadow-sm bg-background" dir="rtl">
+        <table className="w-full text-sm text-right">
+          <thead className="bg-muted/40 border-b border-border">
+            <tr>
+              <th className="p-3 font-semibold w-16 text-center text-muted-foreground">الرقم</th>
+              <th className="p-3 font-semibold">طريقة الدفع</th>
+              <th className="p-3 font-semibold text-center">المبلغ</th>
+              <th className="p-3 font-semibold">المبلغ المستلم</th>
+              <th className="p-3 font-semibold text-center">المبلغ المسترد</th>
+              <th className="p-4 font-semibold w-16 text-center"></th>
+            </tr>
+          </thead>
+          <tbody>
+            { vouchers.map((row, index) => (
+              <tr
+                key={ row.voucherId }
+                className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
+              >
+                <td className="p-2 text-center font-bold text-muted-foreground">{ index + 1 }</td>
+
+                <td className="p-2">
+                  <FormField label="">
+                    <SearchableSelect
+                      items={ paymentMethodState.entities.data ?? [] }
+                      itemLabelKey="name"
+                      itemValueKey="id"
+                      value={ row.paymentMethodId?.toString() }
+                      columnsNames={ PaymentMethodFilterColumns.columnsNames }
+                      onSearch={ (condition) => dispatch(PaymentMethodSlice.entityActions.filter(condition)) }
+                      disabled={ paymentMethodState.isLoading || mode === "update" }
+                      onValueChange={ (val) =>
+                      {
+                        const selected = paymentMethodState.entities.data?.find((a) => a.id.toString() === val);
+                        if (selected)
+                        {
+                          dispatch(updateVoucher({
+                            index: index,
+                            voucher: {
+                              ...row,
+                              paymentMethodId: selected?.id,
+                              paymentMethodName: selected?.name
+                            }
+                          }));
+                        }
+                      } }
+                    />
+                  </FormField>
+                </td>
+
+                <td className="p-2">
+                  <NumberField
+                    label=""
+                    min={ 0 }
+                    max={ (items?.reduce((sum, i) => sum + (i.totalPrice ?? 0), 0) ?? 0)
+                      - (vouchers?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0)
+                      + 1 }
+                    value={ row.amount || "0" }
+                    onChange={ (val) =>
+                    {
+                      if (val != undefined)
+                      {
+                        dispatch(updateVoucher({ index: index, voucher: { ...row, amount: val } }));
+                      }
+                    } }
+                  />
+                </td>
+
+                <td className="p-2">
+                  <NumberField
+                    label=""
+                    value={ row.amountReceived || "0" }
+                    onChange={ (val) =>
+                      dispatch(updateVoucher({ index: index, voucher: { ...row, amountReceived: val } })) }
+                  />
+                </td>
+
+                <td className="p-2">
+                  <NumberField
+                    disabled
+                    label=""
+                    value={ (row.amountReceived ?? 0) - (row.amount ?? 0) || "0" }
+                    onChange={ () =>
+                    {} }
+                  />
+                </td>
+
+                <td className="p-4 text-center align-top pt-5">
+                  <button
+                    type="button"
+                    onClick={ () =>
+                    {
+                      dispatch(removeVoucher(row.voucherId));
+                    } }
+                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
+                    aria-label="حذف السند"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </td>
+              </tr>
+            )) }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
