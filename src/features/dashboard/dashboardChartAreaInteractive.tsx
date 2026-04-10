@@ -50,7 +50,7 @@ export function DashboardChartAreaInteractive({ data }: ChartAreaInteractiveProp
   }, [data, timeRange]);
 
   return (
-    <Card className="@container/card m-4">
+    <Card className="@container/card m-6">
       <CardHeader>
         <CardTitle>المبيعات والمشتريات</CardTitle>
         <CardDescription>مقارنة بين إجمالي المبيعات والمشتريات</CardDescription>

@@ -20,12 +20,12 @@ export default function InvoiceBasicInfo()
 
   const accountState = useAppSelector((state) => state.clientsAndSuppliers);
   const storeState = useAppSelector((state) => state.store);
-  let selectedAccount: Account | undefined = undefined;
+  let selectedAccount: Account | undefined = accountState.entities?.data?.find((account) => account.id === formData.actionAccountId);
 
   const canBeExportInvoice = () =>
   {
     const accountCountryId: number | undefined = selectedAccount?.city?.countryId;
-    const settingsCountryId: number | undefined = authState.setting?.branch?.city?.countryId;
+    const settingsCountryId: number | undefined = authState.setting?.branch?.city?.countryId;    
 
     if (accountCountryId == undefined || settingsCountryId == undefined)
     {
@@ -169,7 +169,7 @@ export default function InvoiceBasicInfo()
       ) }
 
       { canBeImportInvoice() && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-6 border bg-primary/5 rounded-lg px-2">
           <Checkbox id="importInvoice" checked disabled />
           <label htmlFor="importInvoice" className="text-sm font-bold">
             فاتورة تصدير
