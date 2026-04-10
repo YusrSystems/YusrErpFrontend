@@ -38,7 +38,7 @@ export const invoiceSliceUI = createSlice({
     resetVouchers: InvoiceVouchersActions.resetVouchers,
 
     // items tax
-    totalAfterDiscountChanges: ItemsMathActions.priceAfterTaxChanges
+    totalAfterDiscountChanges: ItemsMathActions.priceAfterTaxChanges,
   }
 });
 

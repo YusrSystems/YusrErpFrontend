@@ -6,6 +6,7 @@ import { PaymentMethodFilterColumns, PaymentMethodSlice } from "../../../../core
 import { useAppSelector } from "../../../../core/state/store";
 import { useInvoiceContext } from "../../logic/invoiceContext";
 import { addVoucher, removeVoucher, resetVouchers, updateVoucher } from "../../logic/invoiceSliceUI";
+import { selectInvoiceTotalPrice, selectInvoiceUnpaidPrice } from "../../logic/itemsMathActions";
 
 export default function InvoicePaymentsTab()
 {
@@ -17,10 +18,11 @@ export default function InvoicePaymentsTab()
   } = useInvoiceContext();
   const { vouchers, items } = useAppSelector((state) => state.invoiceUI);
   const paymentMethodState = useAppSelector((state) => state.paymentMethod);
+  const totalPrice = useAppSelector(selectInvoiceTotalPrice);
+  const unpaidPrice = useAppSelector(selectInvoiceUnpaidPrice);
 
   useEffect(() =>
   {
-    const amount = items?.reduce((sum, i) => sum + (i.totalPrice ?? 0), 0) ?? 0;
     if (items == undefined || items.length == 0 || items.length == 1)
     {
       dispatch(resetVouchers());
@@ -33,13 +35,13 @@ export default function InvoicePaymentsTab()
           accountId: undefined,
           accountName: undefined,
           invoiceRelationType: InvoiceRelationType.Payment,
-          amount: amount,
-          amountReceived: amount,
+          amount: totalPrice,
+          amountReceived: totalPrice,
           description: undefined
         })
       ));
     }
-  }, [items]);
+  }, [totalPrice]);
 
   return (
     <div className="flex flex-col gap-2 items-end">
@@ -119,9 +121,7 @@ export default function InvoicePaymentsTab()
                   <NumberField
                     label=""
                     min={ 0 }
-                    max={ (items?.reduce((sum, i) => sum + (i.totalPrice ?? 0), 0) ?? 0)
-                      - (vouchers?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0)
-                      + 1 }
+                    max={ unpaidPrice + (row.amount ?? 0) }
                     value={ row.amount || "0" }
                     onChange={ (val) =>
                     {

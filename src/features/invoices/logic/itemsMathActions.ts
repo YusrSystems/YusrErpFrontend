@@ -1,5 +1,6 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { InvoiceState } from "./invoiceSliceUI";
+import type { RootState } from "../../../core/state/store";
 
 export default class ItemsMathActions
 {
@@ -17,3 +18,12 @@ export default class ItemsMathActions
     // TODO: implement this
   }
 }
+
+export const selectInvoiceTotalPrice = (state: RootState) =>
+  state.invoiceUI.items?.reduce((sum, i) => sum + (i.totalPrice ?? 0), 0) ?? 0;
+
+export const selectInvoicePaidPrice = (state: RootState) =>
+  state.invoiceUI.vouchers?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0;
+
+export const selectInvoiceUnpaidPrice = (state: RootState) =>
+  selectInvoiceTotalPrice(state) - selectInvoicePaidPrice(state);
