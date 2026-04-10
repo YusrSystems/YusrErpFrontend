@@ -4,8 +4,9 @@ import { ChangeDialog, DateField, DialogContent, DialogDescription, DialogHeader
 import { useEffect, useMemo, useState } from "react";
 import type Invoice from "../../core/data/invoice";
 import { ImportExportType, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
-import { InvoiceContext } from "./invoiceContext";
 import InvoiceBasicInfo from "./invoiceBasicInfo";
+import { InvoiceContext } from "./invoiceContext";
+import InvoiceItemsSummary from "./invoiceItemsSummary";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -112,10 +113,10 @@ export default function ChangeInvoiceDialog({
         validate={ validate }
       >
         <div className="flex flex-col gap-6">
-          <InvoiceBasicInfo/>
-          
+          <InvoiceBasicInfo />
 
-          {/* <FieldsSection title="التفاصيل المالية" columns={ 3 }>
+          {
+            /* <FieldsSection title="التفاصيل المالية" columns={ 3 }>
             <NumberField
               label="مبلغ الخصم"
               value={ formData.discountAmount || 0 }
@@ -175,8 +176,12 @@ export default function ChangeInvoiceDialog({
                 rows={ 3 }
               />
             </div>
-          </FieldsSection> */}
+          </FieldsSection> */
+          }
 
+          <div className="flex">
+            <InvoiceItemsSummary />
+          </div>
         </div>
       </ChangeDialog>
     </InvoiceContext.Provider>
