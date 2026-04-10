@@ -1,7 +1,7 @@
-import { cn, InputField, SelectField, TextField } from "@yusr_systems/ui";
+import { cn, InputField, NumberField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
-import { removeItem, updateItem } from "../../logic/invoiceSliceUI";
+import { removeItem, totalAfterDiscountChanges, updateItem } from "../../logic/invoiceSliceUI";
 import EmptyTable from "./emptyTable";
 
 export default function InvoiceItemsTable()
@@ -40,10 +40,12 @@ export default function InvoiceItemsTable()
             >
               <td className="p-4 text-center font-bold text-muted-foreground">{ index + 1 }</td>
 
+              { /* Name */ }
               <td className="p-4">
                 <div className="font-semibold text-foreground">{ row.itemName }</div>
               </td>
 
+              { /* Pricing Method */ }
               <td className="p-4 text-center align-top">
                 <SelectField
                   label=""
@@ -70,19 +72,21 @@ export default function InvoiceItemsTable()
                 ) }
               </td>
 
+              { /* cost */ }
               <td>
-                <TextField label="" value={ row.price || "" } disabled />
+                <NumberField label="" value={ row.cost || "0" } />
               </td>
 
+              { /* quantity */ }
               <td className="p-4 text-center align-top">
                 <div className="flex flex-col items-center justify-center gap-1">
-                  <InputField
+                  <NumberField
                     label=""
                     min={ 1 }
                     value={ row.quantity ?? 1 }
-                    onChange={ (e) =>
+                    onChange={ (newValue) =>
                     {
-                      dispatch(updateItem({ ...row, quantity: Number(e.target.value) }));
+                      dispatch(updateItem({ ...row, quantity: Number(newValue) }));
                     } }
                     disabled={ mode === "update" }
                     className={ cn(
@@ -98,16 +102,24 @@ export default function InvoiceItemsTable()
                 </div>
               </td>
 
+              { /* total cost without tax */ }
               <td>
-                <TextField label="" value={ row.cost || "" } disabled />
+                { /* price with only 2 fractional digits */ }
+                <TextField label="" value={ row.price || "" } disabled />
               </td>
 
+              { /* tax percentage */ }
               <td className="p-4">
                 <TextField label="" value={ row.totalTaxesPerc || "" } disabled />
               </td>
 
+              { /* total after tax */ }
               <td className="p-4">
-                <TextField label="" value={ row.totalTaxesPerc || "" } disabled />
+                <NumberField
+                  label=""
+                  value={ row.price * ((100 + row.totalTaxesPerc) / 100) || 0 }
+                  onChange={ (newVal) => dispatch(totalAfterDiscountChanges({ index, priceAfterTax: Number(newVal) })) }
+                />
               </td>
 
               <td className="p-4">
@@ -124,7 +136,7 @@ export default function InvoiceItemsTable()
                     type="button"
                     onClick={ () =>
                     {
-                      dispatch(removeItem(row.id));
+                      dispatch(removeItem(index));
                     } }
                     className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
                     aria-label="حذف المادة"

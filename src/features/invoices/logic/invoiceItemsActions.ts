@@ -7,10 +7,8 @@ export default class InvoiceItemsActions
 {
   public static removeItem(state: InvoiceState, action: PayloadAction<number>)
   {
-    const id = action.payload;
-    state.items = state.items.filter((item) => item.id !== id);
-    delete state.errors[id];
-    delete state.errors[`${id}_method`];
+    const index = action.payload;
+    state.items.splice(index, 1);
   }
 
   public static changeQuantity(state: InvoiceState, action: PayloadAction<{ id: number; quantity: number; }>)
@@ -53,7 +51,7 @@ export default class InvoiceItemsActions
       || storeItem.itemUnitPricingMethods?.[0];
 
     const price = defaultPricingMethod?.price || 0;
-
+    const priceBeforeTax = storeItem.item.taxIncluded ? price * (storeItem.item.totalTaxes / 100) : price;
     const newItem = new InvoiceItem({
       itemId: baseItem.id!,
       itemName: baseItem.name,
@@ -66,9 +64,9 @@ export default class InvoiceItemsActions
       // Financials
       quantity: 1,
       cost: baseItem.cost || 0,
-      price: price,
+      price: priceBeforeTax,
       discount: 0,
-      totalPrice: price,
+      totalPrice: priceBeforeTax,
 
       // Taxes
       taxable: baseItem.taxable || false,
