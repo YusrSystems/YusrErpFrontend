@@ -118,28 +118,14 @@ export default class Invoice extends BaseEntity
   public actionAccountName!: string;
   public storeName!: string;
 
-  constructor(init?: Partial<Invoice>)
-  {
-    super();
-    Object.assign(this, init);
-  }
-
-  public isReturnInvoice(): boolean
-  {
-    return this.type === InvoiceType.SellReturn || this.type === InvoiceType.PurchaseReturn;
-  }
-}
-
-export class DetailedInvoice
-{
-  public invoice: Invoice = new Invoice();
   public invoiceItems: InvoiceItem[] = [];
   public invoiceVouchers: InvoiceVoucher[] = [];
   public invoiceFiles: StorageFile[] = [];
   public ignoreWarnings: boolean = false;
 
-  constructor(init?: Partial<DetailedInvoice>)
+  constructor(init?: Partial<Invoice>)
   {
+    super();
     Object.assign(this, init);
   }
 }

@@ -1,13 +1,13 @@
 import type { DialogMode } from "@yusr_systems/ui";
 import { createContext, useContext } from "react";
-import type { DetailedInvoice } from "../../core/data/invoice";
+import Invoice from "../../core/data/invoice";
 
 export type InvoiceContextType = {
   mode: DialogMode;
+  formData: Partial<Invoice>;
   handleChange: (
-    update: Partial<DetailedInvoice> | ((prev: Partial<DetailedInvoice>) => Partial<DetailedInvoice>)
+    update: Partial<Invoice> | ((prev: Partial<Invoice>) => Partial<Invoice>)
   ) => void;
-  formData: Partial<DetailedInvoice>;
   isInvalid: (field: string) => boolean;
   getError: (field: string) => string;
   clearError: (field: string) => void;
