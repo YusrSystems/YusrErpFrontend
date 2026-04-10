@@ -27,7 +27,6 @@ export default function StoreItemSelector({ storeId, itemType, onSelect }: Store
   {
     if (itemBarcodeState.barcodeResult)
     {
-      console.log(itemBarcodeState.barcodeResult);
       onSelect?.(itemBarcodeState.barcodeResult.storeItem, itemBarcodeState.barcodeResult.selectedIupm);
       dispatch(clearBarcodeResult());
     }
@@ -39,7 +38,6 @@ export default function StoreItemSelector({ storeId, itemType, onSelect }: Store
       {
         if (value && storeId && itemType)
         {
-          console.log(value, storeId, itemType);
           dispatch(GetItemByBarcode({ barcode: value, storeId: storeId }));
           setBarcode("");
         }

@@ -104,7 +104,6 @@ export default function ChangeItemTransferDialog({
       const getItem = async () =>
       {
         const res = await service.Get(entity.id);
-        console.log(res);
         handleChange({ ...res.data });
         dispatch(initializeItems(res.data?.itemTransfersItems ?? []));
         setInitLoading(false);

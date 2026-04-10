@@ -84,7 +84,6 @@ export const registerAsync = createAsyncThunk(
   async (data: Registration) =>
   {
     const res = await new RegisterApiService().register(data);
-    console.log(res);
 
     return res.data ?? null;
   }

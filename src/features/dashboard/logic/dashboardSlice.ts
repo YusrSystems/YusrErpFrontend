@@ -26,7 +26,6 @@ export const dashboardSlice = createSlice({
 export const fetchDashboardData = createAsyncThunk("dashboard/fetchDashboardData", async () =>
 {
   const res = await new DashboardApiService().get();
-  console.log(res);
 
   return res.data;
 });
