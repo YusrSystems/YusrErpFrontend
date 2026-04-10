@@ -36,131 +36,150 @@ export default function InvoiceItemsTable()
         </thead>
         <tbody>
           { items.map((row, index) => (
-            <tr
-              key={ row.id }
-              className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
-            >
-              <td className="p-4 text-center font-bold text-muted-foreground">{ index + 1 }</td>
+            <>
+              <tr
+                key={ row.id }
+                className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
+              >
+                <td className="p-4 text-center font-bold text-muted-foreground">{ index + 1 }</td>
 
-              { /* Name */ }
-              <td className="p-4">
-                <div className="font-semibold text-foreground">{ row.itemName }</div>
-              </td>
+                { /* Name */ }
+                <td className="p-4">
+                  <div className="font-semibold text-foreground">{ row.itemName }</div>
+                </td>
 
-              { /* Pricing Method */ }
-              <td className="p-4 ">
-                <SelectField
-                  label=""
-                  value={ row.itemUnitPricingMethodId?.toString() || "" }
-                  onValueChange={ (val: string) =>
-                  {
-                    dispatch(updateItem({
-                      ...row,
-                      itemUnitPricingMethodId: Number(val)
-                    }));
-                  } }
-                  options={ row.itemUnitPricingMethods?.map((m) => ({
-                    label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
-                    value: m.id.toString()
-                  })) || [] }
-                  placeholder="اختر طريقة التسعير"
-                  isInvalid={ !!errors[`${row.id}_method`] }
-                  disabled={ mode === "update" }
-                />
-                { errors[`${row.id}_method`] && (
-                  <span className="text-xs text-red-500 mt-1 block animate-in fade-in">
-                    { errors[`${row.id}_method`] }
-                  </span>
-                ) }
-              </td>
-
-              { /* cost */ }
-              <td>
-                <NumberField label="" value={ row.cost || "0" } />
-              </td>
-
-              { /* quantity */ }
-              <td className="p-4">
-                <NumberField
-                  label=""
-                  min={ 1 }
-                  value={ row.quantity ?? 1 }
-                  onChange={ (newValue) =>
-                  {
-                    dispatch(updateItem({ ...row, quantity: Number(newValue) }));
-                  } }
-                  disabled={ mode === "update" }
-                />
-              </td>
-
-              { /* total cost without tax */ }
-              <td className="p-4">
-                { /* price with only 2 fractional digits */ }
-                <NumberField
-                  label=""
-                  value={ row.price || "0" }
-                  onChange={ (newValue) => dispatch(priceChanges({ index, price: Number(newValue) })) }
-                />
-              </td>
-
-              { /* tax percentage */ }
-              <td className="p-4">
-                <TextField label="" value={ row.totalTaxesPerc || "" } disabled />
-              </td>
-
-              { /* total after tax */ }
-              <td className="p-4">
-                <NumberField
-                  label=""
-                  value={ row.priceAtferTax || row.price * ((100 + row.totalTaxesPerc) / 100) || 0 }
-                  onChange={ (newVal) => dispatch(priceAfterTaxChanges({ index, priceAfterTax: Number(newVal) })) }
-                />
-              </td>
-
-              { /* discount */ }
-              <td className="p-4">
-                <NumberField
-                  label=""
-                  value={ row.discount || "0" }
-                  onChange={ (newValue) =>
-                  {
-                    newValue = Number(newValue) || 0;
-                    dispatch(discountChanges({ index, discount: Number(newValue) }));
-                  } }
-                />
-              </td>
-
-              { /* final cost */ }
-              <td className="p-4">
-                <TextField label="" value={ row.cost * row.quantity || "" } disabled />
-              </td>
-
-              { /* final price without tax */ }
-              <td className="p-4">
-                <TextField label="" value={ (row.price * row.quantity) - row.discount || "" } disabled />
-              </td>
-
-              { /* final price with tax */ }
-              <td className="p-4">
-                <TextField label="" value={ ((row.priceAtferTax ?? 0) * row.quantity) - row.discount || "" } disabled />
-              </td>
-
-              <td className="p-4   ">
-                { mode === "create" && (
-                  <button
-                    type="button"
-                    onClick={ () =>
+                { /* Pricing Method */ }
+                <td className="p-4 ">
+                  <SelectField
+                    label=""
+                    value={ row.itemUnitPricingMethodId?.toString() || "" }
+                    onValueChange={ (val: string) =>
                     {
-                      dispatch(removeItem(index));
+                      dispatch(updateItem({
+                        ...row,
+                        itemUnitPricingMethodId: Number(val)
+                      }));
                     } }
-                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
-                    aria-label="حذف المادة"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                ) }
-              </td>
-            </tr>
+                    options={ row.itemUnitPricingMethods?.map((m) => ({
+                      label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
+                      value: m.id.toString()
+                    })) || [] }
+                    placeholder="اختر طريقة التسعير"
+                    isInvalid={ !!errors[`${row.id}_method`] }
+                    disabled={ mode === "update" }
+                  />
+                  { errors[`${row.id}_method`] && (
+                    <span className="text-xs text-red-500 mt-1 block animate-in fade-in">
+                      { errors[`${row.id}_method`] }
+                    </span>
+                  ) }
+                </td>
+
+                { /* cost */ }
+                <td>
+                  <NumberField label="" value={ row.cost || "0" } />
+                </td>
+
+                { /* quantity */ }
+                <td className="p-4">
+                  <NumberField
+                    label=""
+                    min={ 1 }
+                    value={ row.quantity ?? 1 }
+                    onChange={ (newValue) =>
+                    {
+                      dispatch(updateItem({ ...row, quantity: Number(newValue) }));
+                    } }
+                    disabled={ mode === "update" }
+                  />
+                </td>
+
+                { /* total cost without tax */ }
+                <td className="p-4">
+                  { /* price with only 2 fractional digits */ }
+                  <NumberField
+                    label=""
+                    value={ row.price || "0" }
+                    onChange={ (newValue) => dispatch(priceChanges({ index, price: Number(newValue) })) }
+                  />
+                </td>
+
+                { /* tax percentage */ }
+                <td className="p-4">
+                  <TextField label="" value={ row.totalTaxesPerc || "" } disabled />
+                </td>
+
+                { /* total after tax */ }
+                <td className="p-4">
+                  <NumberField
+                    label=""
+                    value={ row.priceAtferTax || row.price * ((100 + row.totalTaxesPerc) / 100) || 0 }
+                    onChange={ (newVal) => dispatch(priceAfterTaxChanges({ index, priceAfterTax: Number(newVal) })) }
+                  />
+                </td>
+
+                { /* discount */ }
+                <td className="p-4">
+                  <NumberField
+                    label=""
+                    value={ row.discount || "0" }
+                    onChange={ (newValue) =>
+                    {
+                      newValue = Number(newValue) || 0;
+                      dispatch(discountChanges({ index, discount: Number(newValue) }));
+                    } }
+                  />
+                </td>
+
+                { /* final cost */ }
+                <td className="p-4">
+                  <TextField label="" value={ row.cost * row.quantity || "" } disabled />
+                </td>
+
+                { /* final price without tax */ }
+                <td className="p-4">
+                  <TextField label="" value={ (row.price * row.quantity) - row.discount || "" } disabled />
+                </td>
+
+                { /* final price with tax */ }
+                <td className="p-4">
+                  <TextField
+                    label=""
+                    value={ ((row.priceAtferTax ?? 0) * row.quantity) - row.discount || "" }
+                    disabled
+                  />
+                </td>
+
+                <td className="p-4   ">
+                  { mode === "create" && (
+                    <button
+                      type="button"
+                      onClick={ () =>
+                      {
+                        dispatch(removeItem(index));
+                      } }
+                      className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
+                      aria-label="حذف المادة"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  ) }
+                </td>
+              </tr>
+              <tr className="bg-muted/10">
+                <td colSpan={ 13 } className="p-3">
+                  <TextField
+                    label=""
+                    placeholder="أضف ملاحظات..."
+                    value={ row.notes || "" }
+                    onChange={ (val) =>
+                    {
+                      dispatch(updateItem({ ...row, notes: typeof val === 'string' ? val : val.target.value }));
+                    } }
+                  />
+                </td>
+              </tr>
+            </>
           )) }
         </tbody>
       </table>
