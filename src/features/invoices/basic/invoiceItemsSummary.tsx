@@ -1,5 +1,5 @@
 import { TextField } from "@yusr_systems/ui";
-import { useInvoiceContext } from "./invoiceContext";
+import { useInvoiceContext } from "../invoiceContext";
 
 export default function InvoiceItemsSummary()
 {

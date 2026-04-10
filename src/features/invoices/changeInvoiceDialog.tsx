@@ -1,15 +1,17 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
+import { Box, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
 import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
-import InvoiceBasicInfo from "./invoiceBasicInfo";
+import InvoiceBasicTab from "./basic/invoiceBasicTab";
 import { InvoiceContext } from "./invoiceContext";
-import InvoiceItemsSummary from "./invoiceItemsSummary";
+import InvoicePolicyTab from "./policy/invoicePolicyTab";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -123,24 +125,28 @@ export default function ChangeInvoiceDialog({
         clearError
       } }
     >
-      <ChangeDialog<Invoice>
-        title={ `${mode === "create" ? "إنشاء" : "تعديل"} فاتورة` }
-        className="sm:max-w-[90vw]"
-        dialogMode={ mode }
-        formData={ formData }
-        service={ service }
-        disable={ () => false }
-        onSuccess={ (data) => onSuccess?.(data, mode) }
-        validate={ validate }
-      >
-        <div className="flex flex-col gap-6">
-          <InvoiceBasicInfo />
-
-          <div className="flex">
-            <InvoiceItemsSummary />
-          </div>
-        </div>
-      </ChangeDialog>
+      <ChangeDialogTabbed<Invoice>
+        changeDialogProps={ {
+          title: `${mode === "create" ? "إنشاء" : "تعديل"} فاتورة`,
+          className: "sm:max-w-[90vw]",
+          formData,
+          dialogMode: mode,
+          service,
+          onSuccess: (data) => onSuccess?.(data, mode),
+          validate
+        } }
+        tabs={ [{
+          label: "المعلومات الأساسية",
+          icon: Box,
+          active: true,
+          content: <InvoiceBasicTab />
+        }, {
+          label: "سياسة الفاتورة",
+          icon: Siren,
+          active: false,
+          content: <InvoicePolicyTab />
+        }] }
+      />
     </InvoiceContext.Provider>
   );
 }
