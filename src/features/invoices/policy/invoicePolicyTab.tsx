@@ -9,6 +9,7 @@ export default function InvoicePolicyTab()
     handleChange,
     authState
   } = useInvoiceContext();
+
   return (
     <TextAreaField
       label="السياسة / الشروط (تظهر في أسفل الفاتورة)"

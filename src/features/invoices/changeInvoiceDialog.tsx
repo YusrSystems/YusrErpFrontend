@@ -1,7 +1,7 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
-import { Box, Siren } from "lucide-react";
+import { Box, FolderKanban, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
@@ -10,7 +10,7 @@ import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import InvoiceBasicTab from "./basic/invoiceBasicTab";
-import InvoiceItemsTable from "./basic/invoiceItemsTable";
+import InvoiceFilesTab from "./files/invoiceFilesTab";
 import { InvoiceContext } from "./invoiceContext";
 import InvoicePolicyTab from "./policy/invoicePolicyTab";
 
@@ -148,6 +148,11 @@ export default function ChangeInvoiceDialog({
           icon: Siren,
           active: false,
           content: <InvoicePolicyTab />
+        }, {
+          label: "مرفقات الفاتورة",
+          icon: FolderKanban,
+          active: false,
+          content: <InvoiceFilesTab />
         }] }
       />
     </InvoiceContext.Provider>
