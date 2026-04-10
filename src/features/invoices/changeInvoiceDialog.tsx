@@ -1,13 +1,18 @@
 import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DateField, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldsSection, Loading, NumberField, SelectField, TextAreaField, TextField, useEntityForm } from "@yusr_systems/ui";
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
+import { Box, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
+import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
-import { ImportExportType, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
-import InvoiceBasicInfo from "./invoiceBasicInfo";
+import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import { filterStores } from "../stores/logic/storeSlice";
+import InvoiceBasicTab from "./basic/invoiceBasicTab";
+import InvoiceItemsTable from "./basic/invoiceItemsTable";
 import { InvoiceContext } from "./invoiceContext";
-import InvoiceItemsSummary from "./invoiceItemsSummary";
-import InvoiceItemsTable from "./invoiceItemsTable";
+import InvoicePolicyTab from "./policy/invoicePolicyTab";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -17,6 +22,8 @@ export default function ChangeInvoiceDialog({
 }: CommonChangeDialogProps<Invoice>)
 {
   const [initLoading, setInitLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
 
   const validationRules: ValidationRule<Partial<Invoice>>[] = useMemo(
     () => [{
@@ -43,6 +50,16 @@ export default function ChangeInvoiceDialog({
     () => ({
       ...entity,
       type: entity?.type ?? InvoiceType.Sell,
+      actionAccountId: entity?.actionAccountId
+        ?? (entity?.type === InvoiceType.Purchase
+          ? authState.setting?.purchaseAccountId
+          : authState.setting?.sellAccountId),
+      actionAccountName: entity?.actionAccountName
+        ?? (entity?.type === InvoiceType.Purchase
+          ? authState.setting?.purchaseAccountName
+          : authState.setting?.sellAccountName),
+      storeId: entity?.storeId ?? authState.setting?.mainStoreId,
+      storeName: entity?.storeName ?? authState.setting?.mainStoreName,
       statusId: entity?.statusId ?? InvoiceStatus.Valid,
       date: entity?.date
         ? new Date(entity.date).toISOString().split("T")[0]
@@ -59,6 +76,12 @@ export default function ChangeInvoiceDialog({
     initialValues,
     validationRules
   );
+
+  useEffect(() =>
+  {
+    dispatch(ClientsAndSuppliersSlice.entityActions.filter());
+    dispatch(filterStores());
+  }, [dispatch]);
 
   useEffect(() =>
   {
@@ -100,92 +123,33 @@ export default function ChangeInvoiceDialog({
         handleChange,
         isInvalid,
         getError,
-        clearError
+        clearError,
+        authState,
+        dispatch
       } }
     >
-      <ChangeDialog<Invoice>
-        title={ `${mode === "create" ? "إنشاء" : "تعديل"} فاتورة` }
-        className="sm:max-w-[95vw] "
-        dialogMode={ mode }
-        formData={ formData }
-        service={ service }
-        disable={ () => false }
-        onSuccess={ (data) => onSuccess?.(data, mode) }
-        validate={ validate }
-      >
-        <div className="flex flex-col gap-6">
-          <InvoiceBasicInfo />
-
-          {
-            /* <FieldsSection title="التفاصيل المالية" columns={ 3 }>
-            <NumberField
-              label="مبلغ الخصم"
-              value={ formData.discountAmount || 0 }
-              onChange={ (e) => handleChange({ discountAmount: Number(e) }) }
-            />
-            <NumberField
-              label="المبلغ المضاف"
-              value={ formData.addedAmount || 0 }
-              onChange={ (e) => handleChange({ addedAmount: Number(e) }) }
-            />
-            <NumberField
-              label="المبلغ المدفوع"
-              value={ formData.paidAmount || 0 }
-              onChange={ (e) => handleChange({ paidAmount: Number(e) }) }
-            />
-          </FieldsSection>
-
-          <FieldsSection title="معلومات إضافية" columns={ 2 }>
-            <TextField
-              label="المندوب"
-              value={ formData.delegateEmp || "" }
-              onChange={ (e) => handleChange({ delegateEmp: e.target.value }) }
-            />
-
-            <SelectField
-              label="نوع الاستيراد / التصدير"
-              value={ formData.importExportType?.toString() || "" }
-              onValueChange={ (val) =>
-                handleChange({
-                  importExportType: Number(val) as ImportExportType
-                }) }
-              options={ [{ label: "محلي", value: ImportExportType.Local.toString() }, {
-                label: "تصدير",
-                value: ImportExportType.Export.toString()
-              }, {
-                label: "استيراد (آلية الاحتساب العكسي)",
-                value: ImportExportType.ImportAccordingToTheReverseChargeMechanism.toString()
-              }, {
-                label: "استيراد (مدفوع للجمارك)",
-                value: ImportExportType.ImportPaidForCustoms.toString()
-              }] }
-            />
-
-            <div className="col-span-2">
-              <TextField
-                label="السياسة / الشروط"
-                value={ formData.policy || "" }
-                onChange={ (e) => handleChange({ policy: e.target.value }) }
-              />
-            </div>
-
-            <div className="col-span-2">
-              <TextAreaField
-                label="ملاحظات"
-                value={ formData.notes || "" }
-                onChange={ (e) => handleChange({ notes: e.target.value }) }
-                rows={ 3 }
-              />
-            </div>
-          </FieldsSection> */
-          }
-          <InvoiceItemsTable />
-
-          <div className="flex">
-            <InvoiceItemsSummary />
-          </div>
-        </div>
-      </ChangeDialog>
+      <ChangeDialogTabbed<Invoice>
+        changeDialogProps={ {
+          title: `${mode === "create" ? "إنشاء" : "تعديل"} فاتورة`,
+          className: "sm:max-w-[90vw]",
+          formData,
+          dialogMode: mode,
+          service,
+          onSuccess: (data) => onSuccess?.(data, mode),
+          validate
+        } }
+        tabs={ [{
+          label: "المعلومات الأساسية",
+          icon: Box,
+          active: true,
+          content: <InvoiceBasicTab />
+        }, {
+          label: "سياسة الفاتورة",
+          icon: Siren,
+          active: false,
+          content: <InvoicePolicyTab />
+        }] }
+      />
     </InvoiceContext.Provider>
   );
 }
