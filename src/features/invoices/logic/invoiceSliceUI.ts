@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { InvoiceItem } from "../../../core/data/invoice";
 import InvoiceItemsActions from "./invoiceItemsActions";
-import { mockInvoiceItems } from "./mockdata";
 
 export interface InvoiceState
 {
@@ -11,7 +10,7 @@ export interface InvoiceState
 }
 
 const initialState: InvoiceState = {
-  items: mockInvoiceItems,
+  items: [],
   errors: {},
   mode: "create"
 };
@@ -20,11 +19,8 @@ export const invoiceSliceUI = createSlice({
   name: "invoiceUI",
   initialState: initialState,
   reducers: {
-    addItem: (state, action) =>
-    {
-      state.items.push(action.payload);
-    },
-
+    // items
+    addItem: InvoiceItemsActions.addItem,
     removeItem: InvoiceItemsActions.removeItem,
     changeQuantity: InvoiceItemsActions.changeQuantity,
     updateItem: InvoiceItemsActions.updateItem

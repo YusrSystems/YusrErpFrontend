@@ -1,4 +1,6 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { InvoiceItem } from "../../../core/data/invoice";
+import type { StoreItem } from "../../../core/data/item";
 import type { InvoiceState } from "./invoiceSliceUI";
 
 export default class InvoiceItemsActions
@@ -27,5 +29,55 @@ export default class InvoiceItemsActions
   {
     const item = action.payload;
     state.items = state.items.map((i) => (i.id === item.id ? item : i));
+  }
+
+  public static addItem(state: InvoiceState, action: PayloadAction<StoreItem>)
+  {
+    const storeItem = action.payload;
+    const baseItem = storeItem.item;
+
+    const existingItem = state.items.find((item) => item.itemId === baseItem.id);
+
+    if (existingItem)
+    {
+      state.items = state.items.map((item) =>
+        item.itemId === baseItem.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ); //  existingItem.totalPrice = (existingItem.quantity * existingItem.price) - (existingItem.discount || 0);
+
+      return;
+    }
+
+    const defaultPricingMethod = storeItem.itemUnitPricingMethods?.find((p) => p.unitId === baseItem.sellUnitId)
+      || storeItem.itemUnitPricingMethods?.[0];
+
+    const price = defaultPricingMethod?.price || 0;
+
+    const newItem = new InvoiceItem({
+      itemId: baseItem.id!,
+      itemName: baseItem.name,
+
+      // Pricing Method Details
+      itemUnitPricingMethodId: defaultPricingMethod?.id || 0,
+      itemUnitPricingMethodName: defaultPricingMethod?.itemUnitPricingMethodName || "",
+      itemUnitPricingMethods: storeItem.itemUnitPricingMethods || [],
+
+      // Financials
+      quantity: 1,
+      cost: baseItem.cost || 0,
+      price: price,
+      discount: 0,
+      totalPrice: price,
+
+      // Taxes
+      taxable: baseItem.taxable || false,
+      totalTaxesPerc: baseItem.totalTaxes || 0,
+
+      // Misc
+      notes: baseItem.notes
+    });
+
+    state.items.push(newItem);
   }
 }
