@@ -7,6 +7,7 @@ import { ImportExportType, InvoiceStatus, InvoiceType } from "../../core/data/in
 import InvoiceBasicInfo from "./invoiceBasicInfo";
 import { InvoiceContext } from "./invoiceContext";
 import InvoiceItemsSummary from "./invoiceItemsSummary";
+import InvoiceItemsTable from "./invoiceItemsTable";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -104,7 +105,7 @@ export default function ChangeInvoiceDialog({
     >
       <ChangeDialog<Invoice>
         title={ `${mode === "create" ? "إنشاء" : "تعديل"} فاتورة` }
-        className="sm:max-w-3xl"
+        className="sm:max-w-[95vw] "
         dialogMode={ mode }
         formData={ formData }
         service={ service }
@@ -178,6 +179,7 @@ export default function ChangeInvoiceDialog({
             </div>
           </FieldsSection> */
           }
+          <InvoiceItemsTable />
 
           <div className="flex">
             <InvoiceItemsSummary />

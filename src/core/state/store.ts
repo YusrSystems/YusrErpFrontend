@@ -5,6 +5,7 @@ import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux
 import branchDialogReducer from "../../features/branches/logic/branchDialogSlice";
 import branchReducer from "../../features/branches/logic/branchSlice";
 import dashboardReducer from "../../features/dashboard/logic/dashboardSlice";
+import invoiceReducerUI from "../../features/invoices/logic/invoiceSliceUI";
 import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTransferSlice";
 import registerReducer from "../../features/register/logic/registerSlice";
 import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
@@ -98,7 +99,8 @@ export const store = configureStore({
     itemsSettlementDialog: ItemsSettlementSlice.dialogReducer,
     itemTransferUI: itemTransferReducer,
     dashboard: dashboardReducer,
-    register: registerReducer
+    register: registerReducer,
+    invoiceUI: invoiceReducerUI
   }
 });
 
