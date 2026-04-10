@@ -23,9 +23,10 @@ export const invoiceSliceUI = createSlice({
     addItem: InvoiceItemsActions.addItem,
     removeItem: InvoiceItemsActions.removeItem,
     changeQuantity: InvoiceItemsActions.changeQuantity,
-    updateItem: InvoiceItemsActions.updateItem
+    updateItem: InvoiceItemsActions.updateItem,
+    resetItems: InvoiceItemsActions.resetItems
   }
 });
 
-export const { addItem, removeItem, changeQuantity, updateItem } = invoiceSliceUI.actions;
+export const { addItem, removeItem, changeQuantity, updateItem, resetItems } = invoiceSliceUI.actions;
 export default invoiceSliceUI.reducer;

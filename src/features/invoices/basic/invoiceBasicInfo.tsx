@@ -5,6 +5,7 @@ import { StoreFilterColumns } from "../../../core/data/store";
 import { useAppSelector } from "../../../core/state/store";
 import { filterStores } from "../../stores/logic/storeSlice";
 import { useInvoiceContext } from "../invoiceContext";
+import { resetItems } from "../logic/invoiceSliceUI";
 
 export default function InvoiceBasicInfo()
 {
@@ -20,12 +21,14 @@ export default function InvoiceBasicInfo()
 
   const accountState = useAppSelector((state) => state.clientsAndSuppliers);
   const storeState = useAppSelector((state) => state.store);
-  let selectedAccount: Account | undefined = accountState.entities?.data?.find((account) => account.id === formData.actionAccountId);
+  let selectedAccount: Account | undefined = accountState.entities?.data?.find((account) =>
+    account.id === formData.actionAccountId
+  );
 
   const canBeExportInvoice = () =>
   {
     const accountCountryId: number | undefined = selectedAccount?.city?.countryId;
-    const settingsCountryId: number | undefined = authState.setting?.branch?.city?.countryId;    
+    const settingsCountryId: number | undefined = authState.setting?.branch?.city?.countryId;
 
     if (accountCountryId == undefined || settingsCountryId == undefined)
     {
@@ -112,6 +115,7 @@ export default function InvoiceBasicInfo()
           {
             const selected = storeState.entities.data?.find((a) => a.id.toString() === val);
             handleChange({ storeId: selected?.id, storeName: selected?.storeName, invoiceItems: [] });
+            dispatch(resetItems());
           } }
         />
       </FormField>

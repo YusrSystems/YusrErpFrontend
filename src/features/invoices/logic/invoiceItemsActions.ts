@@ -80,4 +80,9 @@ export default class InvoiceItemsActions
 
     state.items.push(newItem);
   }
+
+  public static resetItems(state: InvoiceState)
+  {
+    state.items = [];
+  }
 }
