@@ -1,4 +1,5 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
+import type { InvoiceItem } from "../../../core/data/invoice";
 import type { RootState } from "../../../core/state/store";
 import type { InvoiceState } from "./invoiceSliceUI";
 
@@ -37,6 +38,15 @@ export default class ItemsMathActions
   {
     const { index, discount } = action.payload;
     state.items[index].discount = discount;
+  }
+
+  public static summaryCalculate(items: InvoiceItem[])
+  {
+    // ((row.priceAtferTax ?? 0) * row.quantity) - row.discount
+    const totalAfterTaxes = items.reduce((sum, i) => sum + ((i.priceAtferTax ?? 0) * i.quantity) - i.discount, 0);
+    const totalBeforeTaxes = items.reduce((sum, i) => sum + ((i.price ?? 0) * i.quantity) - i.discount, 0);
+
+    return { totalAfterTaxes, totalBeforeTaxes };
   }
 }
 
