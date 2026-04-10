@@ -1,6 +1,9 @@
 import type { DialogMode } from "@yusr_systems/ui";
 import { createContext, useContext } from "react";
 import Invoice from "../../core/data/invoice";
+import type { AuthState, User } from "@yusr_systems/core";
+import type { Setting } from "../../core/data/setting";
+import type { ThunkDispatch } from "redux-thunk";
 
 export type InvoiceContextType = {
   mode: DialogMode;
@@ -11,6 +14,8 @@ export type InvoiceContextType = {
   isInvalid: (field: string) => boolean;
   getError: (field: string) => string;
   clearError: (field: string) => void;
+  authState: AuthState<User, Setting>;
+  dispatch: ThunkDispatch<any, any, any>;
 };
 export const InvoiceContext = createContext<InvoiceContextType | undefined>(
   undefined

@@ -6,12 +6,13 @@ export default function InvoicePolicyTab()
   const {
     mode,
     formData,
-    handleChange
+    handleChange,
+    authState
   } = useInvoiceContext();
   return (
     <TextAreaField
       label="السياسة / الشروط (تظهر في أسفل الفاتورة)"
-      value={ formData.policy || "" }
+      value={ formData.policy || authState.setting?.invoicePolicy || "" }
       onChange={ (e) => handleChange({ policy: e.target.value }) }
       disabled={ mode === "update" }
       className="h-100"

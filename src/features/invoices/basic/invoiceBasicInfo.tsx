@@ -2,7 +2,7 @@ import { Checkbox, DateField, FieldsSection, FormField, SearchableSelect, Select
 import Account, { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../../core/data/account";
 import { ImportExportType, InvoiceType } from "../../../core/data/invoice";
 import { StoreFilterColumns } from "../../../core/data/store";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
+import { useAppSelector } from "../../../core/state/store";
 import { filterStores } from "../../stores/logic/storeSlice";
 import { useInvoiceContext } from "../invoiceContext";
 
@@ -13,13 +13,13 @@ export default function InvoiceBasicInfo()
     formData,
     handleChange,
     isInvalid,
-    getError
+    getError,
+    authState,
+    dispatch
   } = useInvoiceContext();
 
-  const dispatch = useAppDispatch();
   const accountState = useAppSelector((state) => state.clientsAndSuppliers);
   const storeState = useAppSelector((state) => state.store);
-  const authState = useAppSelector((state) => state.auth);
   let selectedAccount: Account | undefined = undefined;
 
   const canBeExportInvoice = () =>

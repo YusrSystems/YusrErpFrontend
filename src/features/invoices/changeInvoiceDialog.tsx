@@ -122,7 +122,9 @@ export default function ChangeInvoiceDialog({
         handleChange,
         isInvalid,
         getError,
-        clearError
+        clearError,
+        authState,
+        dispatch
       } }
     >
       <ChangeDialogTabbed<Invoice>
