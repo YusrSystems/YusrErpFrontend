@@ -3,6 +3,7 @@ import type { DialogMode } from "@yusr_systems/ui";
 import { InvoiceItem, InvoiceVoucher } from "../../../core/data/invoice";
 import InvoiceItemsActions from "./invoiceItemsActions";
 import InvoiceVouchersActions from "./invoiceVouchersActions";
+import ItemsMathActions from "./itemsMathActions";
 
 export interface InvoiceState
 {
@@ -34,7 +35,10 @@ export const invoiceSliceUI = createSlice({
     addVoucher: InvoiceVouchersActions.addVoucher,
     removeVoucher: InvoiceVouchersActions.removeVoucher,
     updateVoucher: InvoiceVouchersActions.updateVoucher,
-    resetVouchers: InvoiceVouchersActions.resetVouchers
+    resetVouchers: InvoiceVouchersActions.resetVouchers,
+
+    // items tax
+    totalAfterDiscountChanges: ItemsMathActions.priceAfterTaxChanges
   }
 });
 
@@ -47,6 +51,8 @@ export const {
   addVoucher,
   removeVoucher,
   updateVoucher,
-  resetVouchers
+  resetVouchers,
+  totalAfterDiscountChanges
 } = invoiceSliceUI.actions;
+
 export default invoiceSliceUI.reducer;
