@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { ItemType } from "../../../core/data/item";
-import { fetchStoreItems } from "../../../core/state/shared/storeItemsSlice";
-import { useAppDispatch } from "../../../core/state/store";
-import StoreItemSelector from "../../items/storeItemSelector";
-import { useInvoiceContext } from "../invoiceContext";
-import { addItem } from "../logic/invoiceSliceUI";
+import { ItemType } from "../../../../core/data/item";
+import { fetchStoreItems } from "../../../../core/state/shared/storeItemsSlice";
+import { useAppDispatch } from "../../../../core/state/store";
+import StoreItemSelector from "../../../items/storeItemSelector";
+import { useInvoiceContext } from "../../logic/invoiceContext";
+import { addItem } from "../../logic/invoiceSliceUI";
 import InvoiceBasicInfo from "./invoiceBasicInfo";
 import InvoiceItemsSummary from "./invoiceItemsSummary";
 import InvoiceItemsTable from "./invoiceItemsTable";

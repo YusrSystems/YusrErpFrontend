@@ -9,10 +9,10 @@ import type Invoice from "../../core/data/invoice";
 import { InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
-import InvoiceBasicTab from "./basic/invoiceBasicTab";
-import InvoiceFilesTab from "./files/invoiceFilesTab";
-import { InvoiceContext } from "./invoiceContext";
-import InvoicePolicyTab from "./policy/invoicePolicyTab";
+import { InvoiceContext } from "./logic/invoiceContext";
+import InvoiceBasicTab from "./presentation/basic/invoiceBasicTab";
+import InvoiceFilesTab from "./presentation/files/invoiceFilesTab";
+import InvoicePolicyTab from "./presentation/policy/invoicePolicyTab";
 
 export default function ChangeInvoiceDialog({
   entity,

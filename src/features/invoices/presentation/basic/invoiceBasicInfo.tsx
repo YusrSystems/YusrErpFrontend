@@ -1,11 +1,11 @@
 import { Checkbox, DateField, FieldsSection, FormField, SearchableSelect, SelectField, TextField } from "@yusr_systems/ui";
-import Account, { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../../core/data/account";
-import { ImportExportType, InvoiceType } from "../../../core/data/invoice";
-import { StoreFilterColumns } from "../../../core/data/store";
-import { useAppSelector } from "../../../core/state/store";
-import { filterStores } from "../../stores/logic/storeSlice";
-import { useInvoiceContext } from "../invoiceContext";
-import { resetItems } from "../logic/invoiceSliceUI";
+import Account, { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../../../core/data/account";
+import { ImportExportType, InvoiceType } from "../../../../core/data/invoice";
+import { StoreFilterColumns } from "../../../../core/data/store";
+import { useAppSelector } from "../../../../core/state/store";
+import { filterStores } from "../../../stores/logic/storeSlice";
+import { useInvoiceContext } from "../../logic/invoiceContext";
+import { resetItems } from "../../logic/invoiceSliceUI";
 
 export default function InvoiceBasicInfo()
 {

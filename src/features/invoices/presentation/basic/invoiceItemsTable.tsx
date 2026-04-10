@@ -1,7 +1,7 @@
 import { cn, InputField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { removeItem, updateItem } from "../logic/invoiceSliceUI";
+import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
+import { removeItem, updateItem } from "../../logic/invoiceSliceUI";
 
 export default function InvoiceItemsTable()
 {
