@@ -54,10 +54,11 @@ export class InvoiceItem extends BaseEntity
   public itemUnitPricingMethodId!: number;
   public quantity!: number;
   public cost!: number;
-  public price!: number;
-  public priceAfterTax !: number;
-  public totalPrice!: number;
-  public discount!: number;
+  public priceBeforeTax!: number;
+  public priceAfterTax!: number;
+  public totalPriceBeforeTax!: number;
+  public totalPriceAfterTax!: number;
+  public settlement!: number;
   public taxable!: boolean;
   public taxIncluded!: boolean;
   public totalTaxesPerc!: number;
@@ -102,10 +103,8 @@ export default class Invoice extends BaseEntity
   public eInvoiceStatus!: EInvoiceStatus;
   public fullAmount!: number;
   public paidAmount!: number;
-  public discountAmount!: number;
-  public addedAmount!: number;
-  public discountPercent!: number;
-  public addedPercent!: number;
+  public settlementAmount!: number;
+  public settlementPercent!: number;
   public returnStatusId!: InvoiceReturnStatus;
   public storeId!: number;
   public actionAccountId!: number;

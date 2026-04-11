@@ -1,4 +1,4 @@
-import { InvoiceRelationType } from "../../../core/data/invoice";
+import { InvoiceItem, InvoiceRelationType } from "../../../core/data/invoice";
 import type { RootState } from "../../../core/state/store";
 
 export default class InvoiceItemsMath
@@ -24,40 +24,51 @@ export default class InvoiceItemsMath
 
   public static CalcPriceAfterTax(priceBeforeTax: number, totalTaxesPerc: number): number
   {
-    return Number((priceBeforeTax * (100 + totalTaxesPerc) / 100));
+    return Number(priceBeforeTax * (100 + totalTaxesPerc) / 100);
   }
 
-  public static CalcTotalPriceBeforeTax(
-    priceBeforeTax: number,
-    discount: number,
-    qtn: number,
-    totalTaxesPerc: number,
-    grandTotal: number,
-    invoiceDiscountAmount: number,
-    invoiceAddedAmount: number,
-  ): number
+  public static CalcTotalPriceBeforeTax(priceBeforeTax: number, settlement: number, qtn: number, totalTaxesPerc: number)
   {
-    // Item-level discount (discount is after-tax, convert to before-tax)
-    const discountBeforeTax = discount / (100 + totalTaxesPerc) * 100;
-    const rawTotal = (priceBeforeTax - discountBeforeTax) * qtn;
-
-    // Item's proportional share of grand total
-    const itemShare = grandTotal > 0 ? rawTotal / grandTotal : 0;
-
-    // Distribute global discount/addition by item share
-    const settlementAdjustment = (invoiceAddedAmount - invoiceDiscountAmount) * itemShare;
-
-    return Number((rawTotal + settlementAdjustment).toFixed(2));
+    return Number(((priceBeforeTax + (settlement / (100 + totalTaxesPerc) * 100)) * qtn).toFixed(2));
   }
 
-  public static CalcTotalPriceAfterTax(priceAfterTax: number, discount: number, qtn: number)
+  public static CalcTotalPriceAfterTax(priceAfterTax: number, settlement: number, qtn: number)
   {
-    return Number(((priceAfterTax - discount) * qtn).toFixed(2));
+    return Number(((priceAfterTax + settlement) * qtn).toFixed(2));
   }
 
   public static CalcTotalCost(cost: number, qtn: number)
   {
     return Number((cost * qtn).toFixed(2));
+  }
+
+  public static CalcInvoicePriceBeforeTax(invoiceItems: InvoiceItem[])
+  {
+    return invoiceItems.reduce(
+      (sum, i) =>
+        sum
+        + InvoiceItemsMath.CalcTotalPriceBeforeTax(
+          i.priceBeforeTax ?? 0,
+          i.settlement ?? 0,
+          i.quantity ?? 0,
+          i.totalTaxesPerc ?? 0
+        ),
+      0
+    ) ?? 0;
+  }
+
+  public static CalcInvoicePriceAfterTax(invoiceItems: InvoiceItem[])
+  {
+    return invoiceItems.reduce(
+      (sum, i) =>
+        sum
+        + InvoiceItemsMath.CalcTotalPriceAfterTax(
+          InvoiceItemsMath.CalcPriceAfterTax(i.priceBeforeTax ?? 0, i.totalTaxesPerc ?? 0),
+          i.settlement ?? 0,
+          i.quantity ?? 0
+        ),
+      0
+    ) ?? 0;
   }
 }
 
@@ -72,25 +83,10 @@ export const CalcInvoiceUnpaidPrice = (state: RootState) =>
 
 export const CalcInvoicePriceBeforeTax = (state: RootState) =>
 {
-  const grandTotal = CalcGrandTotal(state);
-  return state.invoiceUI.items?.reduce(
-    (sum, i) =>
-      sum
-      + InvoiceItemsMath.CalcTotalPriceBeforeTax(i.price ?? 0, i.discount ?? 0, i.quantity ?? 0, i.totalTaxesPerc ?? 0),
-    0
-  ) ?? 0;
+  return InvoiceItemsMath.CalcInvoicePriceBeforeTax(state.invoiceUI.items);
 };
 
 export const CalcInvoicePriceAfterTax = (state: RootState) =>
 {
-  return state.invoiceUI.items?.reduce(
-    (sum, i) =>
-      sum
-      + InvoiceItemsMath.CalcTotalPriceAfterTax(
-        InvoiceItemsMath.CalcPriceAfterTax(i.price ?? 0, i.totalTaxesPerc ?? 0),
-        i.discount ?? 0,
-        i.quantity ?? 0
-      ),
-    0
-  ) ?? 0;
+  return InvoiceItemsMath.CalcInvoicePriceAfterTax(state.invoiceUI.items);
 };

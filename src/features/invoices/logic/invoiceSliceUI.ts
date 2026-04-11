@@ -4,6 +4,12 @@ import { InvoiceItem, InvoiceType, InvoiceVoucher } from "../../../core/data/inv
 import InvoiceItemsActions from "./invoiceItemsActions";
 import InvoiceVouchersActions from "./invoiceVouchersActions";
 
+export interface InvoiceSettlments
+{
+  amount: number;
+  percent: number;
+}
+
 export interface InvoiceState
 {
   mode: DialogMode;
@@ -11,6 +17,7 @@ export interface InvoiceState
   vouchers: InvoiceVoucher[];
   errors: Record<string, string>;
   type: InvoiceType;
+  settlements: InvoiceSettlments;
 }
 
 const initialState: InvoiceState = {
@@ -18,7 +25,8 @@ const initialState: InvoiceState = {
   vouchers: [],
   errors: {},
   mode: "create",
-  type: InvoiceType.Sell
+  type: InvoiceType.Sell,
+  settlements: { amount: 0, percent: 0 }
 };
 
 export const invoiceSliceUI = createSlice({
@@ -36,11 +44,9 @@ export const invoiceSliceUI = createSlice({
     onInvoiceItemIupmChange: InvoiceItemsActions.onInvoiceItemIupmChange,
     onInvoiceItemQuantityChange: InvoiceItemsActions.onInvoiceItemQuantityChange,
     onInvoiceItemAfterTaxPriceChange: InvoiceItemsActions.onInvoiceItemAfterTaxPriceChange,
-    onInvoiceItemDiscountChange: InvoiceItemsActions.onInvoiceItemDiscountChange,
-    onInvoiceAddedAmountChange: InvoiceItemsActions.onInvoiceAddedAmountChange,
-    onInvoiceDiscountAmountChange: InvoiceItemsActions.onInvoiceDiscountAmountChange,
-    onInvoiceAddedPercentChange: InvoiceItemsActions.onInvoiceAddedPercentChange,
-    onInvoiceDiscountPercentChange: InvoiceItemsActions.onInvoiceDiscountPercentChange,
+    onInvoiceItemSettlementChange: InvoiceItemsActions.onInvoiceItemSettlementChange,
+    onInvoiceSettlementAmountChange: InvoiceItemsActions.onInvoiceSettlementAmountChange,
+    onInvoiceSettlementPercentChange: InvoiceItemsActions.onInvoiceSettlementPercentChange,
 
     // vouchers
     addVoucher: InvoiceVouchersActions.addVoucher,
@@ -64,11 +70,9 @@ export const {
   onInvoiceItemIupmChange,
   onInvoiceItemQuantityChange,
   onInvoiceItemAfterTaxPriceChange,
-  onInvoiceItemDiscountChange,
-  onInvoiceAddedAmountChange,
-  onInvoiceDiscountAmountChange,
-  onInvoiceAddedPercentChange,
-  onInvoiceDiscountPercentChange,
+  onInvoiceItemSettlementChange,
+  onInvoiceSettlementAmountChange,
+  onInvoiceSettlementPercentChange,
 
   // vouchers
   addVoucher,

@@ -73,8 +73,8 @@ export default function ChangeInvoiceDialog({
       date: entity?.date
         ? new Date(entity.date).toISOString().split("T")[0]
         : new Date().toISOString().split("T")[0],
-      discountAmount: entity?.discountAmount ?? 0,
-      addedAmount: entity?.addedAmount ?? 0,
+      settlementAmount: entity?.settlementAmount ?? 0,
+      settlementPercent: entity?.settlementPercent ?? 0,
       paidAmount: entity?.paidAmount ?? 0,
       fullAmount: entity?.fullAmount ?? 0
     }),

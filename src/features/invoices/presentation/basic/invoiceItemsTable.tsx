@@ -2,7 +2,7 @@ import { NumberField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
 import InvoiceItemsMath from "../../logic/invoiceItemsMath";
-import { onInvoiceItemAfterTaxPriceChange, onInvoiceItemDiscountChange, onInvoiceItemIupmChange, onInvoiceItemQuantityChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
+import { onInvoiceItemAfterTaxPriceChange, onInvoiceItemIupmChange, onInvoiceItemQuantityChange, onInvoiceItemSettlementChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
 import EmptyTable from "./emptyTable";
 
 export default function InvoiceItemsTable()
@@ -32,7 +32,7 @@ export default function InvoiceItemsTable()
               <th className="p-3 font-semibold w-30 ">السعر بدون ضريبة</th>
               <th className="p-3 font-semibold w-30 ">نسبة الضريبة</th>
               <th className="p-3 font-semibold w-30 ">السعر بعد الضريبة</th>
-              <th className="p-3 font-semibold w-30 ">الخصم</th>
+              <th className="p-3 font-semibold w-30 ">التسوية</th>
               <th className="p-3 font-semibold w-30 ">التكلفة النهائية</th>
               <th className="p-3 font-semibold w-30 ">السعر النهائي بدون ضريبة</th>
               <th className="p-3 font-semibold w-24 ">السعر النهائي مع ضريبة</th>
@@ -88,7 +88,7 @@ export default function InvoiceItemsTable()
                     <NumberField
                       label=""
                       disabled
-                      value={ row.price || "0" }
+                      value={ row.priceBeforeTax || "0" }
                       onChange={ () =>
                       {} }
                     />
@@ -110,11 +110,10 @@ export default function InvoiceItemsTable()
                   <td className="px-2 pt-2">
                     <NumberField
                       label=""
-                      value={ row.discount || "0" }
+                      value={ row.settlement || "0" }
                       onChange={ (newValue) =>
                       {
-                        newValue = Number(newValue) || 0;
-                        dispatch(onInvoiceItemDiscountChange({ index: index, newDiscount: Number(newValue) }));
+                        dispatch(onInvoiceItemSettlementChange({ index: index, newSettlement: Number(newValue) }));
                       } }
                     />
                   </td>
@@ -130,12 +129,7 @@ export default function InvoiceItemsTable()
                   <td className="px-2 pt-2">
                     <TextField
                       label=""
-                      value={ InvoiceItemsMath.CalcTotalPriceBeforeTax(
-                        row.price,
-                        row.discount,
-                        row.quantity,
-                        row.totalTaxesPerc
-                      ) || "0" }
+                      value={ row.totalPriceBeforeTax || "0" }
                       disabled
                     />
                   </td>
@@ -143,11 +137,7 @@ export default function InvoiceItemsTable()
                   <td className="px-2 pt-2">
                     <TextField
                       label=""
-                      value={ InvoiceItemsMath.CalcTotalPriceAfterTax(
-                        InvoiceItemsMath.CalcPriceAfterTax(row.price, row.totalTaxesPerc),
-                        row.discount,
-                        row.quantity
-                      ) || "0" }
+                      value={ row.totalPriceAfterTax || "0" }
                       disabled
                     />
                   </td>
