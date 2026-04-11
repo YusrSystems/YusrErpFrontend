@@ -32,6 +32,10 @@ export const invoiceSliceUI = createSlice({
     onInvoiceItemQuantityChange: InvoiceItemsActions.onInvoiceItemQuantityChange,
     onInvoiceItemAfterTaxPriceChange: InvoiceItemsActions.onInvoiceItemAfterTaxPriceChange,
     onInvoiceItemDiscountChange: InvoiceItemsActions.onInvoiceItemDiscountChange,
+    onInvoiceAddedAmountChange: InvoiceItemsActions.onInvoiceAddedAmountChange,
+    onInvoiceDiscountAmountChange: InvoiceItemsActions.onInvoiceDiscountAmountChange,
+    onInvoiceAddedPercentChange: InvoiceItemsActions.onInvoiceAddedPercentChange,
+    onInvoiceDiscountPercentChange: InvoiceItemsActions.onInvoiceDiscountPercentChange,
 
     // vouchers
     addVoucher: InvoiceVouchersActions.addVoucher,
@@ -52,6 +56,10 @@ export const {
   onInvoiceItemQuantityChange,
   onInvoiceItemAfterTaxPriceChange,
   onInvoiceItemDiscountChange,
+  onInvoiceAddedAmountChange,
+  onInvoiceDiscountAmountChange,
+  onInvoiceAddedPercentChange,
+  onInvoiceDiscountPercentChange,
   addVoucher,
   removeVoucher,
   updateVoucher,

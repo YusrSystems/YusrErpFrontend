@@ -104,6 +104,8 @@ export default class Invoice extends BaseEntity
   public paidAmount!: number;
   public discountAmount!: number;
   public addedAmount!: number;
+  public discountPercent!: number;
+  public addedPercent!: number;
   public returnStatusId!: InvoiceReturnStatus;
   public storeId!: number;
   public actionAccountId!: number;

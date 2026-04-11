@@ -2,6 +2,7 @@ import { useAppDispatch } from "../../../../core/state/store";
 import StoreItemSelector from "../../../items/storeItemSelector";
 import { addItem } from "../../logic/invoiceSliceUI";
 import InvoiceBasicInfo from "./invoiceBasicInfo";
+import InvoiceGlobalSettlements from "./invoiceGlobalSettlements";
 import InvoiceItemsSummary from "./invoiceItemsSummary";
 import InvoiceItemsTable from "./invoiceItemsTable";
 
@@ -16,6 +17,7 @@ export default function InvoiceBasicTab()
       <InvoiceItemsTable />
       <div className="flex">
         <InvoiceItemsSummary />
+        <InvoiceGlobalSettlements />
       </div>
     </div>
   );

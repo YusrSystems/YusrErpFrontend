@@ -27,9 +27,27 @@ export default class InvoiceItemsMath
     return Number((priceBeforeTax * (100 + totalTaxesPerc) / 100));
   }
 
-  public static CalcTotalPriceBeforeTax(priceBeforeTax: number, discount: number, qtn: number, totalTaxesPerc: number)
+  public static CalcTotalPriceBeforeTax(
+    priceBeforeTax: number,
+    discount: number,
+    qtn: number,
+    totalTaxesPerc: number,
+    grandTotal: number,
+    invoiceDiscountAmount: number,
+    invoiceAddedAmount: number,
+  ): number
   {
-    return Number(((priceBeforeTax - (discount / (100 + totalTaxesPerc) * 100)) * qtn).toFixed(2));
+    // Item-level discount (discount is after-tax, convert to before-tax)
+    const discountBeforeTax = discount / (100 + totalTaxesPerc) * 100;
+    const rawTotal = (priceBeforeTax - discountBeforeTax) * qtn;
+
+    // Item's proportional share of grand total
+    const itemShare = grandTotal > 0 ? rawTotal / grandTotal : 0;
+
+    // Distribute global discount/addition by item share
+    const settlementAdjustment = (invoiceAddedAmount - invoiceDiscountAmount) * itemShare;
+
+    return Number((rawTotal + settlementAdjustment).toFixed(2));
   }
 
   public static CalcTotalPriceAfterTax(priceAfterTax: number, discount: number, qtn: number)
@@ -54,6 +72,7 @@ export const CalcInvoiceUnpaidPrice = (state: RootState) =>
 
 export const CalcInvoicePriceBeforeTax = (state: RootState) =>
 {
+  const grandTotal = CalcGrandTotal(state);
   return state.invoiceUI.items?.reduce(
     (sum, i) =>
       sum

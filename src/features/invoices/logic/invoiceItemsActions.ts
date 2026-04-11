@@ -148,6 +148,26 @@ export default class InvoiceItemsActions
     InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }
 
+  public static onInvoiceAddedAmountChange(state: InvoiceState, action: PayloadAction<number>)
+  {
+    const discountAmount = action.payload;
+    state.items.forEach((item) => {
+      item
+    });
+  }
+
+  public static onInvoiceDiscountAmountChange(state: InvoiceState, action: PayloadAction<number>)
+  {
+  }
+
+  public static onInvoiceAddedPercentChange(state: InvoiceState, action: PayloadAction<number>)
+  {
+  }
+
+  public static onInvoiceDiscountPercentChange(state: InvoiceState, action: PayloadAction<number>)
+  {
+  }
+
   public static resetItems(state: InvoiceState)
   {
     state.items = [];

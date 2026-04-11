@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { useAppSelector } from "../../../../core/state/store";
-import { useInvoiceContext } from "../../logic/invoiceContext";
 import { CalcInvoicePaidPrice, CalcInvoicePriceAfterTax, CalcInvoicePriceBeforeTax, CalcInvoiceUnpaidPrice } from "../../logic/invoiceItemsMath";
 
 interface SummaryCardProps
@@ -112,7 +111,6 @@ function SummaryCard({ label, value, symbol, hint, variant = "default", delay = 
 
 export default function InvoiceItemsSummary()
 {
-  const { formData } = useInvoiceContext();
   const priceBeforeTax = useAppSelector(CalcInvoicePriceBeforeTax);
   const priceAfterTax = useAppSelector(CalcInvoicePriceAfterTax);
   const paidPrice = useAppSelector(CalcInvoicePaidPrice);
@@ -127,13 +125,13 @@ export default function InvoiceItemsSummary()
         hint="قبل إضافة الضريبة"
         delay={ 50 }
       />
-        <SummaryCard
-          label="إجمالي الضرائب"
-          value={ priceAfterTax - priceBeforeTax }
-          symbol="%"
-          hint="قيمة مضافة"
-          delay={ 150 }
-        />
+      <SummaryCard
+        label="إجمالي الضرائب"
+        value={ priceAfterTax - priceBeforeTax }
+        symbol="%"
+        hint="قيمة مضافة"
+        delay={ 150 }
+      />
       <SummaryCard
         label="الإجمالي بعد الضريبة"
         value={ priceAfterTax }
