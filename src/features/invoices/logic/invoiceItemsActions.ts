@@ -1,4 +1,5 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
+import type { InvoiceType } from "../../../core/data/invoice";
 import type { StoreItem } from "../../../core/data/item";
 import InvoiceItemsMath from "./invoiceItemsMath";
 import type { InvoiceState } from "./invoiceSliceUI";
@@ -171,5 +172,10 @@ export default class InvoiceItemsActions
   public static resetItems(state: InvoiceState)
   {
     state.items = [];
+  }
+
+  public static setInvoiceType(state: InvoiceState, action: PayloadAction<InvoiceType>)
+  {
+    state.type = action.payload;
   }
 }
