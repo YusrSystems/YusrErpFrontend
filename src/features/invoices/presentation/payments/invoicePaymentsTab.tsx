@@ -22,28 +22,30 @@ export default function InvoicePaymentsTab()
 
   return (
     <div className="flex flex-col gap-2 items-end">
-      <Button
-        type="button"
-        className="max-w-40"
-        size="lg"
-        onClick={ () =>
-          dispatch(addVoucher(
-            new InvoiceVoucher({
-              voucherId: 0,
-              invoiceId: formData.id,
-              paymentMethodId: authState.setting?.mainPaymentMethodId,
-              paymentMethodName: authState.setting?.mainPaymentMethodName,
-              accountId: undefined,
-              accountName: undefined,
-              invoiceRelationType: InvoiceRelationType.Payment,
-              amount: 0,
-              amountReceived: 0,
-              description: undefined
-            })
-          )) }
-      >
-        <Plus className="w-4 h-4 ml-2" /> إضافة طريقة تخزين
-      </Button>
+      { unpaidPrice > 0 && (
+        <Button
+          type="button"
+          className="max-w-40"
+          size="lg"
+          onClick={ () =>
+            dispatch(addVoucher(
+              new InvoiceVoucher({
+                voucherId: 0,
+                invoiceId: formData.id,
+                paymentMethodId: authState.setting?.mainPaymentMethodId,
+                paymentMethodName: authState.setting?.mainPaymentMethodName,
+                accountId: undefined,
+                accountName: undefined,
+                invoiceRelationType: InvoiceRelationType.Payment,
+                amount: 0,
+                amountReceived: 0,
+                description: undefined
+              })
+            )) }
+        >
+          <Plus className="w-4 h-4 ml-2" /> إضافة سند دفع
+        </Button>
+      ) }
 
       <div className="w-full overflow-x-auto border border-border rounded-lg shadow-sm bg-background" dir="rtl">
         <table className="w-full text-sm text-right">
@@ -81,12 +83,9 @@ export default function InvoicePaymentsTab()
                         if (selected)
                         {
                           dispatch(updateVoucher({
-                            index: index,
-                            voucher: {
-                              ...row,
-                              paymentMethodId: selected?.id,
-                              paymentMethodName: selected?.name
-                            }
+                            ...row,
+                            paymentMethodId: selected?.id,
+                            paymentMethodName: selected?.name
                           }));
                         }
                       } }
@@ -104,7 +103,7 @@ export default function InvoicePaymentsTab()
                     {
                       if (val != undefined)
                       {
-                        dispatch(updateVoucher({ index: index, voucher: { ...row, amount: val } }));
+                        dispatch(updateVoucher({ ...row, amount: val }));
                       }
                     } }
                   />
@@ -114,8 +113,7 @@ export default function InvoicePaymentsTab()
                   <NumberField
                     label=""
                     value={ row.amountReceived || "0" }
-                    onChange={ (val) =>
-                      dispatch(updateVoucher({ index: index, voucher: { ...row, amountReceived: val } })) }
+                    onChange={ (val) => dispatch(updateVoucher({ ...row, amountReceived: val })) }
                   />
                 </td>
 

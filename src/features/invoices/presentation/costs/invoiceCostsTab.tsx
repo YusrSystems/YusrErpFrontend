@@ -42,7 +42,7 @@ export default function InvoiceCostsTab()
             })
           )) }
       >
-        <Plus className="w-4 h-4 ml-2" /> إضافة طريقة تخزين
+        <Plus className="w-4 h-4 ml-2" /> إضافة سند تكلفة
       </Button>
 
       <div className="w-full overflow-x-auto border border-border rounded-lg shadow-sm bg-background" dir="rtl">
@@ -81,12 +81,9 @@ export default function InvoiceCostsTab()
                         if (selected)
                         {
                           dispatch(updateVoucher({
-                            index: index,
-                            voucher: {
-                              ...row,
-                              accountId: selected?.id,
-                              accountName: selected?.name
-                            }
+                            ...row,
+                            accountId: selected?.id,
+                            accountName: selected?.name
                           }));
                         }
                       } }
@@ -110,12 +107,9 @@ export default function InvoiceCostsTab()
                         if (selected)
                         {
                           dispatch(updateVoucher({
-                            index: index,
-                            voucher: {
-                              ...row,
-                              paymentMethodId: selected?.id,
-                              paymentMethodName: selected?.name
-                            }
+                            ...row,
+                            paymentMethodId: selected?.id,
+                            paymentMethodName: selected?.name
                           }));
                         }
                       } }
@@ -131,7 +125,7 @@ export default function InvoiceCostsTab()
                     {
                       if (val != undefined)
                       {
-                        dispatch(updateVoucher({ index: index, voucher: { ...row, amount: val } }));
+                        dispatch(updateVoucher({ ...row, amount: val }));
                       }
                     } }
                   />
@@ -141,8 +135,7 @@ export default function InvoiceCostsTab()
                   <TextField
                     label=""
                     value={ row.description || "" }
-                    onChange={ (e) =>
-                      dispatch(updateVoucher({ index: index, voucher: { ...row, description: e.target.value } })) }
+                    onChange={ (e) => dispatch(updateVoucher({ ...row, description: e.target.value })) }
                   />
                 </td>
 

@@ -14,19 +14,22 @@ export default class InvoiceVouchersActions
 
   public static updateVoucher(
     state: InvoiceState,
-    action: PayloadAction<{ index: number; voucher: InvoiceState["vouchers"][0]; }>
+    action: PayloadAction<InvoiceState["vouchers"][0]>
   )
   {
-    state.vouchers[action.payload.index] = action.payload.voucher;
+    const index = state.vouchers.findIndex((v) => v.voucherId === action.payload.voucherId);
+    if (index === -1)
+    {
+      return;
+    }
+    state.vouchers[index] = action.payload;
   }
 
   public static addVoucher(state: InvoiceState, action: PayloadAction<InvoiceVoucher>)
   {
     const baseVoucher = action.payload;
 
-    const tempId = state.vouchers.length > 0
-      ? Math.min(...state.vouchers.map((v) => v.voucherId)) - 1
-      : -1;
+    const tempId = -(Math.floor(Date.now() / 1000) * 1000 + Math.floor(Math.random() * 1000));
 
     state.vouchers.push({
       invoiceId: baseVoucher.invoiceId,
