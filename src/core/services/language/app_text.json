@@ -27,6 +27,8 @@
       "users": "المستخدمون",
       "roles": "الأدوار",
       "invoices": "الفواتير",
+      "sellInvoices": "فواتير البيع",
+      "purchaseInvoices": "فواتير الشراء",
       "vouchers": "السندات",
       "paymentMethods": "طرق الدفع",
       "balanceTransfer": "تحويلات الأرصدة",

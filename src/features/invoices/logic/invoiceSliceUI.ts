@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { DialogMode } from "@yusr_systems/ui";
-import { InvoiceItem, InvoiceVoucher } from "../../../core/data/invoice";
+import { InvoiceItem, InvoiceType, InvoiceVoucher } from "../../../core/data/invoice";
 import InvoiceItemsActions from "./invoiceItemsActions";
 import InvoiceVouchersActions from "./invoiceVouchersActions";
 
@@ -10,19 +10,24 @@ export interface InvoiceState
   items: InvoiceItem[];
   vouchers: InvoiceVoucher[];
   errors: Record<string, string>;
+  type: InvoiceType;
 }
 
 const initialState: InvoiceState = {
   items: [],
   vouchers: [],
   errors: {},
-  mode: "create"
+  mode: "create",
+  type: InvoiceType.Sell
 };
 
 export const invoiceSliceUI = createSlice({
   name: "invoiceUI",
   initialState: initialState,
   reducers: {
+    // invoice
+    setInvoiceType: InvoiceItemsActions.setInvoiceType,
+
     // items
     addItem: InvoiceItemsActions.addItem,
     removeItem: InvoiceItemsActions.removeItem,
@@ -44,6 +49,10 @@ export const invoiceSliceUI = createSlice({
 });
 
 export const {
+  // invoice
+  setInvoiceType,
+
+  // items
   addItem,
   removeItem,
   updateItem,
@@ -52,6 +61,8 @@ export const {
   onInvoiceItemQuantityChange,
   onInvoiceItemAfterTaxPriceChange,
   onInvoiceItemDiscountChange,
+
+  // vouchers
   addVoucher,
   removeVoucher,
   updateVoucher,
