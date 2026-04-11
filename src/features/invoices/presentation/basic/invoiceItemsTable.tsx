@@ -15,175 +15,182 @@ export default function InvoiceItemsTable()
     return <EmptyTable />;
   }
   return (
-    <div className="w-full overflow-x-auto border border-border rounded-lg shadow-sm bg-background" dir="rtl">
-      <table className="w-full text-sm text-right">
-        <thead className="bg-muted/40 border-b border-border">
-          <tr>
-            <th className="p-3 font-semibold w-16 text-center text-muted-foreground">الرقم</th>
-            <th className="p-3 font-semibold w-50 ">المادة</th>
-            <th className="p-3 font-semibold w-40">طريقة التسعير</th>
-            <th className="p-3 font-semibold w-30 ">التكلفة</th>
-            <th className="p-3 font-semibold w-30">الكمية</th>
-            <th className="p-3 font-semibold w-30 ">السعر بدون ضريبة</th>
-            <th className="p-3 font-semibold w-30 ">نسبة الضريبة</th>
-            <th className="p-3 font-semibold w-30 ">السعر بعد الضريبة</th>
-            <th className="p-3 font-semibold w-30 ">الخصم</th>
-            <th className="p-3 font-semibold w-30 ">التكلفة النهائية</th>
-            <th className="p-3 font-semibold w-30 ">السعر النهائي بدون ضريبة</th>
-            <th className="p-3 font-semibold w-24 ">السعر النهائي مع ضريبة</th>
+    <div className="w-full border border-border rounded-lg shadow-sm bg-background">
+      <div className="max-h-56 overflow-y-auto overflow-x-auto 
+  [&::-webkit-scrollbar]:w-1.5
+  [&::-webkit-scrollbar-thumb]:bg-muted-foreground/50
+  [&::-webkit-scrollbar-thumb]:rounded-full
+      ">
+        <table className="w-full text-sm text-right">
+          <thead className="bg-muted/40 border-b border-border">
+            <tr>
+              <th className="p-3 font-semibold w-16 text-center text-muted-foreground">الرقم</th>
+              <th className="p-3 font-semibold w-50 ">المادة</th>
+              <th className="p-3 font-semibold w-40">طريقة التسعير</th>
+              <th className="p-3 font-semibold w-30 ">التكلفة</th>
+              <th className="p-3 font-semibold w-30">الكمية</th>
+              <th className="p-3 font-semibold w-30 ">السعر بدون ضريبة</th>
+              <th className="p-3 font-semibold w-30 ">نسبة الضريبة</th>
+              <th className="p-3 font-semibold w-30 ">السعر بعد الضريبة</th>
+              <th className="p-3 font-semibold w-30 ">الخصم</th>
+              <th className="p-3 font-semibold w-30 ">التكلفة النهائية</th>
+              <th className="p-3 font-semibold w-30 ">السعر النهائي بدون ضريبة</th>
+              <th className="p-3 font-semibold w-24 ">السعر النهائي مع ضريبة</th>
 
-            <th className="p-4 font-semibold w-16 text-center"></th>
-          </tr>
-        </thead>
-        <tbody>
-          { items.map((row, index) => (
-            <>
-              <tr
-                key={ row.id }
-                className="border-border last:border-0 hover:bg-muted/20 transition-colors"
-              >
-                <td className="px-2 pt-2 text-center font-bold text-muted-foreground">{ index + 1 }</td>
+              <th className="p-4 font-semibold w-16 text-center"></th>
+            </tr>
+          </thead>
+          <tbody>
+            { items.map((row, index) => (
+              <>
+                <tr
+                  key={ row.id }
+                  className="border-border last:border-0 hover:bg-muted/20 transition-colors"
+                >
+                  <td className="px-2 pt-2 text-center font-bold text-muted-foreground">{ index + 1 }</td>
 
-                <td className="px-2 pt-2">
-                  <div className="font-semibold text-foreground">{ row.itemName }</div>
-                </td>
+                  <td className="px-2 pt-2">
+                    <div className="font-semibold text-foreground">{ row.itemName }</div>
+                  </td>
 
-                <td className="px-2 pt-2">
-                  <SelectField
-                    label=""
-                    value={ row.itemUnitPricingMethodId?.toString() || "" }
-                    onValueChange={ (val: string) =>
-                      dispatch(onInvoiceItemIupmChange({ index: index, iupmId: Number(val) })) }
-                    options={ row.itemUnitPricingMethods?.map((m) => ({
-                      label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
-                      value: m.id.toString()
-                    })) || [] }
-                    placeholder="اختر طريقة التسعير"
-                    isInvalid={ !!errors[`${row.id}_method`] }
-                    disabled={ mode === "update" }
-                  />
-                </td>
+                  <td className="px-2 pt-2">
+                    <SelectField
+                      label=""
+                      value={ row.itemUnitPricingMethodId?.toString() || "" }
+                      onValueChange={ (val: string) =>
+                        dispatch(onInvoiceItemIupmChange({ index: index, iupmId: Number(val) })) }
+                      options={ row.itemUnitPricingMethods?.map((m) => ({
+                        label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
+                        value: m.id.toString()
+                      })) || [] }
+                      placeholder="اختر طريقة التسعير"
+                      isInvalid={ !!errors[`${row.id}_method`] }
+                      disabled={ mode === "update" }
+                    />
+                  </td>
 
-                <td className="px-2 pt-2">
-                  <NumberField disabled label="" value={ row.cost || "0" } />
-                </td>
+                  <td className="px-2 pt-2">
+                    <NumberField disabled label="" value={ row.cost || "0" } />
+                  </td>
 
-                <td className="px-2 pt-2">
-                  <NumberField
-                    label=""
-                    min={ 1 }
-                    value={ row.quantity ?? 1 }
-                    onChange={ (newValue) => dispatch(onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
-                    disabled={ mode === "update" }
-                  />
-                </td>
+                  <td className="px-2 pt-2">
+                    <NumberField
+                      label=""
+                      min={ 1 }
+                      value={ row.quantity ?? 1 }
+                      onChange={ (newValue) =>
+                        dispatch(onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
+                      disabled={ mode === "update" }
+                    />
+                  </td>
 
-                <td className="px-2 pt-2">
-                  <NumberField
-                    label=""
-                    disabled
-                    value={ row.price || "0" }
-                    onChange={ () =>
-                    {} }
-                  />
-                </td>
+                  <td className="px-2 pt-2">
+                    <NumberField
+                      label=""
+                      disabled
+                      value={ row.price || "0" }
+                      onChange={ () =>
+                      {} }
+                    />
+                  </td>
 
-                <td className="px-2 pt-2">
-                  <TextField label="" value={ row.totalTaxesPerc || "0" } disabled />
-                </td>
+                  <td className="px-2 pt-2">
+                    <TextField label="" value={ row.totalTaxesPerc || "0" } disabled />
+                  </td>
 
-                <td className="px-2 pt-2">
-                  <NumberField
-                    label=""
-                    value={ row.priceAfterTax || "0" }
-                    onChange={ (newVal) =>
-                      dispatch(onInvoiceItemAfterTaxPriceChange({ index: index, newPrice: Number(newVal) })) }
-                  />
-                </td>
+                  <td className="px-2 pt-2">
+                    <NumberField
+                      label=""
+                      value={ row.priceAfterTax || "0" }
+                      onChange={ (newVal) =>
+                        dispatch(onInvoiceItemAfterTaxPriceChange({ index: index, newPrice: Number(newVal) })) }
+                    />
+                  </td>
 
-                <td className="px-2 pt-2">
-                  <NumberField
-                    label=""
-                    value={ row.discount || "0" }
-                    onChange={ (newValue) =>
-                    {
-                      newValue = Number(newValue) || 0;
-                      dispatch(onInvoiceItemDiscountChange({ index: index, newDiscount: Number(newValue) }));
-                    } }
-                  />
-                </td>
-
-                <td className="px-2 pt-2">
-                  <TextField
-                    label=""
-                    value={ InvoiceItemsMath.CalcTotalCost(row.cost, row.quantity) || "0" }
-                    disabled
-                  />
-                </td>
-
-                <td className="px-2 pt-2">
-                  <TextField
-                    label=""
-                    value={ InvoiceItemsMath.CalcTotalPriceBeforeTax(
-                      row.price,
-                      row.discount,
-                      row.quantity,
-                      row.totalTaxesPerc
-                    ) || "0" }
-                    disabled
-                  />
-                </td>
-
-                <td className="px-2 pt-2">
-                  <TextField
-                    label=""
-                    value={ InvoiceItemsMath.CalcTotalPriceAfterTax(
-                      InvoiceItemsMath.CalcPriceAfterTax(row.price, row.totalTaxesPerc),
-                      row.discount,
-                      row.quantity
-                    ) || "0" }
-                    disabled
-                  />
-                </td>
-
-                <td className="px-2 pt-2">
-                  { mode === "create" && (
-                    <button
-                      type="button"
-                      onClick={ () =>
+                  <td className="px-2 pt-2">
+                    <NumberField
+                      label=""
+                      value={ row.discount || "0" }
+                      onChange={ (newValue) =>
                       {
-                        dispatch(removeItem(index));
+                        newValue = Number(newValue) || 0;
+                        dispatch(onInvoiceItemDiscountChange({ index: index, newDiscount: Number(newValue) }));
                       } }
-                      className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
-                      aria-label="حذف المادة"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  ) }
-                </td>
-              </tr>
-              <tr className="bg-muted/10 border-b">
-                <td colSpan={ 13 } className="px-5 pt-1 pb-3">
-                  <TextField
-                    label=""
-                    placeholder="أضف ملاحظات..."
-                    value={ row.notes || "" }
-                    onChange={ (val) =>
-                    {
-                      dispatch(
-                        updateItem({
-                          index: index,
-                          item: { ...row, notes: typeof val === "string" ? val : val.target.value }
-                        })
-                      );
-                    } }
-                  />
-                </td>
-              </tr>
-            </>
-          )) }
-        </tbody>
-      </table>
+                    />
+                  </td>
+
+                  <td className="px-2 pt-2">
+                    <TextField
+                      label=""
+                      value={ InvoiceItemsMath.CalcTotalCost(row.cost, row.quantity) || "0" }
+                      disabled
+                    />
+                  </td>
+
+                  <td className="px-2 pt-2">
+                    <TextField
+                      label=""
+                      value={ InvoiceItemsMath.CalcTotalPriceBeforeTax(
+                        row.price,
+                        row.discount,
+                        row.quantity,
+                        row.totalTaxesPerc
+                      ) || "0" }
+                      disabled
+                    />
+                  </td>
+
+                  <td className="px-2 pt-2">
+                    <TextField
+                      label=""
+                      value={ InvoiceItemsMath.CalcTotalPriceAfterTax(
+                        InvoiceItemsMath.CalcPriceAfterTax(row.price, row.totalTaxesPerc),
+                        row.discount,
+                        row.quantity
+                      ) || "0" }
+                      disabled
+                    />
+                  </td>
+
+                  <td className="px-2 pt-2">
+                    { mode === "create" && (
+                      <button
+                        type="button"
+                        onClick={ () =>
+                        {
+                          dispatch(removeItem(index));
+                        } }
+                        className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
+                        aria-label="حذف المادة"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    ) }
+                  </td>
+                </tr>
+                <tr className="bg-muted/10 border-b">
+                  <td colSpan={ 13 } className="px-5 pt-1 pb-3">
+                    <TextField
+                      label=""
+                      placeholder="أضف ملاحظات..."
+                      value={ row.notes || "" }
+                      onChange={ (val) =>
+                      {
+                        dispatch(
+                          updateItem({
+                            index: index,
+                            item: { ...row, notes: typeof val === "string" ? val : val.target.value }
+                          })
+                        );
+                      } }
+                    />
+                  </td>
+                </tr>
+              </>
+            )) }
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
