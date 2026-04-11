@@ -16,7 +16,7 @@ export default function InvoiceItemsTable()
   }
   return (
     <div className="w-full border border-border rounded-lg shadow-sm bg-background">
-      <div className="max-h-56 overflow-y-auto overflow-x-auto 
+      <div className="max-h-100 overflow-y-auto overflow-x-auto 
   [&::-webkit-scrollbar]:w-1.5
   [&::-webkit-scrollbar-thumb]:bg-muted-foreground/50
   [&::-webkit-scrollbar-thumb]:rounded-full
