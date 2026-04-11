@@ -127,19 +127,19 @@ export default function InvoiceItemsSummary()
         hint="قبل إضافة الضريبة"
         delay={ 50 }
       />
+        <SummaryCard
+          label="إجمالي الضرائب"
+          value={ priceAfterTax - priceBeforeTax }
+          symbol="%"
+          hint="قيمة مضافة"
+          delay={ 150 }
+        />
       <SummaryCard
         label="الإجمالي بعد الضريبة"
         value={ priceAfterTax }
         symbol="Σ"
         hint="صافي المبلغ الكلي"
         delay={ 100 }
-      />
-      <SummaryCard
-        label="إجمالي الضرائب"
-        value={ formData.addedAmount ?? 0 }
-        symbol="%"
-        hint="قيمة مضافة"
-        delay={ 150 }
       />
       <SummaryCard
         label="المبلغ المدفوع"
