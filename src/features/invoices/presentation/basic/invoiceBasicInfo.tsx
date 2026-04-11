@@ -25,6 +25,8 @@ export default function InvoiceBasicInfo()
     account.id === formData.actionAccountId
   );
 
+  const invoiceType = useAppSelector((state) => state.invoiceUI.type);
+
   const canBeExportInvoice = () =>
   {
     const accountCountryId: number | undefined = selectedAccount?.city?.countryId;
@@ -57,28 +59,21 @@ export default function InvoiceBasicInfo()
 
   return (
     <FieldsSection title="البيانات الأساسية" columns={ { base: 1, md: 2, lg: 4 } }>
-      <SelectField
-        label="نوع الفاتورة"
-        required
-        value={ formData.type?.toString() || "" }
-        onValueChange={ (val) => handleChange({ type: Number(val) as InvoiceType }) }
-        isInvalid={ isInvalid("type") }
-        error={ getError("type") }
-        disabled={ mode === "update" }
-        options={ [
-          { label: "مبيعات", value: InvoiceType.Sell.toString() },
-          { label: "مشتريات", value: InvoiceType.Purchase.toString() },
-          {
-            label: "مرتجع مبيعات",
-            value: InvoiceType.SellReturn.toString()
-          },
-          { label: "عرض سعر", value: InvoiceType.Quotation.toString() },
-          {
-            label: "مرتجع مشتريات",
-            value: InvoiceType.PurchaseReturn.toString()
-          }
-        ] }
-      />
+      { invoiceType === InvoiceType.Sell && (
+        <SelectField
+          label="نوع الفاتورة"
+          required
+          value={ formData.type?.toString() || "" }
+          onValueChange={ (val) => handleChange({ type: Number(val) as InvoiceType }) }
+          isInvalid={ isInvalid("type") }
+          error={ getError("type") }
+          disabled={ mode === "update" }
+          options={ [{ label: "مبيعات", value: InvoiceType.Sell.toString() }, {
+            label: "عرض سعر",
+            value: InvoiceType.Quotation.toString()
+          }] }
+        />
+      ) }
 
       { mode === "update" && (
         <TextField
