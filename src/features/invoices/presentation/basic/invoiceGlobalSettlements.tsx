@@ -20,8 +20,8 @@ export default function InvoiceGlobalSettlements()
             />
             <NumberInput
               className="max-w-30 pr-8"
-              value={ settlements.amount || "0" }
-              onChange={ (newValue) => dispatch(onInvoiceSettlementAmountChange(newValue ?? 0)) }
+              value={ settlements.amount ?? 0 }
+              onChange={ (newValue) => dispatch(onInvoiceSettlementAmountChange(Number(newValue) ?? 0)) }
               disabled={ mode === "update" }
             />
           </div>
@@ -30,8 +30,8 @@ export default function InvoiceGlobalSettlements()
               min={ -100 }
               max={ 100 }
               className="max-w-30 pr-8"
-              value={ settlements.percent || "0" }
-              onChange={ (newValue) => dispatch(onInvoiceSettlementPercentChange(newValue ?? 0)) }
+              value={ settlements.percent ?? 0 }
+              onChange={ (newValue) => dispatch(onInvoiceSettlementPercentChange(Number(newValue) ?? 0)) }
               disabled={ mode === "update" }
             />
             <Percent
