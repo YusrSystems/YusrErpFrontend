@@ -2,8 +2,9 @@ import { NumberField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
 import InvoiceItemsMath from "../../logic/invoiceItemsMath";
-import { onInvoiceItemTaxInclusivePriceChange, onInvoiceItemIupmChange, onInvoiceItemQuantityChange, onInvoiceItemSettlementChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
+import { onInvoiceItemIupmChange, onInvoiceItemQuantityChange, onInvoiceItemSettlementChange, onInvoiceItemTaxInclusivePriceChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
 import EmptyTable from "./emptyTable";
+import { ItemProfitDialog } from "../profit/ItemProfitDialog";
 
 export default function InvoiceItemsTable()
 {
@@ -37,7 +38,8 @@ export default function InvoiceItemsTable()
               <th className="p-3 font-semibold w-30 ">السعر النهائي بدون ضريبة</th>
               <th className="p-3 font-semibold w-24 ">السعر النهائي مع ضريبة</th>
 
-              <th className="p-4 font-semibold w-16 text-center"></th>
+              <th className="p-4 font-semibold w-3 text-center"></th>
+              <th className="p-4 font-semibold w-3 text-center"></th>
             </tr>
           </thead>
           <tbody>
@@ -143,6 +145,10 @@ export default function InvoiceItemsTable()
                   </td>
 
                   <td className="px-2 pt-2">
+                    <ItemProfitDialog item={ row } />
+                  </td>
+
+                  <td className="px-2 pt-2">
                     { mode === "create" && (
                       <button
                         type="button"
@@ -159,7 +165,7 @@ export default function InvoiceItemsTable()
                   </td>
                 </tr>
                 <tr className="bg-muted/10 border-b">
-                  <td colSpan={ 13 } className="px-5 pt-1 pb-3">
+                  <td colSpan={ 14 } className="px-5 pt-1 pb-3">
                     <TextField
                       label=""
                       placeholder="أضف ملاحظات..."

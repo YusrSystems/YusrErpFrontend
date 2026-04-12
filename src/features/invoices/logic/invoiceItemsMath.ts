@@ -1,4 +1,6 @@
-import { InvoiceItem, InvoiceRelationType } from "../../../core/data/invoice";
+import { InvoiceItem, InvoiceRelationType, InvoiceVoucher } from "../../../core/data/invoice";
+import type { InvoiceItemProfitResult } from "../../../core/data/InvoiceItemProfitResult";
+import type { InvoiceProfitResult } from "../../../core/data/InvoiceProfitResult";
 import type { RootState } from "../../../core/state/store";
 
 export default class InvoiceItemsMath
@@ -72,6 +74,51 @@ export default class InvoiceItemsMath
         ),
       0
     ) ?? 0;
+  }
+
+  public static CalcInvoiceItemProfit(invoiceItem: InvoiceItem): InvoiceItemProfitResult
+  {
+    const taxInclusivePrice = (invoiceItem.taxInclusivePrice ?? 0) + (invoiceItem.settlement ?? 0);
+    const totalTaxesAmount = Number(
+      ((invoiceItem.taxInclusivePrice ?? 0) - (invoiceItem.taxExclusivePrice ?? 0)).toFixed(2)
+    );
+    const profit = Number((taxInclusivePrice - totalTaxesAmount - (invoiceItem.cost ?? 0)).toFixed(2));
+    const qtn = invoiceItem.quantity ?? 0;
+    return {
+      taxInclusivePrice: taxInclusivePrice,
+      cost: invoiceItem.cost ?? 0,
+      totalTaxesAmount: totalTaxesAmount,
+      quantity: qtn,
+      profit: profit,
+      totalProfit: Number((profit * qtn).toFixed(2))
+    };
+  }
+
+  public static CalcInvoiceProfit(invoiceItems: InvoiceItem[], invoiceCosts: InvoiceVoucher[]): InvoiceProfitResult
+  {
+    const invoiceCostsAmount = invoiceCosts.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0;
+
+    let taxInclusiveTotalPrice = 0;
+    let totalCost = 0;
+    let totalTaxesAmount = 0;
+    let profit = 0;
+
+    invoiceItems.forEach((i) =>
+    {
+      const itemProfit = InvoiceItemsMath.CalcInvoiceItemProfit(i);
+      taxInclusiveTotalPrice += itemProfit.taxInclusivePrice;
+      totalCost += itemProfit.cost;
+      totalTaxesAmount += itemProfit.totalTaxesAmount;
+      profit += itemProfit.profit;
+    });
+
+    return {
+      taxInclusiveTotalPrice: taxInclusiveTotalPrice,
+      totalCost: totalCost,
+      totalTaxesAmount: totalTaxesAmount,
+      invoiceCosts: invoiceCostsAmount,
+      profit: profit
+    };
   }
 }
 

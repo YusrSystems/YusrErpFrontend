@@ -29,6 +29,7 @@ export default function InvoiceGlobalSettlements()
         </div>
 
         <div className="relative">
+          <Percent size={ 13 } className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <NumberInput
             min={ -100 }
             max={ 100 }
@@ -37,7 +38,6 @@ export default function InvoiceGlobalSettlements()
             onChange={ (newValue) => dispatch(onInvoiceSettlementPercentChange(Number(newValue) ?? 0)) }
             disabled={ disabled }
           />
-          <Percent size={ 13 } className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
       </div>
     </div>
