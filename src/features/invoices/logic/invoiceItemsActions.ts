@@ -42,12 +42,12 @@ export default class InvoiceItemsActions
     const defaultPricingMethod = storeItem.itemUnitPricingMethods?.find((p) => p.unitId === baseItem.sellUnitId)
       || storeItem.itemUnitPricingMethods?.[0];
 
-    const priceBeforeTax = InvoiceItemsMath.GetPriceBeforeTax(
+    const taxExclusivePrice = InvoiceItemsMath.GetTaxExclusivePrice(
       baseItem.taxIncluded,
       defaultPricingMethod?.price || 0,
       baseItem.totalTaxes || 0
     );
-    const priceAfterTax = InvoiceItemsMath.CalcPriceAfterTax(priceBeforeTax, baseItem.totalTaxes || 0);
+    const taxInclusivePrice = InvoiceItemsMath.CalcTaxInclusivePrice(taxExclusivePrice, baseItem.totalTaxes || 0);
 
     state.items.push({
       id: 0,
@@ -63,11 +63,11 @@ export default class InvoiceItemsActions
       // Financials
       quantity: 1,
       cost: baseItem.cost || 0,
-      priceBeforeTax: priceBeforeTax,
-      priceAfterTax: priceAfterTax,
+      taxExclusivePrice: taxExclusivePrice,
+      taxInclusivePrice: taxInclusivePrice,
       settlement: state.settlements.amount || 0,
-      totalPriceBeforeTax: priceBeforeTax,
-      totalPriceAfterTax: priceAfterTax,
+      taxExclusiveTotalPrice: taxExclusivePrice,
+      taxInclusiveTotalPrice: taxInclusivePrice,
 
       // Taxes
       taxable: baseItem.taxable || false,
@@ -148,18 +148,18 @@ export default class InvoiceItemsActions
     }
     const { index, newSettlement } = action.payload;
     let row = state.items[index];
-    row.settlement = newSettlement!;
-    row.totalPriceBeforeTax = InvoiceItemsMath.CalcTotalPriceBeforeTax(
-      row.priceBeforeTax,
+    row.settlement = newSettlement || 0;
+    row.taxExclusiveTotalPrice = InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
+      row.taxExclusivePrice,
       row.settlement,
       row.quantity,
       row.totalTaxesPerc
     );
-    row.totalPriceAfterTax = InvoiceItemsMath.CalcTotalPriceAfterTax(row.priceAfterTax, row.settlement, row.quantity);
+    row.taxInclusiveTotalPrice = InvoiceItemsMath.CalcTaxInclusiveTotalPrice(row.taxInclusivePrice, row.settlement, row.quantity);
     InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }
 
-  public static onInvoiceItemAfterTaxPriceChange(
+  public static onInvoiceItemTaxInclusivePriceChange(
     state: InvoiceState,
     action: PayloadAction<{ index: number; newPrice: number | undefined; }>
   )
@@ -170,15 +170,15 @@ export default class InvoiceItemsActions
     }
     const { index, newPrice } = action.payload;
     let row = state.items[index];
-    row.priceAfterTax = newPrice!;
-    row.priceBeforeTax = InvoiceItemsMath.CalcPriceBeforeTax(newPrice!, row.totalTaxesPerc);
-    row.totalPriceBeforeTax = InvoiceItemsMath.CalcTotalPriceBeforeTax(
-      row.priceBeforeTax,
+    row.taxInclusivePrice = newPrice!;
+    row.taxExclusivePrice = InvoiceItemsMath.CalcTaxExclusivePrice(newPrice!, row.totalTaxesPerc);
+    row.taxExclusiveTotalPrice = InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
+      row.taxExclusivePrice,
       row.settlement,
       row.quantity,
       row.totalTaxesPerc
     );
-    row.totalPriceAfterTax = InvoiceItemsMath.CalcTotalPriceAfterTax(row.priceAfterTax, row.settlement, row.quantity);
+    row.taxInclusiveTotalPrice = InvoiceItemsMath.CalcTaxInclusiveTotalPrice(row.taxInclusivePrice, row.settlement, row.quantity);
     InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }
 
@@ -189,10 +189,10 @@ export default class InvoiceItemsActions
 
   public static onInvoiceSettlementAmountChange(state: InvoiceState, action: PayloadAction<number>)
   {
-    state.settlements.amount = action.payload;
+    state.settlements.amount = action.payload || 0;
     state.items.forEach((_, i) =>
       InvoiceItemsActions.onInvoiceItemSettlementChange(state, {
-        payload: { index: i, newSettlement: action.payload },
+        payload: { index: i, newSettlement: state.settlements.amount },
         type: "onInvoiceItemSettlementChange"
       })
     );
@@ -200,17 +200,13 @@ export default class InvoiceItemsActions
 
   public static onInvoiceSettlementPercentChange(state: InvoiceState, action: PayloadAction<number>)
   {
-    console.log(state.settlements);
-
-    state.settlements.percent = action.payload;
+    state.settlements.percent = action.payload || 0;
     state.items.forEach((item, i) =>
     {
-      // Use priceAfterTax (unit price) * quantity as the clean base, never totalPriceAfterTax
-      const baseTotalAfterTax = Number((item.priceAfterTax * item.quantity).toFixed(2));
-      const newSettlement = Number((baseTotalAfterTax * (action.payload / 100)).toFixed(2));
+      const newSettlement = Number((item.taxInclusivePrice * (state.settlements.percent / 100)).toFixed(2));
 
       InvoiceItemsActions.onInvoiceItemSettlementChange(state, {
-        payload: { index: i, newSettlement },
+        payload: { index: i, newSettlement: newSettlement },
         type: "onInvoiceItemSettlementChange"
       });
     });

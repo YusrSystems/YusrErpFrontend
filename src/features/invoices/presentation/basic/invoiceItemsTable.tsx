@@ -2,7 +2,7 @@ import { NumberField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
 import InvoiceItemsMath from "../../logic/invoiceItemsMath";
-import { onInvoiceItemAfterTaxPriceChange, onInvoiceItemIupmChange, onInvoiceItemQuantityChange, onInvoiceItemSettlementChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
+import { onInvoiceItemTaxInclusivePriceChange, onInvoiceItemIupmChange, onInvoiceItemQuantityChange, onInvoiceItemSettlementChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
 import EmptyTable from "./emptyTable";
 
 export default function InvoiceItemsTable()
@@ -103,7 +103,7 @@ export default function InvoiceItemsTable()
                       label=""
                       value={ row.taxInclusivePrice || "0" }
                       onChange={ (newVal) =>
-                        dispatch(onInvoiceItemAfterTaxPriceChange({ index: index, newPrice: Number(newVal) })) }
+                        dispatch(onInvoiceItemTaxInclusivePriceChange({ index: index, newPrice: Number(newVal) })) }
                     />
                   </td>
 

@@ -13,13 +13,13 @@ import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
 import { InvoiceContext } from "./logic/invoiceContext";
-import { CalcInvoicePriceAfterTax } from "./logic/invoiceItemsMath";
 import { addVoucher, resetItems, resetPaymentVouchers, resetVouchers } from "./logic/invoiceSliceUI";
 import InvoiceBasicTab from "./presentation/basic/invoiceBasicTab";
 import InvoiceCostsTab from "./presentation/costs/invoiceCostsTab";
 import InvoiceFilesTab from "./presentation/files/invoiceFilesTab";
 import InvoicePaymentsTab from "./presentation/payments/invoicePaymentsTab";
 import InvoicePolicyTab from "./presentation/policy/invoicePolicyTab";
+import { CalcInvoiceTaxInclusivePrice } from "./logic/invoiceItemsMath";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -32,7 +32,7 @@ export default function ChangeInvoiceDialog({
   const dispatch = useAppDispatch();
   const authState = useAppSelector((state) => state.auth);
   const { items } = useAppSelector((state) => state.invoiceUI);
-  const totalPrice = useAppSelector(CalcInvoicePriceAfterTax);
+  const invoiceTaxInclusivePrice = useAppSelector(CalcInvoiceTaxInclusivePrice);
 
   const validationRules: ValidationRule<Partial<Invoice>>[] = useMemo(
     () => [{
@@ -121,8 +121,8 @@ export default function ChangeInvoiceDialog({
           accountId: undefined,
           accountName: undefined,
           invoiceRelationType: InvoiceRelationType.Payment,
-          amount: totalPrice,
-          amountReceived: totalPrice,
+          amount: invoiceTaxInclusivePrice,
+          amountReceived: invoiceTaxInclusivePrice,
           description: undefined
         })
       ));

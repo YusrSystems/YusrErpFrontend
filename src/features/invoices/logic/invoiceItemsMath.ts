@@ -22,7 +22,7 @@ export default class InvoiceItemsMath
 
   public static CalcTaxInclusivePrice(taxExclusivePrice: number, totalTaxesPerc: number): number
   {
-    return Number(taxExclusivePrice * (100 + totalTaxesPerc) / 100);
+    return Number((taxExclusivePrice * (100 + totalTaxesPerc) / 100).toFixed(2));
   }
 
   public static CalcTaxExclusiveTotalPrice(
