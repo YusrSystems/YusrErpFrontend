@@ -46,7 +46,7 @@ export default function InvoiceProfitDialog()
         type="button"
         variant="outline"
         onClick={ () => setOpen(true) }
-        className="gap-2 p-6.5 text-green-500"
+        className="gap-2 p-6.5 text-green-500 h-full"
       >
         <Banknote className="h-4 w-4" />
         ربح الفاتورة

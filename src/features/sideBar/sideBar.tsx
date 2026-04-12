@@ -37,13 +37,21 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
       title: appLangSections.invoices,
       url: "/invoices",
       icon: <ReceiptText />,
-      hasAuth: true,
+      hasAuth: SystemPermissions.hasAuth(
+        permissions,
+        SystemPermissionsResources.InvoiceSell,
+        SystemPermissionsActions.Get
+      ) || SystemPermissions.hasAuth(
+        permissions,
+        SystemPermissionsResources.InvoicePurchase,
+        SystemPermissionsActions.Get
+      ),
       subItems: [{
         title: appLangSections.sellInvoices,
         url: "/sales",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
-          SystemPermissionsResources.Invoices,
+          SystemPermissionsResources.InvoiceSell,
           SystemPermissionsActions.Get
         )
       }, {
@@ -51,7 +59,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "/purchases",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
-          SystemPermissionsResources.Invoices,
+          SystemPermissionsResources.InvoicePurchase,
           SystemPermissionsActions.Get
         )
       }]

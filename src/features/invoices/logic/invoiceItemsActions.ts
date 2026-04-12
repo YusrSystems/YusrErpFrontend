@@ -62,9 +62,11 @@ export default class InvoiceItemsActions
 
       // Financials
       quantity: 1,
+      originalQuantity: storeItem.storeQuantity || 0,
       cost: baseItem.cost || 0,
       taxExclusivePrice: taxExclusivePrice,
       taxInclusivePrice: taxInclusivePrice,
+      originaltaxInclusivePrice: taxInclusivePrice,
       settlement: state.settlements.amount || 0,
       taxExclusiveTotalPrice: taxExclusivePrice,
       taxInclusiveTotalPrice: taxInclusivePrice,
@@ -155,7 +157,11 @@ export default class InvoiceItemsActions
       row.quantity,
       row.totalTaxesPerc
     );
-    row.taxInclusiveTotalPrice = InvoiceItemsMath.CalcTaxInclusiveTotalPrice(row.taxInclusivePrice, row.settlement, row.quantity);
+    row.taxInclusiveTotalPrice = InvoiceItemsMath.CalcTaxInclusiveTotalPrice(
+      row.taxInclusivePrice,
+      row.settlement,
+      row.quantity
+    );
     InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }
 
@@ -178,7 +184,11 @@ export default class InvoiceItemsActions
       row.quantity,
       row.totalTaxesPerc
     );
-    row.taxInclusiveTotalPrice = InvoiceItemsMath.CalcTaxInclusiveTotalPrice(row.taxInclusivePrice, row.settlement, row.quantity);
+    row.taxInclusiveTotalPrice = InvoiceItemsMath.CalcTaxInclusiveTotalPrice(
+      row.taxInclusivePrice,
+      row.settlement,
+      row.quantity
+    );
     InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }
 

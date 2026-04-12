@@ -1,15 +1,52 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { NumberField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
+import { SystemPermissionsActions } from "../../../../core/auth/systemPermissionsActions";
+import { SystemPermissionsResources } from "../../../../core/auth/systemPermissionsResources";
+import { InvoiceType } from "../../../../core/data/invoice";
 import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
 import InvoiceItemsMath from "../../logic/invoiceItemsMath";
 import { onInvoiceItemIupmChange, onInvoiceItemQuantityChange, onInvoiceItemSettlementChange, onInvoiceItemTaxInclusivePriceChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
-import EmptyTable from "./emptyTable";
 import { ItemProfitDialog } from "../profit/ItemProfitDialog";
+import EmptyTable from "./emptyTable";
 
 export default function InvoiceItemsTable()
 {
   const dispatch = useAppDispatch();
-  const { items, errors, mode } = useAppSelector((state) => state.invoiceUI);
+  const { items, errors, mode, type } = useAppSelector((state) => state.invoiceUI);
+  const authState = useAppSelector((state) => state.auth);
+
+  const getMaxAllowedQuantity = (storeQuantity: number) =>
+  {
+    if (type !== InvoiceType.Sell && type !== InvoiceType.Quotation)
+    {
+      return Number.MAX_SAFE_INTEGER;
+    }
+
+    return SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.InvoiceSellBeyondAvailableQuantity,
+        SystemPermissionsActions.Get
+      )
+      ? Number.MAX_SAFE_INTEGER
+      : storeQuantity;
+  };
+
+  const getMinAllowedTaxInclusivePrice = (originaltaxInclusivePrice: number) =>
+  {
+    if (type !== InvoiceType.Sell && type !== InvoiceType.Quotation)
+    {
+      return 0;
+    }
+
+    return SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.InvoiceSellBelowSellingPrice,
+        SystemPermissionsActions.Get
+      )
+      ? 0
+      : originaltaxInclusivePrice;
+  };
 
   if (items.length === 0)
   {
@@ -18,9 +55,9 @@ export default function InvoiceItemsTable()
   return (
     <div className="w-full border border-border rounded-lg shadow-sm bg-background">
       <div className="max-h-100 overflow-y-auto overflow-x-auto 
-  [&::-webkit-scrollbar]:w-1.5
-  [&::-webkit-scrollbar-thumb]:bg-muted-foreground/50
-  [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar]:w-1.5
+        [&::-webkit-scrollbar-thumb]:bg-muted-foreground/50
+        [&::-webkit-scrollbar-thumb]:rounded-full
       ">
         <table className="relative w-full text-sm text-right">
           <thead className="sticky top-0 bg-muted z-50 border-b border-border">
@@ -33,12 +70,21 @@ export default function InvoiceItemsTable()
               <th className="p-3 font-semibold w-30 ">السعر بدون ضريبة</th>
               <th className="p-3 font-semibold w-30 ">نسبة الضريبة</th>
               <th className="p-3 font-semibold w-30 ">السعر بعد الضريبة</th>
-              <th className="p-3 font-semibold w-30 ">التسوية</th>
+              { SystemPermissions.hasAuth(
+                authState.loggedInUser?.role?.permissions ?? [],
+                SystemPermissionsResources.InvoiceAddSettlement,
+                SystemPermissionsActions.Get
+              ) && <th className="p-3 font-semibold w-30 ">التسوية</th> }
+
               <th className="p-3 font-semibold w-30 ">التكلفة النهائية</th>
               <th className="p-3 font-semibold w-30 ">السعر النهائي بدون ضريبة</th>
               <th className="p-3 font-semibold w-24 ">السعر النهائي مع ضريبة</th>
+              { SystemPermissions.hasAuth(
+                authState.loggedInUser?.role?.permissions ?? [],
+                SystemPermissionsResources.InvoiceShowItemProfit,
+                SystemPermissionsActions.Get
+              ) && <th className="p-4 font-semibold w-3 text-center"></th> }
 
-              <th className="p-4 font-semibold w-3 text-center"></th>
               <th className="p-4 font-semibold w-3 text-center"></th>
             </tr>
           </thead>
@@ -79,6 +125,7 @@ export default function InvoiceItemsTable()
                     <NumberField
                       label=""
                       min={ 1 }
+                      max={ getMaxAllowedQuantity(row.originalQuantity) }
                       value={ row.quantity ?? 1 }
                       onChange={ (newValue) =>
                         dispatch(onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
@@ -103,22 +150,29 @@ export default function InvoiceItemsTable()
                   <td className="px-2 pt-2">
                     <NumberField
                       label=""
+                      min={ getMinAllowedTaxInclusivePrice(row.originaltaxInclusivePrice) }
                       value={ row.taxInclusivePrice || "0" }
                       onChange={ (newVal) =>
                         dispatch(onInvoiceItemTaxInclusivePriceChange({ index: index, newPrice: Number(newVal) })) }
                     />
                   </td>
 
-                  <td className="px-2 pt-2">
-                    <NumberField
-                      label=""
-                      value={ row.settlement || "0" }
-                      onChange={ (newValue) =>
-                      {
-                        dispatch(onInvoiceItemSettlementChange({ index: index, newSettlement: Number(newValue) }));
-                      } }
-                    />
-                  </td>
+                  { SystemPermissions.hasAuth(
+                    authState.loggedInUser?.role?.permissions ?? [],
+                    SystemPermissionsResources.InvoiceAddSettlement,
+                    SystemPermissionsActions.Get
+                  ) && (
+                    <td className="px-2 pt-2">
+                      <NumberField
+                        label=""
+                        value={ row.settlement || "0" }
+                        onChange={ (newValue) =>
+                        {
+                          dispatch(onInvoiceItemSettlementChange({ index: index, newSettlement: Number(newValue) }));
+                        } }
+                      />
+                    </td>
+                  ) }
 
                   <td className="px-2 pt-2">
                     <TextField
@@ -144,9 +198,15 @@ export default function InvoiceItemsTable()
                     />
                   </td>
 
-                  <td className="px-2 pt-2">
-                    <ItemProfitDialog item={ row } />
-                  </td>
+                  { SystemPermissions.hasAuth(
+                    authState.loggedInUser?.role?.permissions ?? [],
+                    SystemPermissionsResources.InvoiceShowItemProfit,
+                    SystemPermissionsActions.Get
+                  ) && (
+                    <td className="px-2 pt-2">
+                      <ItemProfitDialog item={ row } />
+                    </td>
+                  ) }
 
                   <td className="px-2 pt-2">
                     { mode === "create" && (

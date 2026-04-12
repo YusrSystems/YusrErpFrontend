@@ -1,9 +1,11 @@
 import { Button } from "@yusr_systems/ui";
 import { ArrowRight, FileQuestion, Home } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function NotFoundPage()
 {
+  const navigate = useNavigate();
+
   return (
     <div className="relative flex min-h-[80vh] flex-col items-center justify-center px-6 text-center">
       { /* 1. Background Visual Hint */ }
@@ -32,11 +34,9 @@ export default function NotFoundPage()
           </Link>
         </Button>
 
-        <Button asChild variant="ghost" size="lg" className="h-12 rounded-full px-8">
-          <button onClick={ () => window.history.back() }>
-            <ArrowRight className="ml-2 h-4 w-4" />
-            العودة للخلف
-          </button>
+        <Button variant="ghost" size="lg" className="h-12 rounded-full px-8" onClick={ () => navigate(-1) }>
+          <ArrowRight className="ml-2 h-4 w-4" />
+          العودة للخلف
         </Button>
       </div>
 

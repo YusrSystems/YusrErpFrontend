@@ -22,8 +22,7 @@ export class SystemPermissionsResources
   public static Roles: string = "Roles";
 
   // Invoice Permission Settings
-  public static InvoiceAddDiscount: string = "InvoiceAddDiscount";
-  public static InvoiceAddAdditionalAmount: string = "InvoiceAddAdditionalAmount";
+  public static InvoiceAddSettlement: string = "InvoiceAddSettlement";
   public static InvoiceShowProfit: string = "InvoiceShowProfit";
   public static InvoiceShowItemProfit: string = "InvoiceShowItemProfit";
   public static InvoiceSellBelowSellingPrice: string = "InvoiceSellBelowSellingPrice";
@@ -32,9 +31,6 @@ export class SystemPermissionsResources
   // Allowed Invoice Types
   public static InvoiceSell: string = "InvoiceSell";
   public static InvoicePurchase: string = "InvoicePurchase";
-  public static InvoiceSellReturn: string = "InvoiceSellReturn";
-  public static InvoiceQuotation: string = "InvoiceQuotation";
-  public static InvoicePurchaseReturn: string = "InvoicePurchaseReturn";
 
   // Allowed Account Types
   public static AccountShowBalance: string = "AccountShowBalance";

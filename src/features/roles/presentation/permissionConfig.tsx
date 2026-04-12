@@ -26,8 +26,7 @@ export const ArabicLabels: Record<string, string> = {
   [SystemPermissionsResources.PosTerminals]: "نقاط البيع",
 
   // Invoice Permission Settings
-  [SystemPermissionsResources.InvoiceAddDiscount]: "إضافة خصم للفاتورة",
-  [SystemPermissionsResources.InvoiceAddAdditionalAmount]: "إضافة مبلغ مضاف للفاتورة",
+  [SystemPermissionsResources.InvoiceAddSettlement]: "إضافة تسوية للفاتورة",
   [SystemPermissionsResources.InvoiceShowProfit]: "عرض ربح الفاتورة",
   [SystemPermissionsResources.InvoiceShowItemProfit]: "عرض ربح المادة في الفاتورة",
   [SystemPermissionsResources.InvoiceSellBelowSellingPrice]: "البيع بسعر أقل من سعر البيع",
@@ -111,8 +110,7 @@ export const PERMISSION_SECTIONS = [{
   title: "صلاحيات الفواتير",
   icon: <ShoppingCart className="w-5 h-5" />,
   resources: [
-    SystemPermissionsResources.InvoiceAddDiscount,
-    SystemPermissionsResources.InvoiceAddAdditionalAmount,
+    SystemPermissionsResources.InvoiceAddSettlement,
     SystemPermissionsResources.InvoiceShowProfit,
     SystemPermissionsResources.InvoiceShowItemProfit,
     SystemPermissionsResources.InvoiceSellBelowSellingPrice,
