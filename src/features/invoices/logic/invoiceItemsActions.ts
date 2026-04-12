@@ -89,19 +89,23 @@ export default class InvoiceItemsActions
     const selectedMethod = row.itemUnitPricingMethods?.find((p) => p.id === iupmId);
     row.itemUnitPricingMethodId = iupmId;
     row.itemUnitPricingMethodName = selectedMethod?.itemUnitPricingMethodName || "";
-    row.priceBeforeTax = InvoiceItemsMath.GetPriceBeforeTax(
+    row.taxExclusivePrice = InvoiceItemsMath.GetTaxExclusivePrice(
       row.taxIncluded,
       selectedMethod?.price || 0,
       row.totalTaxesPerc || 0
     );
-    row.priceAfterTax = InvoiceItemsMath.CalcPriceAfterTax(row.priceBeforeTax, row.totalTaxesPerc);
-    row.totalPriceBeforeTax = InvoiceItemsMath.CalcTotalPriceBeforeTax(
-      row.priceBeforeTax,
+    row.taxInclusivePrice = InvoiceItemsMath.CalcTaxInclusivePrice(row.taxExclusivePrice, row.totalTaxesPerc);
+    row.taxExclusiveTotalPrice = InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
+      row.taxExclusivePrice,
       row.settlement,
       row.quantity,
       row.totalTaxesPerc
     );
-    row.totalPriceAfterTax = InvoiceItemsMath.CalcTotalPriceAfterTax(row.priceAfterTax, row.settlement, row.quantity);
+    row.taxInclusiveTotalPrice = InvoiceItemsMath.CalcTaxInclusiveTotalPrice(
+      row.taxInclusivePrice,
+      row.settlement,
+      row.quantity
+    );
 
     InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }
@@ -118,13 +122,17 @@ export default class InvoiceItemsActions
     const { index, newQtn } = action.payload;
     let row = state.items[index];
     row.quantity = newQtn!;
-    row.totalPriceBeforeTax = InvoiceItemsMath.CalcTotalPriceBeforeTax(
-      row.priceBeforeTax,
+    row.taxExclusiveTotalPrice = InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
+      row.taxExclusivePrice,
       row.settlement,
       row.quantity,
       row.totalTaxesPerc
     );
-    row.totalPriceAfterTax = InvoiceItemsMath.CalcTotalPriceAfterTax(row.priceAfterTax, row.settlement, row.quantity);
+    row.taxInclusiveTotalPrice = InvoiceItemsMath.CalcTaxInclusiveTotalPrice(
+      row.taxInclusivePrice,
+      row.settlement,
+      row.quantity
+    );
 
     InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }

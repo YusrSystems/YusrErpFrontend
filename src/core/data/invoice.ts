@@ -54,10 +54,10 @@ export class InvoiceItem extends BaseEntity
   public itemUnitPricingMethodId!: number;
   public quantity!: number;
   public cost!: number;
-  public priceBeforeTax!: number;
-  public priceAfterTax!: number;
-  public totalPriceBeforeTax!: number;
-  public totalPriceAfterTax!: number;
+  public taxExclusivePrice!: number;
+  public taxInclusivePrice!: number;
+  public taxExclusiveTotalPrice!: number;
+  public taxInclusiveTotalPrice!: number;
   public settlement!: number;
   public taxable!: boolean;
   public taxIncluded!: boolean;

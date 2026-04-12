@@ -88,7 +88,7 @@ export default function InvoiceItemsTable()
                     <NumberField
                       label=""
                       disabled
-                      value={ row.priceBeforeTax || "0" }
+                      value={ row.taxExclusivePrice || "0" }
                       onChange={ () =>
                       {} }
                     />
@@ -101,7 +101,7 @@ export default function InvoiceItemsTable()
                   <td className="px-2 pt-2">
                     <NumberField
                       label=""
-                      value={ row.priceAfterTax || "0" }
+                      value={ row.taxInclusivePrice || "0" }
                       onChange={ (newVal) =>
                         dispatch(onInvoiceItemAfterTaxPriceChange({ index: index, newPrice: Number(newVal) })) }
                     />
@@ -129,7 +129,7 @@ export default function InvoiceItemsTable()
                   <td className="px-2 pt-2">
                     <TextField
                       label=""
-                      value={ row.totalPriceBeforeTax || "0" }
+                      value={ row.taxExclusiveTotalPrice || "0" }
                       disabled
                     />
                   </td>
@@ -137,7 +137,7 @@ export default function InvoiceItemsTable()
                   <td className="px-2 pt-2">
                     <TextField
                       label=""
-                      value={ row.totalPriceAfterTax || "0" }
+                      value={ row.taxInclusiveTotalPrice || "0" }
                       disabled
                     />
                   </td>

@@ -3,13 +3,11 @@ import type { RootState } from "../../../core/state/store";
 
 export default class InvoiceItemsMath
 {
-  public static GetPriceBeforeTax(taxIncluded: boolean, price: number, totalTaxesPerc: number): number
+  public static GetTaxExclusivePrice(taxIncluded: boolean, price: number, totalTaxesPerc: number): number
   {
-    console.log(taxIncluded, price, totalTaxesPerc);
-
     if (taxIncluded)
     {
-      return InvoiceItemsMath.CalcPriceBeforeTax(price, totalTaxesPerc);
+      return InvoiceItemsMath.CalcTaxExclusivePrice(price, totalTaxesPerc);
     }
     else
     {
@@ -17,24 +15,29 @@ export default class InvoiceItemsMath
     }
   }
 
-  public static CalcPriceBeforeTax(priceAfterTax: number, totalTaxesPerc: number)
+  public static CalcTaxExclusivePrice(taxInclusivePrice: number, totalTaxesPerc: number)
   {
-    return Number((priceAfterTax / (100 + totalTaxesPerc) * 100).toFixed(2));
+    return Number((taxInclusivePrice / (100 + totalTaxesPerc) * 100).toFixed(2));
   }
 
-  public static CalcPriceAfterTax(priceBeforeTax: number, totalTaxesPerc: number): number
+  public static CalcTaxInclusivePrice(taxExclusivePrice: number, totalTaxesPerc: number): number
   {
-    return Number(priceBeforeTax * (100 + totalTaxesPerc) / 100);
+    return Number(taxExclusivePrice * (100 + totalTaxesPerc) / 100);
   }
 
-  public static CalcTotalPriceBeforeTax(priceBeforeTax: number, settlement: number, qtn: number, totalTaxesPerc: number)
+  public static CalcTaxExclusiveTotalPrice(
+    taxExclusivePrice: number,
+    settlement: number,
+    qtn: number,
+    totalTaxesPerc: number
+  )
   {
-    return Number(((priceBeforeTax + (settlement / (100 + totalTaxesPerc) * 100)) * qtn).toFixed(2));
+    return Number(((taxExclusivePrice + (settlement / (100 + totalTaxesPerc) * 100)) * qtn).toFixed(2));
   }
 
-  public static CalcTotalPriceAfterTax(priceAfterTax: number, settlement: number, qtn: number)
+  public static CalcTaxInclusiveTotalPrice(taxInclusivePrice: number, settlement: number, qtn: number)
   {
-    return Number(((priceAfterTax + settlement) * qtn).toFixed(2));
+    return Number(((taxInclusivePrice + settlement) * qtn).toFixed(2));
   }
 
   public static CalcTotalCost(cost: number, qtn: number)
@@ -42,13 +45,13 @@ export default class InvoiceItemsMath
     return Number((cost * qtn).toFixed(2));
   }
 
-  public static CalcInvoicePriceBeforeTax(invoiceItems: InvoiceItem[])
+  public static CalcInvoiceTaxExclusivePrice(invoiceItems: InvoiceItem[])
   {
     return invoiceItems.reduce(
       (sum, i) =>
         sum
-        + InvoiceItemsMath.CalcTotalPriceBeforeTax(
-          i.priceBeforeTax ?? 0,
+        + InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
+          i.taxExclusivePrice ?? 0,
           i.settlement ?? 0,
           i.quantity ?? 0,
           i.totalTaxesPerc ?? 0
@@ -57,13 +60,13 @@ export default class InvoiceItemsMath
     ) ?? 0;
   }
 
-  public static CalcInvoicePriceAfterTax(invoiceItems: InvoiceItem[])
+  public static CalcInvoiceTaxInclusivePrice(invoiceItems: InvoiceItem[])
   {
     return invoiceItems.reduce(
       (sum, i) =>
         sum
-        + InvoiceItemsMath.CalcTotalPriceAfterTax(
-          InvoiceItemsMath.CalcPriceAfterTax(i.priceBeforeTax ?? 0, i.totalTaxesPerc ?? 0),
+        + InvoiceItemsMath.CalcTaxInclusiveTotalPrice(
+          InvoiceItemsMath.CalcTaxInclusivePrice(i.taxExclusivePrice ?? 0, i.totalTaxesPerc ?? 0),
           i.settlement ?? 0,
           i.quantity ?? 0
         ),
@@ -79,14 +82,14 @@ export const CalcInvoicePaidPrice = (state: RootState) =>
 };
 
 export const CalcInvoiceUnpaidPrice = (state: RootState) =>
-  CalcInvoicePriceAfterTax(state) - CalcInvoicePaidPrice(state);
+  CalcInvoiceTaxInclusivePrice(state) - CalcInvoicePaidPrice(state);
 
-export const CalcInvoicePriceBeforeTax = (state: RootState) =>
+export const CalcInvoiceTaxExclusivePrice = (state: RootState) =>
 {
-  return InvoiceItemsMath.CalcInvoicePriceBeforeTax(state.invoiceUI.items);
+  return InvoiceItemsMath.CalcInvoiceTaxExclusivePrice(state.invoiceUI.items);
 };
 
-export const CalcInvoicePriceAfterTax = (state: RootState) =>
+export const CalcInvoiceTaxInclusivePrice = (state: RootState) =>
 {
-  return InvoiceItemsMath.CalcInvoicePriceAfterTax(state.invoiceUI.items);
+  return InvoiceItemsMath.CalcInvoiceTaxInclusivePrice(state.invoiceUI.items);
 };
