@@ -15,9 +15,9 @@ export default function InvoiceBasicTab()
       <InvoiceBasicInfo />
       <StoreItemSelector onSelect={ (item) => dispatch(addItem(item)) } />
       <InvoiceItemsTable />
-      <div className="flex">
-        <InvoiceItemsSummary />
+      <div className="flex flex-col-reverse lg:flex-row items- gap-3">
         <InvoiceGlobalSettlements />
+        <InvoiceItemsSummary />
       </div>
     </div>
   );

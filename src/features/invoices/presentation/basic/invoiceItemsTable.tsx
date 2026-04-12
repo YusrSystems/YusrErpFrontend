@@ -21,8 +21,8 @@ export default function InvoiceItemsTable()
   [&::-webkit-scrollbar-thumb]:bg-muted-foreground/50
   [&::-webkit-scrollbar-thumb]:rounded-full
       ">
-        <table className="w-full text-sm text-right">
-          <thead className="bg-muted/40 border-b border-border">
+        <table className="relative w-full text-sm text-right">
+          <thead className="sticky top-0 bg-muted z-50 border-b border-border">
             <tr>
               <th className="p-3 font-semibold w-16 text-center text-muted-foreground">الرقم</th>
               <th className="p-3 font-semibold w-50 ">المادة</th>
