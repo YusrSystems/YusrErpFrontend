@@ -94,7 +94,7 @@ function AppRoutes()
             <Route path="/boxes" element={ <BoxesAccountsPage /> } />
             <Route path="/paymentMethods" element={ <PaymentMethodsPage /> } />
             <Route path="/balanceTransfer" element={ <BalanceTransfersPage /> } />
-            <Route path="/sales" element={ <SellInvoicesPage /> } />
+            <Route path="/sales/:invoiceId" element={ <SellInvoicesPage /> } />
             <Route path="/purchases" element={ <PurchaseInvoicesPage /> } />
             <Route path="/vouchers" element={ <VouchersPage /> } />
             <Route path="/items" element={ <ItemsPage /> } />

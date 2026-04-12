@@ -1,8 +1,9 @@
-import type { PayloadAction } from "@reduxjs/toolkit";
-import type { InvoiceType } from "../../../core/data/invoice";
+import { createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
+import { InvoiceSlice, type InvoiceType } from "../../../core/data/invoice";
 import type { StoreItem } from "../../../core/data/item";
+import InvoicesApiService from "../../../core/networking/invoiceApiService";
 import InvoiceItemsMath from "./invoiceItemsMath";
-import type { InvoiceState } from "./invoiceSliceUI";
+import type { InvoiceSettlments, InvoiceState } from "./invoiceSliceUI";
 
 export default class InvoiceItemsActions
 {
@@ -226,4 +227,31 @@ export default class InvoiceItemsActions
   {
     state.type = action.payload;
   }
+
+  public static fetchInvoiceAsync = createAsyncThunk(
+    "invoice/fetchInvoice",
+    async (id: number): Promise<InvoiceState> =>
+    {
+      const service = new InvoicesApiService();
+      const response = await service.Get(id);
+
+      if (response.status !== 200)
+      {
+        return {} as InvoiceState;
+      }
+      const invoice = response.data;
+      const items = invoice?.invoiceItems;
+      const vouchers = invoice?.invoiceVouchers;
+      const settlement: InvoiceSettlments = {
+        amount: invoice?.settlementAmount ?? 0,
+        percent: invoice?.settlementPercent ?? 0
+      };
+
+      return {
+        items: items,
+        vouchers: vouchers,
+        settlements: settlement
+      } as InvoiceState;
+    }
+  );
 }

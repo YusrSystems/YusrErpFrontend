@@ -55,6 +55,13 @@ export const invoiceSliceUI = createSlice({
     resetVouchers: InvoiceVouchersActions.resetVouchers,
     resetPaymentVouchers: InvoiceVouchersActions.resetPaymentVouchers,
     resetCostVouchers: InvoiceVouchersActions.resetCostVouchers
+  },
+  extraReducers: (builder) =>
+  {
+    builder.addCase(InvoiceItemsActions.fetchInvoiceAsync.fulfilled, (state, action) =>
+    {
+      state = action.payload;
+    });
   }
 });
 
