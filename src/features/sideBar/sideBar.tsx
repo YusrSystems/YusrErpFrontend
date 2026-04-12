@@ -40,7 +40,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
       hasAuth: true,
       subItems: [{
         title: appLangSections.sellInvoices,
-        url: "/invoices/sell",
+        url: "/sales",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
           SystemPermissionsResources.Invoices,
@@ -48,7 +48,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         )
       }, {
         title: appLangSections.purchaseInvoices,
-        url: "/invoices/purchase",
+        url: "/purchases",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
           SystemPermissionsResources.Invoices,
