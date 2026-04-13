@@ -26,6 +26,7 @@ export default function ChangeDialogTabbed<T extends BaseEntity>({
         <div className="flex justify-start border-b mb-4 shrink-0 bg-muted/20 rounded-t-lg">
           { tabs.map((tab, i) => (
             <TabButton
+              key={ i }
               active={ currentTab === i }
               icon={ tab.icon }
               label={ tab.label }

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
-import { InvoiceRelationType, InvoiceStatus, InvoiceType, InvoiceVoucher } from "../../core/data/invoice";
+import { InvoiceRelationType, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import { ItemType } from "../../core/data/item";
 import { PaymentMethodSlice } from "../../core/data/paymentMethod";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
@@ -115,18 +115,18 @@ export default function ChangeInvoiceDialog({
     {
       dispatch(resetPaymentVouchers());
       dispatch(addVoucher(
-        new InvoiceVoucher({
+        {
           voucherId: 0,
-          invoiceId: formData.id,
-          paymentMethodId: authState.setting?.mainPaymentMethodId,
-          paymentMethodName: authState.setting?.mainPaymentMethodName,
-          accountId: formData.actionAccountId,
-          accountName: formData.actionAccountName,
+          invoiceId: formData.id ?? 0,
+          paymentMethodId: authState.setting?.mainPaymentMethodId ?? 0,
+          paymentMethodName: authState.setting?.mainPaymentMethodName ?? "",
+          accountId: formData.actionAccountId ?? 0,
+          accountName: formData.actionAccountName ?? "",
           invoiceRelationType: InvoiceRelationType.Payment,
           amount: invoiceTaxInclusivePrice,
           amountReceived: invoiceTaxInclusivePrice,
           description: undefined
-        })
+        }
       ));
     }
     else if (paymentVouchers().length === 1)

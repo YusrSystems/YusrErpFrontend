@@ -1,6 +1,7 @@
 import { SystemPermissions } from "@yusr_systems/core";
 import { NumberField, SelectField, TextField } from "@yusr_systems/ui";
 import { Trash2 } from "lucide-react";
+import React from "react";
 import { SystemPermissionsActions } from "../../../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../../../core/auth/systemPermissionsResources";
 import { InvoiceType } from "../../../../core/data/invoice";
@@ -90,7 +91,7 @@ export default function InvoiceItemsTable()
           </thead>
           <tbody>
             { items.map((row, index) => (
-              <>
+              <React.Fragment key={ row.id }>
                 <tr
                   key={ row.id }
                   className="border-border last:border-0 hover:bg-muted/20 transition-colors"
@@ -242,7 +243,7 @@ export default function InvoiceItemsTable()
                     />
                   </td>
                 </tr>
-              </>
+              </React.Fragment>
             )) }
           </tbody>
         </table>

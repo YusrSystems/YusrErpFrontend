@@ -1,7 +1,7 @@
 import { Button, FormField, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../../../core/data/account";
-import { InvoiceRelationType, InvoiceVoucher } from "../../../../core/data/invoice";
+import { InvoiceRelationType } from "../../../../core/data/invoice";
 import { PaymentMethodFilterColumns, PaymentMethodSlice } from "../../../../core/data/paymentMethod";
 import { useAppSelector } from "../../../../core/state/store";
 import { useInvoiceContext } from "../../logic/invoiceContext";
@@ -28,18 +28,18 @@ export default function InvoiceCostsTab()
         size="lg"
         onClick={ () =>
           dispatch(addVoucher(
-            new InvoiceVoucher({
+            {
               voucherId: 0,
-              invoiceId: formData.id,
-              paymentMethodId: authState.setting?.mainPaymentMethodId,
-              paymentMethodName: authState.setting?.mainPaymentMethodName,
-              accountId: formData.actionAccountId,
-              accountName: formData.actionAccountName,
+              invoiceId: formData.id ?? 0,
+              paymentMethodId: authState.setting?.mainPaymentMethodId ?? 0,
+              paymentMethodName: authState.setting?.mainPaymentMethodName ?? "",
+              accountId: formData.actionAccountId ?? 0,
+              accountName: formData.actionAccountName ?? "",
               invoiceRelationType: InvoiceRelationType.Cost,
               amount: 0,
               amountReceived: 0,
               description: undefined
-            })
+            }
           )) }
       >
         <Plus className="w-4 h-4 ml-2" /> إضافة سند تكلفة
