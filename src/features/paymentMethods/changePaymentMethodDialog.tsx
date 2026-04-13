@@ -1,10 +1,9 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, FormField, NumberField, SearchableSelect, SelectField, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, FormField, NumberField, SearchableSelect, SelectField, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
 import { AccountFilterColumns, BanksAndBoxesSlice } from "../../core/data/account";
 import type PaymentMethod from "../../core/data/paymentMethod";
-import { CommissionType } from "../../core/data/paymentMethod";
+import { CommissionType, PaymentMethodSlice, PaymentMethodValidationRules } from "../../core/data/paymentMethod";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 
 export default function ChangePaymentMethodDialog({
@@ -15,29 +14,7 @@ export default function ChangePaymentMethodDialog({
 }: CommonChangeDialogProps<PaymentMethod>)
 {
   const dispatch = useAppDispatch();
-
   const accountState = useAppSelector((state) => state.banksAndBoxes);
-
-  const validationRules: ValidationRule<Partial<PaymentMethod>>[] = useMemo(
-    () => [{
-      field: "name",
-      selector: (d) => d.name,
-      validators: [Validators.required("يرجى إدخال اسم طريقة الدفع")]
-    }, {
-      field: "accountId",
-      selector: (d) => d.accountId,
-      validators: [Validators.required("يرجى اختيار الحساب")]
-    }, {
-      field: "commissionType",
-      selector: (d) => d.commissionType,
-      validators: [Validators.required("يرجى اختيار نوع العمولة")]
-    }, {
-      field: "commissionAmount",
-      selector: (d) => d.commissionAmount,
-      validators: [Validators.required("يرجى إدخال قيمة العمولة")]
-    }],
-    []
-  );
 
   const initialValues = useMemo(
     () => ({
@@ -54,11 +31,16 @@ export default function ChangePaymentMethodDialog({
   const {
     formData,
     handleChange,
-    getError,
-    isInvalid,
     validate,
-    errorInputClass
-  } = useEntityForm<PaymentMethod>(initialValues, validationRules);
+    getError,
+    errorInputClass,
+    isInvalid
+  } = useReduxEntityForm<PaymentMethod>(
+    PaymentMethodSlice.formActions,
+    (state) => state.unitForm,
+    PaymentMethodValidationRules.validationRules,
+    initialValues
+  );
 
   useEffect(() =>
   {

@@ -1,5 +1,5 @@
-import { BaseEntity, type ColumnName } from "@yusr_systems/core";
-import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
+import { BaseEntity, type ColumnName, type ValidationRule, Validators } from "@yusr_systems/core";
+import { createGenericDialogSlice, createGenericEntitySlice, createGenericFormSlice } from "@yusr_systems/ui";
 import PaymentMethodsApiService from "../networking/paymentMethodApiService";
 
 export const CommissionType = {
@@ -31,20 +31,38 @@ export class PaymentMethodFilterColumns
   }, { label: "اسم الحساب", value: "AccountName" }];
 }
 
+export class PaymentMethodValidationRules
+{
+  public static validationRules: ValidationRule<Partial<PaymentMethod>>[] = [{
+    field: "name",
+    selector: (d) => d.name,
+    validators: [Validators.required("يرجى إدخال اسم طريقة الدفع")]
+  }, {
+    field: "accountId",
+    selector: (d) => d.accountId,
+    validators: [Validators.required("يرجى اختيار الحساب")]
+  }, {
+    field: "commissionType",
+    selector: (d) => d.commissionType,
+    validators: [Validators.required("يرجى اختيار نوع العمولة")]
+  }, {
+    field: "commissionAmount",
+    selector: (d) => d.commissionAmount,
+    validators: [Validators.required("يرجى إدخال قيمة العمولة")]
+  }];
+}
+
 export class PaymentMethodSlice
 {
-  private static entitySliceInstance = createGenericEntitySlice(
-    "paymentMethod",
-    new PaymentMethodsApiService()
-  );
-
+  private static entitySliceInstance = createGenericEntitySlice("paymentMethod", new PaymentMethodsApiService());
   public static entityActions = PaymentMethodSlice.entitySliceInstance.actions;
   public static entityReducer = PaymentMethodSlice.entitySliceInstance.reducer;
 
-  private static dialogSliceInstance = createGenericDialogSlice<PaymentMethod>(
-    "paymentMethodDialog"
-  );
-
+  private static dialogSliceInstance = createGenericDialogSlice<PaymentMethod>("paymentMethodDialog");
   public static dialogActions = PaymentMethodSlice.dialogSliceInstance.actions;
   public static dialogReducer = PaymentMethodSlice.dialogSliceInstance.reducer;
+
+  private static formSliceInstance = createGenericFormSlice<PaymentMethod>("paymentMethodForm");
+  public static formActions = PaymentMethodSlice.formSliceInstance.actions;
+  public static formReducer = PaymentMethodSlice.formSliceInstance.reducer;
 }
