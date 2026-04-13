@@ -1,5 +1,5 @@
-import { BaseEntity, type ColumnName } from "@yusr_systems/core";
-import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
+import { BaseEntity, type ColumnName, type ValidationRule, Validators } from "@yusr_systems/core";
+import { createGenericDialogSlice, createGenericEntitySlice, createGenericFormSlice } from "@yusr_systems/ui";
 import VouchersApiService from "../networking/voucherApiService";
 import type PaymentMethod from "./paymentMethod";
 
@@ -44,18 +44,40 @@ export class VoucherFilterColumns
   }, { label: "البيان", value: "Description" }];
 }
 
+export class VoucherValidationRules
+{
+  public static validationRules: ValidationRule<Partial<Voucher>>[] = [
+    {
+      field: "type",
+      selector: (d) => d.type,
+      validators: [Validators.required("يرجى اختيار نوع السند")]
+    },
+    { field: "date", selector: (d) => d.date, validators: [Validators.required("يرجى اختيار التاريخ")] },
+    {
+      field: "amount",
+      selector: (d) => d.amount,
+      validators: [Validators.required("يرجى إدخال المبلغ")]
+    },
+    { field: "accountId", selector: (d) => d.accountId, validators: [Validators.required("يرجى اختيار الحساب")] },
+    {
+      field: "paymentMethodId",
+      selector: (d) => d.paymentMethodId,
+      validators: [Validators.required("يرجى اختيار طريقة الدفع")]
+    }
+  ];
+}
+
 export class VoucherSlice
 {
-  private static entitySliceInstance = createGenericEntitySlice(
-    "voucher",
-    new VouchersApiService()
-  );
-
+  private static entitySliceInstance = createGenericEntitySlice("voucher", new VouchersApiService());
   public static entityActions = VoucherSlice.entitySliceInstance.actions;
   public static entityReducer = VoucherSlice.entitySliceInstance.reducer;
 
   private static dialogSliceInstance = createGenericDialogSlice<Voucher>("voucherDialog");
-
   public static dialogActions = VoucherSlice.dialogSliceInstance.actions;
   public static dialogReducer = VoucherSlice.dialogSliceInstance.reducer;
+
+  private static formSliceInstance = createGenericFormSlice<Voucher>("voucherForm");
+  public static formActions = VoucherSlice.formSliceInstance.actions;
+  public static formReducer = VoucherSlice.formSliceInstance.reducer;
 }

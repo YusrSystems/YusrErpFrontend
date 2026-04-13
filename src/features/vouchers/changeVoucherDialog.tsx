@@ -1,10 +1,10 @@
-import { NumbertoWordsService, type ValidationRule, Validators } from "@yusr_systems/core";
+import { NumbertoWordsService } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, SelectField, TextAreaField, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, SelectField, TextAreaField, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../core/data/account";
 import { CommissionType, PaymentMethodFilterColumns, PaymentMethodSlice } from "../../core/data/paymentMethod";
-import Voucher, { VoucherType } from "../../core/data/voucher";
+import Voucher, { VoucherSlice, VoucherType, VoucherValidationRules } from "../../core/data/voucher";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 
 export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<Voucher>)
@@ -15,26 +15,6 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
   const authState = useAppSelector((state) => state.auth);
   const [amountToWords, setAmountToWords] = useState("");
 
-  const validationRules: ValidationRule<Partial<Voucher>>[] = useMemo(
-    () => [
-      { field: "type", selector: (d) => d.type, validators: [Validators.required("يرجى اختيار نوع السند")] },
-      { field: "date", selector: (d) => d.date, validators: [Validators.required("يرجى اختيار التاريخ")] },
-      {
-        field: "amount",
-        selector: (d) =>
-          d.amount,
-        validators: [Validators.required("يرجى إدخال المبلغ")]
-      },
-      { field: "accountId", selector: (d) => d.accountId, validators: [Validators.required("يرجى اختيار الحساب")] },
-      {
-        field: "paymentMethodId",
-        selector: (d) => d.paymentMethodId,
-        validators: [Validators.required("يرجى اختيار طريقة الدفع")]
-      }
-    ],
-    []
-  );
-
   const initialValues = useMemo(() => ({
     type: entity?.type || VoucherType.Receipt,
     ...entity,
@@ -43,15 +23,24 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
     commissionAmount: entity?.commissionAmount || 0
   }), [entity]);
 
-  const { formData, handleChange, getError, isInvalid, validate, errorInputClass } = useEntityForm<Voucher>(
-    initialValues,
-    validationRules
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    errorInputClass,
+    isInvalid
+  } = useReduxEntityForm<Voucher>(
+    VoucherSlice.formActions,
+    (state) => state.voucherForm,
+    VoucherValidationRules.validationRules,
+    initialValues
   );
 
   useEffect(() =>
   {
-    dispatch(ClientsAndSuppliersSlice.entityActions.filter(undefined));
-    dispatch(PaymentMethodSlice.entityActions.filter(undefined));
+    dispatch(ClientsAndSuppliersSlice.entityActions.filter());
+    dispatch(PaymentMethodSlice.entityActions.filter());
   }, [dispatch]);
 
   useEffect(() =>
@@ -61,8 +50,6 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
       setAmountToWords(NumbertoWordsService.ConvertAmount(formData.amount, authState.setting.currency));
     }
   }, [formData.amount, authState.setting?.currency]);
-
-  // --- دوال تطبيق قواعد الأعمال (Business Rules) ---
 
   const calculateCommission = (amount: number | undefined, methodId?: number): number =>
   {
@@ -77,12 +64,10 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
       return 0;
     }
 
-    // إذا كانت العمولة نسبة مئوية
     if (method.commissionType === CommissionType.Percent)
     {
       return (amount * (method.commissionAmount || 0)) / 100;
     }
-    // إذا كانت العمولة مبلغاً ثابتاً
     else if (method.commissionType === CommissionType.Amount)
     {
       return method.commissionAmount || 0;
@@ -96,9 +81,7 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
     const newType = Number(val) as VoucherType;
     handleChange({
       type: newType,
-      // تصفير المبلغ المستحق إذا تحول إلى سند قبض
       amountDue: newType === VoucherType.Payment ? formData.amountDue : undefined,
-      // حساب العمولة فقط إذا كان سند قبض، وإلا 0
       commissionAmount: newType === VoucherType.Receipt
         ? calculateCommission(formData.amount, formData.paymentMethodId)
         : 0
@@ -109,7 +92,6 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
   {
     handleChange({
       amount: val,
-      // إعادة حساب العمولة إذا كان سند قبض
       commissionAmount: formData.type === VoucherType.Receipt ? calculateCommission(val, formData.paymentMethodId) : 0
     });
   };
@@ -121,7 +103,6 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
     handleChange({
       paymentMethodId: methodId,
       paymentMethod: selected,
-      // إعادة حساب العمولة بناءً على طريقة الدفع الجديدة
       commissionAmount: formData.type === VoucherType.Receipt ? calculateCommission(formData.amount, methodId) : 0
     });
   };
@@ -229,9 +210,7 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
             </div>
           </FieldsSection>
 
-          { /* 3. تفاصيل مالية إضافية (تعتمد على نوع السند) */ }
           <FieldsSection title="تفاصيل مالية" columns={ 2 }>
-            { /* يظهر فقط في سند الصرف */ }
             { isPayment && (
               <NumberField
                 label="المبلغ المستحق"
@@ -240,12 +219,11 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
               />
             ) }
 
-            { /* يظهر فقط في سند القبض (للقراءة فقط) */ }
             { isReceipt && (
               <NumberField
                 label="مبلغ العمولة (محسوب تلقائياً)"
                 value={ formData.commissionAmount || 0 }
-                disabled={ true } // Read-only
+                disabled={ true }
                 className="bg-muted"
               />
             ) }
@@ -269,7 +247,6 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
             />
           </FieldsSection>
 
-          { /* 5. الفاتورة المرتبطة (للقراءة فقط إذا وجدت) */ }
           { formData.invoiceId && (
             <FieldsSection title="ارتباطات النظام" columns={ 1 }>
               <TextField
@@ -281,7 +258,6 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
             </FieldsSection>
           ) }
 
-          { /* 6. نصوص وملاحظات */ }
           <FieldsSection title="البيان والملاحظات" columns={ 1 }>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TextAreaField

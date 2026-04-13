@@ -1,8 +1,8 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useMemo } from "react";
 import type Unit from "../../core/data/unit";
+import { UnitSlice, UnitValidationRules } from "../../core/data/unit";
 
 export default function ChangeUnitDialog({
   entity,
@@ -11,15 +11,6 @@ export default function ChangeUnitDialog({
   onSuccess
 }: CommonChangeDialogProps<Unit>)
 {
-  const validationRules: ValidationRule<Partial<Unit>>[] = useMemo(
-    () => [{
-      field: "unitName",
-      selector: (d) => d.unitName,
-      validators: [Validators.required("يرجى إدخال اسم الوحدة")]
-    }],
-    []
-  );
-
   const initialValues = useMemo(
     () => ({
       ...entity,
@@ -31,10 +22,15 @@ export default function ChangeUnitDialog({
   const {
     formData,
     handleChange,
+    validate,
     getError,
-    isInvalid,
-    validate
-  } = useEntityForm<Unit>(initialValues, validationRules);
+    isInvalid
+  } = useReduxEntityForm<Unit>(
+    UnitSlice.formActions,
+    (state) => state.unitForm,
+    UnitValidationRules.validationRules,
+    initialValues
+  );
 
   return (
     <ChangeDialog<Unit>
