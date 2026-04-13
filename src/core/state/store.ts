@@ -22,6 +22,7 @@ import { PaymentMethodSlice } from "../data/paymentMethod";
 import { PricingMethodSlice } from "../data/pricingMethod";
 import type { Setting } from "../data/setting";
 import { StocktakingSlice } from "../data/stocktaking";
+import { StoreSlice } from "../data/store";
 import { TaxSlice } from "../data/tax";
 import { UnitSlice } from "../data/unit";
 import { VoucherSlice } from "../data/voucher";
@@ -32,7 +33,6 @@ import itemBarcodeReducer from "./shared/itemBarcodeSlice";
 import serviceIdsReducer from "./shared/serviceIdsSlice";
 import storeItemsReducer from "./shared/storeItemsSlice";
 import systemReducer from "./shared/systemSlice";
-import { StoreSlice } from "../data/store";
 
 const authSlice = createAuthSlice<User, Setting>();
 export const {
@@ -94,10 +94,12 @@ export const store = configureStore({
     pricingMethod: PricingMethodSlice.entityReducer,
     pricingMethodDialog: PricingMethodSlice.dialogReducer,
     stocktaking: StocktakingSlice.entityReducer,
+    stocktakingForm: StocktakingSlice.formReducer,
     stocktakingDialog: StocktakingSlice.dialogReducer,
     itemTransfer: ItemTransferSlice.entityReducer,
     itemTransferDialog: ItemTransferSlice.dialogReducer,
     itemsSettlement: ItemsSettlementSlice.entityReducer,
+    itemsSettlementForm: ItemsSettlementSlice.formReducer,
     itemsSettlementDialog: ItemsSettlementSlice.dialogReducer,
     itemTransferUI: itemTransferReducer,
     dashboard: dashboardReducer,

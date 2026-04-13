@@ -1,5 +1,5 @@
-import { BaseEntity, type ColumnName } from "@yusr_systems/core";
-import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
+import { BaseEntity, type ColumnName, type ValidationRule, Validators } from "@yusr_systems/core";
+import { createGenericDialogSlice, createGenericEntitySlice, createGenericFormSlice } from "@yusr_systems/ui";
 import ItemsSettlementsApiService from "../networking/itemsSettlementsApiService";
 import type { IStocktaking, IStocktakingItem } from "./stocktaking";
 
@@ -51,18 +51,26 @@ export class ItemsSettlementFilterColumns
   }, { label: "الوصف", value: "Description" }];
 }
 
+export class ItemsSettlementValidationRules
+{
+  public static validationRules: ValidationRule<Partial<ItemsSettlement>>[] = [{
+    field: "storeId",
+    selector: (d) => d.storeId,
+    validators: [Validators.required("يرجى اختيار المستودع")]
+  }, { field: "date", selector: (d) => d.date, validators: [Validators.required("يرجى اختيار التاريخ")] }];
+}
+
 export class ItemsSettlementSlice
 {
-  private static entitySliceInstance = createGenericEntitySlice(
-    "itemsSettlement",
-    new ItemsSettlementsApiService()
-  );
-
+  private static entitySliceInstance = createGenericEntitySlice("itemsSettlement", new ItemsSettlementsApiService());
   public static entityActions = ItemsSettlementSlice.entitySliceInstance.actions;
   public static entityReducer = ItemsSettlementSlice.entitySliceInstance.reducer;
 
   private static dialogSliceInstance = createGenericDialogSlice<ItemsSettlement>("itemsSettlementDialog");
-
   public static dialogActions = ItemsSettlementSlice.dialogSliceInstance.actions;
   public static dialogReducer = ItemsSettlementSlice.dialogSliceInstance.reducer;
+
+  private static formSliceInstance = createGenericFormSlice<ItemsSettlement>("itemsSettlementForm");
+  public static formActions = ItemsSettlementSlice.formSliceInstance.actions;
+  public static formReducer = ItemsSettlementSlice.formSliceInstance.reducer;
 }

@@ -1,9 +1,8 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, Loading, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, Loading, SearchableSelect, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
-import ItemsSettlement, { ItemsSettlementItem } from "../../core/data/itemsSettlement";
+import ItemsSettlement, { ItemsSettlementItem, ItemsSettlementSlice, ItemsSettlementValidationRules } from "../../core/data/itemsSettlement";
 import type { IStocktaking } from "../../core/data/stocktaking";
 import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
@@ -18,23 +17,24 @@ export default function ChangeItemsSettlementDialog(
   const [initLoading, setInitLoading] = useState(false);
   const storeState = useAppSelector((state) => state.store);
 
-  const validationRules: ValidationRule<Partial<ItemsSettlement>>[] = useMemo(
-    () => [
-      { field: "storeId", selector: (d) => d.storeId, validators: [Validators.required("يرجى اختيار المستودع")] },
-      { field: "date", selector: (d) => d.date, validators: [Validators.required("يرجى اختيار التاريخ")] }
-    ],
-    []
-  );
-
   const initialValues = useMemo(() => ({
     ...entity,
     date: entity?.date ? new Date(entity.date) : new Date(),
     itemsSettlementItems: entity?.itemsSettlementItems || []
   }), [entity]);
 
-  const { formData, handleChange, getError, isInvalid, validate, clearError } = useEntityForm<ItemsSettlement>(
-    initialValues,
-    validationRules
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    clearError,
+    isInvalid
+  } = useReduxEntityForm<ItemsSettlement>(
+    ItemsSettlementSlice.formActions,
+    (state) => state.itemsSettlementForm,
+    ItemsSettlementValidationRules.validationRules,
+    initialValues
   );
 
   useEffect(() =>
