@@ -4,10 +4,9 @@ import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTit
 import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
 import Stocktaking, { StocktakingItem } from "../../core/data/stocktaking";
-import { StoreFilterColumns } from "../../core/data/store";
+import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
-import { filterStores } from "../stores/logic/storeSlice";
 import StocktakingItemsTable from "./stocktakingItemsTable";
 
 export default function ChangeStocktakingDialog(
@@ -39,7 +38,7 @@ export default function ChangeStocktakingDialog(
 
   useEffect(() =>
   {
-    dispatch(filterStores(undefined));
+    dispatch(StoreSlice.entityActions.filter());
   }, [dispatch]);
 
   useEffect(() =>
@@ -76,7 +75,7 @@ export default function ChangeStocktakingDialog(
     const selected = storeState.entities.data?.find((s) => s.id.toString() === val);
     handleChange({
       storeId: selected?.id,
-      storeName: selected?.storeName,
+      storeName: selected?.name,
       stocktakingItems: []
     });
     clearError("storeId");
@@ -126,13 +125,13 @@ export default function ChangeStocktakingDialog(
               </label>
               <SearchableSelect
                 items={ storeState.entities.data ?? [] }
-                itemLabelKey="storeName"
+                itemLabelKey="name"
                 itemValueKey="id"
                 placeholder="اختر المستودع"
                 value={ formData.storeId?.toString() || "" }
                 onValueChange={ handleStoreChange }
                 columnsNames={ StoreFilterColumns.columnsNames }
-                onSearch={ (condition) => dispatch(filterStores(condition)) }
+                onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
                 disabled={ storeState.isLoading || mode === "update" }
               />
               { isInvalid("storeId") && <span className="text-xs text-red-500">{ getError("storeId") }</span> }

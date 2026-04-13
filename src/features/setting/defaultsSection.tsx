@@ -1,9 +1,8 @@
 import { FieldGroup, FieldsSection, SearchableSelect } from "@yusr_systems/ui";
 import { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../core/data/account";
 import { PaymentMethodFilterColumns, PaymentMethodSlice } from "../../core/data/paymentMethod";
-import { StoreFilterColumns } from "../../core/data/store";
+import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
-import { filterStores } from "../stores/logic/storeSlice";
 import { useSettingContext } from "./settingContext";
 
 export default function DefaultsSection()
@@ -26,16 +25,16 @@ export default function DefaultsSection()
             <label className="text-sm font-medium">المستودع الافتراضي</label>
             <SearchableSelect
               items={ storeState.entities.data ?? [] }
-              itemLabelKey="storeName"
+              itemLabelKey="name"
               itemValueKey="id"
               value={ formData.mainStoreId?.toString() || "" }
               onValueChange={ (val) =>
               {
                 const selected = storeState.entities.data?.find((s) => s.id.toString() === val);
-                handleChange({ mainStoreId: selected?.id, mainStoreName: selected?.storeName });
+                handleChange({ mainStoreId: selected?.id, mainStoreName: selected?.name });
               } }
               columnsNames={ StoreFilterColumns.columnsNames }
-              onSearch={ (condition) => dispatch(filterStores(condition)) }
+              onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
               disabled={ storeState.isLoading }
             />
           </div>

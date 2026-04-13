@@ -10,11 +10,11 @@ import { TaxSlice } from "../../core/data/tax";
 import { UnitSlice } from "../../core/data/unit";
 import { fetchServiceIds } from "../../core/state/shared/serviceIdsSlice";
 import { useAppDispatch } from "../../core/state/store";
-import { filterStores } from "../stores/logic/storeSlice";
 import BasicTab from "./basic/basicTab";
 import { ItemContext } from "./itemContext";
 import PricingTab from "./pricing/pricingTab";
 import StorageTab from "./storage/storageTab";
+import { StoreSlice } from "../../core/data/store";
 
 export default function ChangeItemDialog({
   entity,
@@ -126,7 +126,7 @@ export default function ChangeItemDialog({
     dispatch(TaxSlice.entityActions.filter());
     dispatch(UnitSlice.entityActions.filter());
     dispatch(PricingMethodSlice.entityActions.filter());
-    dispatch(filterStores());
+    dispatch(StoreSlice.entityActions.filter());
     dispatch(fetchServiceIds());
   }, [dispatch]);
 

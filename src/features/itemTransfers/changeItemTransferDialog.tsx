@@ -3,11 +3,10 @@ import { ChangeDialog, type CommonChangeDialogProps, DialogContent, DialogDescri
 import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
 import ItemTransfer, { ItemTransfersItem } from "../../core/data/itemTransfer";
-import { StoreFilterColumns } from "../../core/data/store";
+import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import StoreItemSelector from "../items/storeItemSelector";
-import { filterStores } from "../stores/logic/storeSlice";
 import { ItemTransferActions } from "./logic/itemTransferActions";
 import { initializeItems } from "./logic/itemTransferSlice";
 import SelectedItemsTable from "./selectedItemsTable";
@@ -135,7 +134,7 @@ export default function ChangeItemTransferDialog({
 
   useEffect(() =>
   {
-    dispatch(filterStores());
+    dispatch(StoreSlice.entityActions.filter());
   }, [dispatch]);
 
   const availableFromStores = useMemo(() =>
@@ -200,12 +199,12 @@ export default function ChangeItemTransferDialog({
           >
             <SearchableSelect
               items={ availableFromStores }
-              itemLabelKey="storeName"
+              itemLabelKey="name"
               itemValueKey="id"
               placeholder="اختر المستودع"
               value={ formData.fromStoreId?.toString() || "" }
               columnsNames={ StoreFilterColumns.columnsNames }
-              onSearch={ (condition) => dispatch(filterStores(condition)) }
+              onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
               errorInputClass={ errorInputClass("fromStoreId") }
               disabled={ storeState.isLoading || mode === "update" }
               onValueChange={ (val) =>
@@ -214,7 +213,7 @@ export default function ChangeItemTransferDialog({
                 if (selected)
                 {
                   ItemTransferActions.clear(dispatch);
-                  handleChange({ fromStoreId: selected.id, fromStoreName: selected.storeName });
+                  handleChange({ fromStoreId: selected.id, fromStoreName: selected.name });
                 }
               } }
             />
@@ -228,12 +227,12 @@ export default function ChangeItemTransferDialog({
           >
             <SearchableSelect
               items={ availableToStores }
-              itemLabelKey="storeName"
+              itemLabelKey="name"
               itemValueKey="id"
               placeholder="اختر المستودع"
               value={ formData.toStoreId?.toString() || "" }
               columnsNames={ StoreFilterColumns.columnsNames }
-              onSearch={ (condition) => dispatch(filterStores(condition)) }
+              onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
               errorInputClass={ errorInputClass("toStoreId") }
               disabled={ storeState.isLoading || mode === "update" }
               onValueChange={ (val) =>
@@ -241,7 +240,7 @@ export default function ChangeItemTransferDialog({
                 const selected = availableToStores.find((s) => s.id.toString() === val);
                 if (selected)
                 {
-                  handleChange({ toStoreId: selected.id, toStoreName: selected.storeName });
+                  handleChange({ toStoreId: selected.id, toStoreName: selected.name });
                 }
               } }
             />

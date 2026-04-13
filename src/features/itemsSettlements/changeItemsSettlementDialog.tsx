@@ -5,11 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
 import ItemsSettlement, { ItemsSettlementItem } from "../../core/data/itemsSettlement";
 import type { IStocktaking } from "../../core/data/stocktaking";
-import { StoreFilterColumns } from "../../core/data/store";
+import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import StocktakingItemsTable from "../stocktakings/stocktakingItemsTable";
-import { filterStores } from "../stores/logic/storeSlice";
 
 export default function ChangeItemsSettlementDialog(
   { entity, mode, service, onSuccess }: CommonChangeDialogProps<ItemsSettlement>
@@ -40,7 +39,7 @@ export default function ChangeItemsSettlementDialog(
 
   useEffect(() =>
   {
-    dispatch(filterStores());
+    dispatch(StoreSlice.entityActions.filter());
   }, [dispatch]);
 
   useEffect(() =>
@@ -77,7 +76,7 @@ export default function ChangeItemsSettlementDialog(
     const selected = storeState.entities.data?.find((s) => s.id.toString() === val);
     handleChange({
       storeId: selected?.id,
-      storeName: selected?.storeName,
+      storeName: selected?.name,
       itemsSettlementItems: []
     });
     clearError("storeId");
@@ -168,13 +167,13 @@ export default function ChangeItemsSettlementDialog(
               </label>
               <SearchableSelect
                 items={ storeState.entities.data ?? [] }
-                itemLabelKey="storeName"
+                itemLabelKey="name"
                 itemValueKey="id"
                 placeholder="اختر المستودع"
                 value={ formData.storeId?.toString() || "" }
                 onValueChange={ handleStoreChange }
                 columnsNames={ StoreFilterColumns.columnsNames }
-                onSearch={ (condition) => dispatch(filterStores(condition)) }
+                onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
                 disabled={ storeState.isLoading || mode === "update" }
               />
               { isInvalid("storeId") && <span className="text-xs text-red-500">{ getError("storeId") }</span> }

@@ -9,9 +9,9 @@ import type Invoice from "../../core/data/invoice";
 import { InvoiceRelationType, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import { ItemType } from "../../core/data/item";
 import { PaymentMethodSlice } from "../../core/data/paymentMethod";
+import { StoreSlice } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
-import { filterStores } from "../stores/logic/storeSlice";
 import { InvoiceContext } from "./logic/invoiceContext";
 import { CalcInvoicePaidPrice, CalcInvoiceTaxInclusivePrice } from "./logic/invoiceItemsMath";
 import { addVoucher, initItems, initVouchers, resetItems, resetPaymentVouchers, resetVouchers, updateVoucher } from "./logic/invoiceSliceUI";
@@ -92,7 +92,7 @@ export default function ChangeInvoiceDialog({
   {
     dispatch(ClientsAndSuppliersSlice.entityActions.filter());
     dispatch(PaymentMethodSlice.entityActions.filter());
-    dispatch(filterStores());
+    dispatch(StoreSlice.entityActions.filter());
   }, [dispatch]);
 
   useEffect(() =>

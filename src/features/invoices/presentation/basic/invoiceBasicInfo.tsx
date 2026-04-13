@@ -1,9 +1,8 @@
 import { Checkbox, DateField, FieldsSection, FormField, SearchableSelect, SelectField, TextField } from "@yusr_systems/ui";
 import Account, { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../../../core/data/account";
 import { ImportExportType, InvoiceType } from "../../../../core/data/invoice";
-import { StoreFilterColumns } from "../../../../core/data/store";
+import { StoreFilterColumns, StoreSlice } from "../../../../core/data/store";
 import { useAppSelector } from "../../../../core/state/store";
-import { filterStores } from "../../../stores/logic/storeSlice";
 import { useInvoiceContext } from "../../logic/invoiceContext";
 import { resetItems } from "../../logic/invoiceSliceUI";
 
@@ -100,16 +99,16 @@ export default function InvoiceBasicInfo()
       <FormField label="المستودع" required={ true } isInvalid={ isInvalid("storeId") } error={ getError("storeId") }>
         <SearchableSelect
           items={ storeState.entities.data ?? [] }
-          itemLabelKey="storeName"
+          itemLabelKey="name"
           itemValueKey="id"
           value={ formData.storeId?.toString() || "" }
           columnsNames={ StoreFilterColumns.columnsNames }
-          onSearch={ (condition) => dispatch(filterStores(condition)) }
+          onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
           disabled={ storeState.isLoading || mode === "update" }
           onValueChange={ (val) =>
           {
             const selected = storeState.entities.data?.find((a) => a.id.toString() === val);
-            handleChange({ storeId: selected?.id, storeName: selected?.storeName, invoiceItems: [] });
+            handleChange({ storeId: selected?.id, storeName: selected?.name, invoiceItems: [] });
             dispatch(resetItems());
           } }
         />

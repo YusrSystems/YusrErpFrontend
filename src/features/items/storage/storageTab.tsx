@@ -1,9 +1,8 @@
 import { Button, FormField, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { ItemStore } from "../../../core/data/item";
-import { StoreFilterColumns } from "../../../core/data/store";
+import { StoreFilterColumns, StoreSlice } from "../../../core/data/store";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { filterStores } from "../../stores/logic/storeSlice";
 import { useItemContext } from "../itemContext";
 
 export default function StorageTab()
@@ -109,7 +108,7 @@ export default function StorageTab()
                     >
                       <SearchableSelect
                         items={ storeState.entities.data ?? [] }
-                        itemLabelKey="storeName"
+                        itemLabelKey="name"
                         itemValueKey="id"
                         value={ store.storeId?.toString() || "" }
                         onValueChange={ (val) =>
@@ -119,11 +118,11 @@ export default function StorageTab()
                           );
                           updateStore(index, {
                             storeId: selected?.id,
-                            storeName: selected?.storeName
+                            storeName: selected?.name
                           });
                         } }
                         columnsNames={ StoreFilterColumns.columnsNames }
-                        onSearch={ (condition) => dispatch(filterStores(condition)) }
+                        onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
                         disabled={ storeState.isLoading }
                       />
                     </FormField>

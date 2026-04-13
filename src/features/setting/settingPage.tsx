@@ -9,12 +9,12 @@ import { Setting } from "../../core/data/setting";
 import SettingsApiService from "../../core/networking/settingsApiService";
 import { filterCurrencies } from "../../core/state/shared/currencySlice";
 import { updateSetting, useAppDispatch } from "../../core/state/store";
-import { filterStores } from "../stores/logic/storeSlice";
 import BasicSection from "./basicSection";
 import DefaultsSection from "./defaultsSection";
 import InvoiceSection from "./invoiceSection";
 import { SettingContext } from "./settingContext";
 import { TaxSlice } from "../../core/data/tax";
+import { StoreSlice } from "../../core/data/store";
 
 export default function SettingPage()
 {
@@ -69,7 +69,7 @@ export default function SettingPage()
   {
     dispatch(filterCurrencies());
     dispatch(TaxSlice.entityActions.filter());
-    dispatch(filterStores());
+    dispatch(StoreSlice.entityActions.filter());
     dispatch(PaymentMethodSlice.entityActions.filter());
     dispatch(ClientsAndSuppliersSlice.entityActions.filter());
   }, [dispatch]);

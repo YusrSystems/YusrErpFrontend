@@ -10,8 +10,6 @@ import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTran
 import registerReducer from "../../features/register/logic/registerSlice";
 import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
 import roleReducer from "../../features/roles/logic/roleSlice";
-import storeDialogReducer from "../../features/stores/logic/storeDialogSlice";
-import storeReducer from "../../features/stores/logic/storeSlice";
 import userDialogReducer from "../../features/users/logic/userDialogSlice";
 import userReducer from "../../features/users/logic/userSlice";
 import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsAndSuppliersSlice, ClientsSlice, EmployeesSlice, SuppliersSlice } from "../data/account";
@@ -34,6 +32,7 @@ import itemBarcodeReducer from "./shared/itemBarcodeSlice";
 import serviceIdsReducer from "./shared/serviceIdsSlice";
 import storeItemsReducer from "./shared/storeItemsSlice";
 import systemReducer from "./shared/systemSlice";
+import { StoreSlice } from "../data/store";
 
 const authSlice = createAuthSlice<User, Setting>();
 export const {
@@ -63,8 +62,9 @@ export const store = configureStore({
     tax: TaxSlice.entityReducer,
     taxForm: TaxSlice.formReducer,
     taxDialog: TaxSlice.dialogReducer,
-    store: storeReducer,
-    storeDialog: storeDialogReducer,
+    store: StoreSlice.entityReducer,
+    storeForm: StoreSlice.formReducer,
+    storeDialog: StoreSlice.dialogReducer,
     unit: UnitSlice.entityReducer,
     unitForm: UnitSlice.formReducer,
     unitDialog: UnitSlice.dialogReducer,

@@ -1,14 +1,12 @@
 import { CrudPage } from "@yusr_systems/ui";
 import { Warehouse } from "lucide-react";
 import { useMemo } from "react";
-import { selectPermissionsByResource } from "../../../core/auth/authSelectors";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
-import type Store from "../../../core/data/store";
-import { StoreFilterColumns } from "../../../core/data/store";
-import StoresApiService from "../../../core/networking/storeApiService";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { openStoreChangeDialog, openStoreDeleteDialog, setIsStoreChangeDialogOpen, setIsStoreDeleteDialogOpen } from "../logic/storeDialogSlice";
-import { filterStores, refreshStores, setCurrentStoresPage } from "../logic/storeSlice";
+import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import type Store from "../../core/data/store";
+import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
+import StoresApiService from "../../core/networking/storeApiService";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import ChangeStoreDialog from "./changeStoreDialog";
 
 export default function StoresPage()
@@ -40,15 +38,15 @@ export default function StoresPage()
       }] }
       tableRowMapper={ (
         store: Store
-      ) => [{ rowName: `#${store.id}`, rowStyles: "" }, { rowName: store.storeName, rowStyles: "font-semibold" }] }
+      ) => [{ rowName: `#${store.id}`, rowStyles: "" }, { rowName: store.name, rowStyles: "font-semibold" }] }
       actions={ {
-        filter: filterStores,
-        openChangeDialog: (entity) => openStoreChangeDialog(entity),
-        openDeleteDialog: (entity) => openStoreDeleteDialog(entity),
-        setIsChangeDialogOpen: (open) => setIsStoreChangeDialogOpen(open),
-        setIsDeleteDialogOpen: (open) => setIsStoreDeleteDialogOpen(open),
-        refresh: refreshStores,
-        setCurrentPage: (page) => setCurrentStoresPage(page)
+        filter: StoreSlice.entityActions.filter,
+        openChangeDialog: (entity) => StoreSlice.dialogActions.openChangeDialog(entity),
+        openDeleteDialog: (entity) => StoreSlice.dialogActions.openDeleteDialog(entity),
+        setIsChangeDialogOpen: (open) => StoreSlice.dialogActions.setIsChangeDialogOpen(open),
+        setIsDeleteDialogOpen: (open) => StoreSlice.dialogActions.setIsDeleteDialogOpen(open),
+        refresh: StoreSlice.entityActions.refresh,
+        setCurrentPage: (page) => StoreSlice.entityActions.setCurrentPage(page)
       } }
       ChangeDialog={ 
         <ChangeStoreDialog
@@ -57,10 +55,10 @@ export default function StoresPage()
           service={ service }
           onSuccess={ (data, mode) =>
           {
-            dispatch(refreshStores({ data: data }));
+            dispatch(StoreSlice.entityActions.refresh({ data: data }));
             if (mode === "create")
             {
-              dispatch(setIsStoreChangeDialogOpen(false));
+              dispatch(StoreSlice.dialogActions.setIsChangeDialogOpen(false));
             }
           } }
         />

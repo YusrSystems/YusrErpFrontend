@@ -1,9 +1,8 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useMemo } from "react";
-import type Store from "../../../core/data/store";
-
+import type Store from "../../core/data/store";
+import { StoreSlice, StoreValidationRules } from "../../core/data/store";
 export default function ChangeStoreDialog({
   entity,
   mode,
@@ -11,19 +10,10 @@ export default function ChangeStoreDialog({
   onSuccess
 }: CommonChangeDialogProps<Store>)
 {
-  const validationRules: ValidationRule<Partial<Store>>[] = useMemo(
-    () => [{
-      field: "storeName",
-      selector: (d) => d.storeName,
-      validators: [Validators.required("يرجى إدخال اسم المستودع")]
-    }],
-    []
-  );
-
   const initialValues = useMemo(
     () => ({
       ...entity,
-      storeName: entity?.storeName || ""
+      storeName: entity?.name || ""
     }),
     [entity]
   );
@@ -31,10 +21,15 @@ export default function ChangeStoreDialog({
   const {
     formData,
     handleChange,
+    validate,
     getError,
-    isInvalid,
-    validate
-  } = useEntityForm<Store>(initialValues, validationRules);
+    isInvalid
+  } = useReduxEntityForm<Store>(
+    StoreSlice.formActions,
+    (state) => state.storeForm,
+    StoreValidationRules.validationRules,
+    initialValues
+  );
 
   return (
     <ChangeDialog<Store>
@@ -51,10 +46,10 @@ export default function ChangeStoreDialog({
         <TextField
           label="اسم المستودع"
           required
-          value={ formData.storeName || "" }
-          onChange={ (e) => handleChange({ storeName: e.target.value }) }
-          isInvalid={ isInvalid("storeName") }
-          error={ getError("storeName") }
+          value={ formData.name || "" }
+          onChange={ (e) => handleChange({ name: e.target.value }) }
+          isInvalid={ isInvalid("name") }
+          error={ getError("name") }
         />
       </FieldGroup>
     </ChangeDialog>
