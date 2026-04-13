@@ -10,11 +10,11 @@ import SettingsApiService from "../../core/networking/settingsApiService";
 import { filterCurrencies } from "../../core/state/shared/currencySlice";
 import { updateSetting, useAppDispatch } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
-import { filterTaxes } from "../taxes/logic/taxSlice";
 import BasicSection from "./basicSection";
 import DefaultsSection from "./defaultsSection";
 import InvoiceSection from "./invoiceSection";
 import { SettingContext } from "./settingContext";
+import { TaxSlice } from "../../core/data/tax";
 
 export default function SettingPage()
 {
@@ -68,7 +68,7 @@ export default function SettingPage()
   useEffect(() =>
   {
     dispatch(filterCurrencies());
-    dispatch(filterTaxes());
+    dispatch(TaxSlice.entityActions.filter());
     dispatch(filterStores());
     dispatch(PaymentMethodSlice.entityActions.filter());
     dispatch(ClientsAndSuppliersSlice.entityActions.filter());

@@ -14,7 +14,7 @@ export default function ChangeUnitDialog({
   const initialValues = useMemo(
     () => ({
       ...entity,
-      unitName: entity?.unitName || ""
+      name: entity?.name || ""
     }),
     [entity]
   );
@@ -47,10 +47,10 @@ export default function ChangeUnitDialog({
         <TextField
           label="اسم الوحدة"
           required
-          value={ formData.unitName || "" }
-          onChange={ (e) => handleChange({ unitName: e.target.value }) }
-          isInvalid={ isInvalid("unitName") }
-          error={ getError("unitName") }
+          value={ formData.name || "" }
+          onChange={ (e) => handleChange({ name: e.target.value }) }
+          isInvalid={ isInvalid("name") }
+          error={ getError("name") }
         />
       </FieldGroup>
     </ChangeDialog>

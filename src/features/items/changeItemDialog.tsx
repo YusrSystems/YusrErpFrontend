@@ -6,11 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import Item, { ItemType } from "../../core/data/item";
 import { PricingMethodSlice } from "../../core/data/pricingMethod";
+import { TaxSlice } from "../../core/data/tax";
 import { UnitSlice } from "../../core/data/unit";
 import { fetchServiceIds } from "../../core/state/shared/serviceIdsSlice";
 import { useAppDispatch } from "../../core/state/store";
 import { filterStores } from "../stores/logic/storeSlice";
-import { filterTaxes } from "../taxes/logic/taxSlice";
 import BasicTab from "./basic/basicTab";
 import { ItemContext } from "./itemContext";
 import PricingTab from "./pricing/pricingTab";
@@ -123,10 +123,10 @@ export default function ChangeItemDialog({
 
   useEffect(() =>
   {
-    dispatch(filterTaxes(undefined));
-    dispatch(UnitSlice.entityActions.filter(undefined));
-    dispatch(PricingMethodSlice.entityActions.filter(undefined));
-    dispatch(filterStores(undefined));
+    dispatch(TaxSlice.entityActions.filter());
+    dispatch(UnitSlice.entityActions.filter());
+    dispatch(PricingMethodSlice.entityActions.filter());
+    dispatch(filterStores());
     dispatch(fetchServiceIds());
   }, [dispatch]);
 

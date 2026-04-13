@@ -1,8 +1,7 @@
 import { FieldGroup, FieldsSection, FormField, SearchableSelect, SelectField, SelectInput, TextAreaField } from "@yusr_systems/ui";
 import { InvoicePrintSize } from "../../core/data/setting";
-import { TaxFilterColumns } from "../../core/data/tax";
+import { TaxFilterColumns, TaxSlice } from "../../core/data/tax";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
-import { filterTaxes } from "../taxes/logic/taxSlice";
 import { useSettingContext } from "./settingContext";
 
 export default function InvoiceSection()
@@ -52,7 +51,7 @@ export default function InvoiceSection()
               value={ formData.mainTaxId?.toString() || "" }
               onValueChange={ (val) => handleChange({ mainTaxId: Number(val) }) }
               columnsNames={ TaxFilterColumns.columnsNames }
-              onSearch={ (condition) => dispatch(filterTaxes(condition)) }
+              onSearch={ (condition) => dispatch(TaxSlice.entityActions.filter(condition)) }
               disabled={ taxState.isLoading }
             />
           </div>

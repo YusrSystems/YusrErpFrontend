@@ -1,13 +1,11 @@
 import { CrudPage } from "@yusr_systems/ui";
 import { Percent } from "lucide-react";
 import { useMemo } from "react";
-import { selectPermissionsByResource } from "../../../core/auth/authSelectors";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
-import { Tax, TaxFilterColumns } from "../../../core/data/tax";
-import TaxesApiService from "../../../core/networking/taxesApiService";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { openTaxChangeDialog, openTaxDeleteDialog, setIsTaxChangeDialogOpen, setIsTaxDeleteDialogOpen } from "../logic/taxDialogSlice";
-import { filterTaxes, refreshTaxes, setCurrentTaxesPage } from "../logic/taxSlice";
+import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import { Tax, TaxFilterColumns, TaxSlice } from "../../core/data/tax";
+import TaxesApiService from "../../core/networking/taxesApiService";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import ChangeTaxDialog from "./changeTaxDialog";
 
 export default function TaxesPage()
@@ -52,13 +50,13 @@ export default function TaxesPage()
         } text-slate-800`
       }] }
       actions={ {
-        filter: filterTaxes,
-        openChangeDialog: (entity) => openTaxChangeDialog(entity),
-        openDeleteDialog: (entity) => openTaxDeleteDialog(entity),
-        setIsChangeDialogOpen: (open) => setIsTaxChangeDialogOpen(open),
-        setIsDeleteDialogOpen: (open) => setIsTaxDeleteDialogOpen(open),
-        refresh: refreshTaxes,
-        setCurrentPage: (page) => setCurrentTaxesPage(page)
+        filter: TaxSlice.entityActions.filter,
+        openChangeDialog: (entity) => TaxSlice.dialogActions.openChangeDialog(entity),
+        openDeleteDialog: (entity) => TaxSlice.dialogActions.openDeleteDialog(entity),
+        setIsChangeDialogOpen: (open) => TaxSlice.dialogActions.setIsChangeDialogOpen(open),
+        setIsDeleteDialogOpen: (open) => TaxSlice.dialogActions.setIsDeleteDialogOpen(open),
+        refresh: TaxSlice.entityActions.refresh,
+        setCurrentPage: (page) => TaxSlice.entityActions.setCurrentPage(page)
       } }
       ChangeDialog={ 
         <ChangeTaxDialog
@@ -67,10 +65,10 @@ export default function TaxesPage()
           service={ service }
           onSuccess={ (data, mode) =>
           {
-            dispatch(refreshTaxes({ data: data }));
+            dispatch(TaxSlice.entityActions.refresh({ data: data }));
             if (mode === "create")
             {
-              dispatch(setIsTaxChangeDialogOpen(false));
+              dispatch(TaxSlice.dialogActions.setIsChangeDialogOpen(false));
             }
           } }
         />

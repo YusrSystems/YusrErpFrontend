@@ -2,9 +2,8 @@ import { Button, Checkbox, NumberField, SearchableSelect, TextField } from "@yus
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import { ItemTax } from "../../../core/data/item";
-import { type Tax, TaxFilterColumns } from "../../../core/data/tax";
+import { type Tax, TaxFilterColumns, TaxSlice } from "../../../core/data/tax";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { filterTaxes } from "../../taxes/logic/taxSlice";
 import { useItemContext } from "../itemContext";
 
 export default function TaxesSection()
@@ -137,7 +136,7 @@ export default function TaxesSection()
                             placeholder="اختر الضريبة"
                             value={ tax.taxId?.toString() || "" }
                             columnsNames={ TaxFilterColumns.columnsNames }
-                            onSearch={ (condition) => dispatch(filterTaxes(condition)) }
+                            onSearch={ (condition) => dispatch(TaxSlice.entityActions.filter(condition)) }
                             disabled={ taxState.isLoading }
                             onValueChange={ (val) =>
                             {

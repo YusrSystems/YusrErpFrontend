@@ -38,7 +38,7 @@ export default function UnitsPage()
       }] }
       tableRowMapper={ (
         unit: Unit
-      ) => [{ rowName: `#${unit.id}`, rowStyles: "" }, { rowName: unit.unitName, rowStyles: "font-semibold" }] }
+      ) => [{ rowName: `#${unit.id}`, rowStyles: "" }, { rowName: unit.name, rowStyles: "font-semibold" }] }
       actions={ {
         filter: UnitSlice.entityActions.filter,
         openChangeDialog: (entity) => UnitSlice.dialogActions.openChangeDialog(entity),

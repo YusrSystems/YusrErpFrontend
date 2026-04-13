@@ -61,7 +61,7 @@ export default function PricingMethodsTable()
                   >
                     <SearchableSelect
                       items={ unitState.entities.data ?? [] }
-                      itemLabelKey="unitName"
+                      itemLabelKey="name"
                       itemValueKey="id"
                       value={ method.unitId?.toString() || "" }
                       onValueChange={ (val) =>
@@ -72,7 +72,7 @@ export default function PricingMethodsTable()
                         );
                         updatePricingMethod(index, {
                           unitId: selected?.id,
-                          unitName: selected?.unitName
+                          unitName: selected?.name
                         });
                       } }
                       columnsNames={ UnitFilterColumns.columnsNames }

@@ -22,7 +22,7 @@ export default function PricingTab()
         >
           <SearchableSelect
             items={ unitState.entities.data ?? [] }
-            itemLabelKey="unitName"
+            itemLabelKey="name"
             itemValueKey="id"
             value={ formData.sellUnitId?.toString() || "" }
             onValueChange={ (val) =>
@@ -32,7 +32,7 @@ export default function PricingTab()
               );
               handleChange({
                 sellUnitId: selected?.id,
-                sellUnitName: selected?.unitName
+                sellUnitName: selected?.name
               });
             } }
             columnsNames={ UnitFilterColumns.columnsNames }

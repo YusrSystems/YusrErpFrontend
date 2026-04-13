@@ -1,29 +1,23 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, NumberField, SelectField, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, NumberField, SelectField, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useMemo } from "react";
-import type { Tax } from "../../../core/data/tax";
+import { type Tax, TaxSlice, TaxValidationRules } from "../../core/data/tax";
 
 export default function ChangeTaxDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<Tax>)
 {
-  const validationRules: ValidationRule<Partial<Tax>>[] = useMemo(
-    () => [{
-      field: "name",
-      selector: (d) => d.name,
-      validators: [Validators.required("يرجى إدخال اسم الضريبة")]
-    }, {
-      field: "percentage",
-      selector: (d) => d.percentage,
-      validators: [Validators.required("يرجى إدخال نسبة الضريبة")]
-    }],
-    []
-  );
-
   const initialValues = useMemo(() => ({ isPrimary: false, ...entity }), [entity]);
 
-  const { formData, handleChange, getError, isInvalid, validate } = useEntityForm<Tax>(
-    initialValues,
-    validationRules
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    isInvalid
+  } = useReduxEntityForm<Tax>(
+    TaxSlice.formActions,
+    (state) => state.taxForm,
+    TaxValidationRules.validationRules,
+    initialValues
   );
 
   return (

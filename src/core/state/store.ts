@@ -12,8 +12,6 @@ import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
 import roleReducer from "../../features/roles/logic/roleSlice";
 import storeDialogReducer from "../../features/stores/logic/storeDialogSlice";
 import storeReducer from "../../features/stores/logic/storeSlice";
-import taxDialogReducer from "../../features/taxes/logic/taxDialogSlice";
-import taxReducer from "../../features/taxes/logic/taxSlice";
 import userDialogReducer from "../../features/users/logic/userDialogSlice";
 import userReducer from "../../features/users/logic/userSlice";
 import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsAndSuppliersSlice, ClientsSlice, EmployeesSlice, SuppliersSlice } from "../data/account";
@@ -26,6 +24,7 @@ import { PaymentMethodSlice } from "../data/paymentMethod";
 import { PricingMethodSlice } from "../data/pricingMethod";
 import type { Setting } from "../data/setting";
 import { StocktakingSlice } from "../data/stocktaking";
+import { TaxSlice } from "../data/tax";
 import { UnitSlice } from "../data/unit";
 import { VoucherSlice } from "../data/voucher";
 import cityReducer from "./shared/citySlice";
@@ -61,8 +60,9 @@ export const store = configureStore({
     storeItems: storeItemsReducer,
     itemBarcode: itemBarcodeReducer,
     serviceIds: serviceIdsReducer,
-    tax: taxReducer,
-    taxDialog: taxDialogReducer,
+    tax: TaxSlice.entityReducer,
+    taxForm: TaxSlice.formReducer,
+    taxDialog: TaxSlice.dialogReducer,
     store: storeReducer,
     storeDialog: storeDialogReducer,
     unit: UnitSlice.entityReducer,
