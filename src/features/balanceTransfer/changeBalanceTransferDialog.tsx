@@ -1,9 +1,9 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, TextAreaField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, TextAreaField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
 import { AccountFilterColumns, BanksAndBoxesSlice } from "../../core/data/account";
 import type BalanceTransfer from "../../core/data/balanceTransfer";
+import { BalanceTransferSlice, BalanceTransferValidationRules } from "../../core/data/balanceTransfer";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 
 export default function ChangeBalanceTransferDialog(
@@ -13,32 +13,24 @@ export default function ChangeBalanceTransferDialog(
   const dispatch = useAppDispatch();
   const accountState = useAppSelector((state) => state.banksAndBoxes);
 
-  const validationRules: ValidationRule<Partial<BalanceTransfer>>[] = useMemo(
-    () => [{ field: "amount", selector: (d) => d.amount, validators: [Validators.required("يرجى إدخال المبلغ")] }, {
-      field: "date",
-      selector: (d) => d.date,
-      validators: [Validators.required("يرجى اختيار التاريخ")]
-    }, {
-      field: "fromAccountId",
-      selector: (d) => d.fromAccountId,
-      validators: [Validators.required("يرجى اختيار الحساب المحول منه")]
-    }, {
-      field: "toAccountId",
-      selector: (d) => d.toAccountId,
-      validators: [Validators.required("يرجى اختيار الحساب المحول إليه")]
-    }],
-    []
-  );
-
   const initialValues = useMemo(() => ({
     ...entity,
     date: entity?.date || new Date(),
     amount: entity?.amount || 0
   }), [entity]);
 
-  const { formData, handleChange, getError, isInvalid, validate, errorInputClass } = useEntityForm<BalanceTransfer>(
-    initialValues,
-    validationRules
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    errorInputClass,
+    isInvalid
+  } = useReduxEntityForm<BalanceTransfer>(
+    BalanceTransferSlice.formActions,
+    (state) => state.balanceTransferForm,
+    BalanceTransferValidationRules.validationRules,
+    initialValues
   );
 
   useEffect(() =>

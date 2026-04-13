@@ -1,8 +1,7 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
-import { ChangeDialog, type CommonChangeDialogProps, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, FormField, Loading, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, type CommonChangeDialogProps, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, FormField, Loading, SearchableSelect, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
-import ItemTransfer, { ItemTransfersItem } from "../../core/data/itemTransfer";
+import ItemTransfer, { ItemTransfersItem, ItemTransferSlice, ItemTransferValidationRules } from "../../core/data/itemTransfer";
 import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
@@ -23,33 +22,6 @@ export default function ChangeItemTransferDialog({
   const storeState = useAppSelector((state) => state.store);
   const { items } = useAppSelector((state) => state.itemTransferUI);
 
-  const validationRules: ValidationRule<Partial<ItemTransfer>>[] = useMemo(
-    () => [{
-      field: "transferDate",
-      selector: (d) => d.transferDate,
-      validators: [Validators.required("يرجى إدخال تاريخ التحويل")]
-    }, {
-      field: "fromStoreId",
-      selector: (d) => d.fromStoreId,
-      validators: [Validators.required("يرجى اختيار المستودع المحول منه")]
-    }, {
-      field: "toStoreId",
-      selector: (d) => d.toStoreId,
-      validators: [
-        Validators.required("يرجى اختيار المستودع المحول إليه"),
-        Validators.custom(
-          (val, formData) => val !== formData.fromStoreId,
-          "لا يمكن التحويل لنفس المستودع"
-        )
-      ]
-    }, {
-      field: "itemTransfersItems",
-      selector: (d) => d.itemTransfersItems,
-      validators: [Validators.arrayMinLength(1, "يرجى إضافة مادة واحدة على الأقل للتحويل")]
-    }],
-    []
-  );
-
   const initialValues = useMemo(
     () => ({
       ...entity,
@@ -59,9 +31,18 @@ export default function ChangeItemTransferDialog({
     [entity]
   );
 
-  const { formData, handleChange, getError, isInvalid, validate, errorInputClass } = useEntityForm<ItemTransfer>(
-    initialValues,
-    validationRules
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    errorInputClass,
+    isInvalid
+  } = useReduxEntityForm<ItemTransfer>(
+    ItemTransferSlice.formActions,
+    (state) => state.taxForm,
+    ItemTransferValidationRules.validationRules,
+    initialValues
   );
 
   useEffect(() =>

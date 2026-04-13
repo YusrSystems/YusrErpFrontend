@@ -9,7 +9,7 @@ import ClientsAccountsPage from "./features/accounts/clientsAccountsPage";
 import EmployeesAccountsPage from "./features/accounts/employeesAccountsPage";
 import SuppliersAccountsPage from "./features/accounts/suppliersAccountsPage";
 import BalanceTransfersPage from "./features/balanceTransfer/balanceTransfersPage";
-import BranchesPage from "./features/branches/presentation/branchesPage";
+import BranchesPage from "./features/branches/branchesPage";
 import DashboardPage from "./features/dashboard/dashboardPage";
 import PurchaseInvoicesPage from "./features/invoices/purchaseInvoices";
 import SellInvoicesPage from "./features/invoices/sellInvoicesPage";

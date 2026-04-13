@@ -1,27 +1,32 @@
-import { Branch, CityFilterColumns, type ValidationRule, Validators } from "@yusr_systems/core";
-import { ChangeDialog, type CommonChangeDialogProps, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useEntityForm } from "@yusr_systems/ui";
-import { useEffect, useMemo } from "react";
-import { filterCities } from "../../../core/state/shared/citySlice";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
+import { Branch, CityFilterColumns } from "@yusr_systems/core";
+import { ChangeDialog, type CommonChangeDialogProps, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { useEffect } from "react";
+import { BranchSlice, BranchValidationRules } from "../../core/data/branchLogic";
+import { filterCities } from "../../core/state/shared/citySlice";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 
 export default function ChangeBranchDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<Branch>)
 {
   const cityState = useAppSelector((state) => state.city);
   const dispatch = useAppDispatch();
-  const validationRules: ValidationRule<Partial<Branch>>[] = useMemo(
-    () => [{ field: "name", selector: (d) => d.name, validators: [Validators.required("اسم الفرع مطلوب")] }, {
-      field: "cityId",
-      selector: (d) => d.cityId,
-      validators: [Validators.required("يرجى اختيار المدينة")]
-    }],
-    []
-  );
-  const { formData, handleChange, getError, isInvalid, validate } = useEntityForm<Branch>(entity, validationRules);
 
   useEffect(() =>
   {
     dispatch(filterCities(undefined));
   }, [dispatch]);
+
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    isInvalid
+  } = useReduxEntityForm<Branch>(
+    BranchSlice.formActions,
+    (state) => state.branchForm,
+    BranchValidationRules.validationRules,
+    entity
+  );
 
   return (
     <ChangeDialog<Branch>

@@ -2,9 +2,9 @@ import { RoleFilterColumns, User, type ValidationRule, Validators } from "@yusr_
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, FieldGroup, FormField, PasswordField, SearchableSelect, SelectField, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
+import { BranchSlice } from "../../../core/data/branchLogic";
 import { RoleSlice } from "../../../core/data/role";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { filterBranches } from "../../branches/logic/branchSlice";
 
 export default function ChangeUserDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<User>)
 {
@@ -39,7 +39,7 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
   useEffect(() =>
   {
     dispatch(RoleSlice.entityActions.filter());
-    dispatch(filterBranches(undefined));
+    dispatch(BranchSlice.entityActions.filter());
   }, [dispatch]);
 
   return (
@@ -105,7 +105,7 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
             placeholder="اختر الفرع"
             value={ formData.branchId?.toString() || "" }
             columnsNames={ RoleFilterColumns.columnsNames }
-            onSearch={ (condition) => dispatch(filterBranches(condition)) }
+            onSearch={ (condition) => dispatch(BranchSlice.entityActions.filter(condition)) }
             errorInputClass={ errorInputClass("branchId") }
             disabled={ branchState.isLoading }
             onValueChange={ (val) =>

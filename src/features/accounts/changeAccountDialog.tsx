@@ -1,9 +1,9 @@
-import { CityFilterColumns, type ValidationRule, Validators } from "@yusr_systems/core";
-import type { CommonChangeDialogProps, IEntityState } from "@yusr_systems/ui";
-import { Button, ChangeDialog, FieldGroup, FieldsSection, Input, NumberField, SearchableSelect, TextAreaField, TextField, useEntityForm } from "@yusr_systems/ui";
+import { CityFilterColumns } from "@yusr_systems/core";
+import type { CommonChangeDialogProps, FormSliceActions, IEntityState } from "@yusr_systems/ui";
+import { Button, ChangeDialog, FieldGroup, FieldsSection, Input, NumberField, SearchableSelect, TextAreaField, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import Account, { AccountContact, AccountFilterColumns, AccountSlice, AccountType } from "../../core/data/account";
+import Account, { AccountContact, AccountFilterColumns, AccountSlice, AccountType, AccountValidationRules } from "../../core/data/account";
 import { filterCities } from "../../core/state/shared/citySlice";
 import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
 
@@ -16,29 +16,20 @@ export default function ChangeAccountDialog({
   onSuccess,
   slice,
   stateKey,
-  fixedType
+  fixedType,
+  actions,
+  selectFormState
 }: CommonChangeDialogProps<Account> & {
   slice: AccountSliceType;
   stateKey: keyof RootState;
   fixedType?: AccountType;
+  actions: FormSliceActions<Account>;
+  selectFormState: (state: any) => { data: Partial<Account>; errors: Record<string, string>; };
 })
 {
   const dispatch = useAppDispatch();
   const cityState = useAppSelector((state) => state.city);
   const accountState = useAppSelector((state) => state[stateKey] as IEntityState<Account>);
-
-  const validationRules: ValidationRule<Partial<Account>>[] = useMemo(
-    () => [{
-      field: "name",
-      selector: (d) => d.name,
-      validators: [Validators.required("يرجى إدخال اسم الحساب")]
-    }, {
-      field: "type",
-      selector: (d) => d.type,
-      validators: [Validators.required("يرجى اختيار نوع الحساب")]
-    }],
-    []
-  );
 
   const initialValues = useMemo(
     () => ({
@@ -50,9 +41,17 @@ export default function ChangeAccountDialog({
     [entity]
   );
 
-  const { formData, handleChange, getError, isInvalid, validate } = useEntityForm<Account>(
-    initialValues,
-    validationRules
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    isInvalid
+  } = useReduxEntityForm<Account>(
+    actions,
+    selectFormState,
+    AccountValidationRules.validationRules,
+    initialValues
   );
 
   useEffect(() =>

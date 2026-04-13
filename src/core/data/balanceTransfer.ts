@@ -1,5 +1,5 @@
-import { BaseEntity, type ColumnName } from "@yusr_systems/core";
-import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
+import { BaseEntity, type ColumnName, type ValidationRule, Validators } from "@yusr_systems/core";
+import { createGenericDialogSlice, createGenericEntitySlice, createGenericFormSlice } from "@yusr_systems/ui";
 import BalanceTransfersApiService from "../networking/balanceTransferApiService";
 
 export default class BalanceTransfer extends BaseEntity
@@ -27,18 +27,38 @@ export class BalanceTransferFilterColumns
   }];
 }
 
+export class BalanceTransferValidationRules
+{
+  public static validationRules: ValidationRule<Partial<BalanceTransfer>>[] = [{
+    field: "amount",
+    selector: (d) => d.amount,
+    validators: [Validators.required("يرجى إدخال المبلغ")]
+  }, {
+    field: "date",
+    selector: (d) => d.date,
+    validators: [Validators.required("يرجى اختيار التاريخ")]
+  }, {
+    field: "fromAccountId",
+    selector: (d) => d.fromAccountId,
+    validators: [Validators.required("يرجى اختيار الحساب المحول منه")]
+  }, {
+    field: "toAccountId",
+    selector: (d) => d.toAccountId,
+    validators: [Validators.required("يرجى اختيار الحساب المحول إليه")]
+  }];
+}
+
 export class BalanceTransferSlice
 {
-  private static entitySliceInstance = createGenericEntitySlice(
-    "balanceTransfer",
-    new BalanceTransfersApiService()
-  );
-
+  private static entitySliceInstance = createGenericEntitySlice("balanceTransfer", new BalanceTransfersApiService());
   public static entityActions = BalanceTransferSlice.entitySliceInstance.actions;
   public static entityReducer = BalanceTransferSlice.entitySliceInstance.reducer;
 
   private static dialogSliceInstance = createGenericDialogSlice<BalanceTransfer>("balanceTransferDialog");
-
   public static dialogActions = BalanceTransferSlice.dialogSliceInstance.actions;
   public static dialogReducer = BalanceTransferSlice.dialogSliceInstance.reducer;
+
+  private static formSliceInstance = createGenericFormSlice<BalanceTransfer>("balanceTransferForm");
+  public static formActions = BalanceTransferSlice.formSliceInstance.actions;
+  public static formReducer = BalanceTransferSlice.formSliceInstance.reducer;
 }

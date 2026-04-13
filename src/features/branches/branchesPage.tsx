@@ -2,12 +2,11 @@ import { Branch, BranchesApiService, BranchFilterColumns } from "@yusr_systems/c
 import { CrudPage } from "@yusr_systems/ui";
 import { Building } from "lucide-react";
 import { useMemo } from "react";
-import { selectPermissionsByResource } from "../../../core/auth/authSelectors";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { openBranchChangeDialog, openBranchDeleteDialog, setIsBranchChangeDialogOpen, setIsBranchDeleteDialogOpen } from "../logic/branchDialogSlice";
-import { filterBranches, refreshBranches, setCurrentBranchesPage } from "../logic/branchSlice";
+import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import ChangeBranchDialog from "./changeBranchDialog";
+import { BranchSlice } from "../../core/data/branchLogic";
 
 export default function BranchesPage()
 {
@@ -45,13 +44,13 @@ export default function BranchesPage()
         rowStyles: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800"
       }] }
       actions={ {
-        filter: filterBranches,
-        openChangeDialog: (entity) => openBranchChangeDialog(entity),
-        openDeleteDialog: (entity) => openBranchDeleteDialog(entity),
-        setIsChangeDialogOpen: (open) => setIsBranchChangeDialogOpen(open),
-        setIsDeleteDialogOpen: (open) => setIsBranchDeleteDialogOpen(open),
-        refresh: refreshBranches,
-        setCurrentPage: (page) => setCurrentBranchesPage(page)
+         filter: BranchSlice.entityActions.filter,
+                openChangeDialog: (entity) => BranchSlice.dialogActions.openChangeDialog(entity),
+                openDeleteDialog: (entity) => BranchSlice.dialogActions.openDeleteDialog(entity),
+                setIsChangeDialogOpen: (open) => BranchSlice.dialogActions.setIsChangeDialogOpen(open),
+                setIsDeleteDialogOpen: (open) => BranchSlice.dialogActions.setIsDeleteDialogOpen(open),
+                refresh: BranchSlice.entityActions.refresh,
+                setCurrentPage: (page) => BranchSlice.entityActions.setCurrentPage(page)
       } }
       ChangeDialog={ 
         <ChangeBranchDialog
@@ -60,11 +59,11 @@ export default function BranchesPage()
           service={ service }
           onSuccess={ (data, mode) =>
           {
-            dispatch(refreshBranches({ data: data }));
-            if (mode === "create")
-            {
-              dispatch(setIsBranchChangeDialogOpen(false));
-            }
+            dispatch(BranchSlice.entityActions.refresh({ data: data }));
+                        if (mode === "create")
+                        {
+                          dispatch(BranchSlice.dialogActions.setIsChangeDialogOpen(false));
+                        }
           } }
         />
        }

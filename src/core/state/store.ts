@@ -2,8 +2,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import { createAuthSlice, User } from "@yusr_systems/core";
 import { setupAuthListeners } from "@yusr_systems/ui";
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import branchDialogReducer from "../../features/branches/logic/branchDialogSlice";
-import branchReducer from "../../features/branches/logic/branchSlice";
 import dashboardReducer from "../../features/dashboard/logic/dashboardSlice";
 import invoiceReducerUI from "../../features/invoices/logic/invoiceSliceUI";
 import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTransferSlice";
@@ -12,6 +10,7 @@ import userDialogReducer from "../../features/users/logic/userDialogSlice";
 import userReducer from "../../features/users/logic/userSlice";
 import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsAndSuppliersSlice, ClientsSlice, EmployeesSlice, SuppliersSlice } from "../data/account";
 import { BalanceTransferSlice } from "../data/balanceTransfer";
+import { BranchSlice } from "../data/branchLogic";
 import { InvoiceSlice } from "../data/invoice";
 import { ItemSlice } from "../data/item";
 import { ItemsSettlementSlice } from "../data/itemsSettlement";
@@ -44,8 +43,9 @@ export const {
 
 export const store = configureStore({
   reducer: {
-    branch: branchReducer,
-    branchDialog: branchDialogReducer,
+    branch: BranchSlice.entityReducer,
+    branchForm: BranchSlice.formReducer,
+    branchDialog: BranchSlice.dialogReducer,
     role: RoleSlice.entityReducer,
     roleForm: RoleSlice.formReducer,
     roleDialog: RoleSlice.dialogReducer,
@@ -69,14 +69,19 @@ export const store = configureStore({
     unitForm: UnitSlice.formReducer,
     unitDialog: UnitSlice.dialogReducer,
     clients: ClientsSlice.entityReducer,
+    clientsForm: ClientsSlice.formReducer,
     clientsDialog: ClientsSlice.dialogReducer,
     suppliers: SuppliersSlice.entityReducer,
+    suppliersForm: SuppliersSlice.formReducer,
     suppliersDialog: SuppliersSlice.dialogReducer,
     employees: EmployeesSlice.entityReducer,
+    employeesForm: EmployeesSlice.formReducer,
     employeesDialog: EmployeesSlice.dialogReducer,
     banks: BanksSlice.entityReducer,
+    banksForm: BanksSlice.formReducer,
     banksDialog: BanksSlice.dialogReducer,
     boxes: BoxesSlice.entityReducer,
+    boxesForm: BoxesSlice.formReducer,
     boxesDialog: BoxesSlice.dialogReducer,
     banksAndBoxes: BanksAndBoxesSlice.entityReducer,
     clientsAndSuppliers: ClientsAndSuppliersSlice.entityReducer,
@@ -85,6 +90,7 @@ export const store = configureStore({
     paymentMethod: PaymentMethodSlice.entityReducer,
     paymentMethodDialog: PaymentMethodSlice.dialogReducer,
     balanceTransfer: BalanceTransferSlice.entityReducer,
+    balanceTransferForm: BalanceTransferSlice.formReducer,
     balanceTransferDialog: BalanceTransferSlice.dialogReducer,
     voucher: VoucherSlice.entityReducer,
     voucherForm: VoucherSlice.formReducer,
@@ -98,6 +104,7 @@ export const store = configureStore({
     stocktakingForm: StocktakingSlice.formReducer,
     stocktakingDialog: StocktakingSlice.dialogReducer,
     itemTransfer: ItemTransferSlice.entityReducer,
+    itemTransferForm: ItemTransferSlice.formReducer,
     itemTransferDialog: ItemTransferSlice.dialogReducer,
     itemsSettlement: ItemsSettlementSlice.entityReducer,
     itemsSettlementForm: ItemsSettlementSlice.formReducer,

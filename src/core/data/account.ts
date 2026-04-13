@@ -1,5 +1,5 @@
-import { BaseEntity, City, type ColumnName } from "@yusr_systems/core";
-import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
+import { BaseEntity, City, type ColumnName, type ValidationRule, Validators } from "@yusr_systems/core";
+import { createGenericDialogSlice, createGenericEntitySlice, createGenericFormSlice } from "@yusr_systems/ui";
 import AccountsApiService from "../networking/accountApiService";
 import { FilterByTypeRequest } from "./filterByTypeRequest";
 
@@ -66,7 +66,19 @@ export class AccountFilterColumns
   ];
 }
 
-// account.ts
+export class AccountValidationRules
+{
+  public static validationRules: ValidationRule<Partial<Account>>[] = [{
+    field: "name",
+    selector: (d) => d.name,
+    validators: [Validators.required("يرجى إدخال اسم الحساب")]
+  }, {
+    field: "type",
+    selector: (d) => d.type,
+    validators: [Validators.required("يرجى اختيار نوع الحساب")]
+  }];
+}
+
 export class AccountSlice
 {
   static create(sliceName: string, types: AccountType[])
@@ -83,12 +95,15 @@ export class AccountSlice
     );
 
     const dialogSliceInstance = createGenericDialogSlice<Account>(sliceName + "Dialog");
+    const formSliceInstance = createGenericFormSlice<Account>(sliceName + "Form");
 
     return {
       entityActions: entitySliceInstance.actions,
       entityReducer: entitySliceInstance.reducer,
       dialogActions: dialogSliceInstance.actions,
-      dialogReducer: dialogSliceInstance.reducer
+      dialogReducer: dialogSliceInstance.reducer,
+      formActions: formSliceInstance.actions,
+      formReducer: formSliceInstance.reducer
     };
   }
 }
@@ -99,4 +114,7 @@ export const EmployeesSlice = AccountSlice.create("employees", [AccountType.Empl
 export const BanksSlice = AccountSlice.create("banks", [AccountType.Bank]);
 export const BoxesSlice = AccountSlice.create("boxes", [AccountType.Box]);
 export const BanksAndBoxesSlice = AccountSlice.create("banksAndBoxes", [AccountType.Box, AccountType.Bank]);
-export const ClientsAndSuppliersSlice = AccountSlice.create("clientsAndSuppliers", [AccountType.Client, AccountType.Supplier]);
+export const ClientsAndSuppliersSlice = AccountSlice.create("clientsAndSuppliers", [
+  AccountType.Client,
+  AccountType.Supplier
+]);

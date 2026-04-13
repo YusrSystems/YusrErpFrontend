@@ -10,6 +10,8 @@ export default function ClientsAccountsPage()
       stateKey="clients"
       dialogStateKey="clientsDialog"
       fixedType={ AccountType.Client }
+      actions={ ClientsSlice.formActions }
+      selectFormState={ (state) => state.clientsForm }
     />
   );
 }

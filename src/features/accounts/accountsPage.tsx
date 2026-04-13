@@ -1,4 +1,4 @@
-import { CrudPage, type IDialogState, type IEntityState } from "@yusr_systems/ui";
+import { CrudPage, type FormSliceActions, type IDialogState, type IEntityState } from "@yusr_systems/ui";
 import { WalletIcon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
@@ -13,13 +13,17 @@ export default function AccountsPage({
   slice,
   stateKey,
   dialogStateKey,
-  fixedType
+  fixedType,
+  actions, 
+  selectFormState
 }: {
   title: string;
   slice: ReturnType<typeof AccountSlice.create>;
   stateKey: keyof RootState;
   dialogStateKey: keyof RootState;
   fixedType?: AccountType;
+  actions: FormSliceActions<Account>;
+  selectFormState: (state: any) => { data: Partial<Account>; errors: Record<string, string>; };
 })
 {
   const dispatch = useAppDispatch();
@@ -47,10 +51,16 @@ export default function AccountsPage({
         icon: <WalletIcon className="h-4 w-4 text-muted-foreground" />
       }] }
       columnsToFilter={ AccountFilterColumns.columnsNames }
-      tableHeadRows={ [{ rowName: "", rowStyles: "text-left w-12.5" }, { rowName: "رقم الحساب", rowStyles: "w-24" }, {
-        rowName: "اسم الحساب",
-        rowStyles: "w-40"
-      }, { rowName: "الرصيد", rowStyles: "w-32" }, { rowName: "", rowStyles: "w-32" }] }
+      tableHeadRows={ [
+        { rowName: "", rowStyles: "text-left w-12.5" },
+        { rowName: "رقم الحساب", rowStyles: "w-24" },
+        {
+          rowName: "اسم الحساب",
+          rowStyles: "w-40"
+        },
+        { rowName: "الرصيد", rowStyles: "w-32" },
+        { rowName: "", rowStyles: "w-32" }
+      ] }
       tableRowMapper={ (
         account: Account
       ) =>
@@ -85,6 +95,8 @@ export default function AccountsPage({
           slice={ slice }
           stateKey={ stateKey }
           fixedType={ fixedType }
+          actions={ actions }
+          selectFormState={selectFormState}
           onSuccess={ (data, mode) =>
           {
             dispatch(slice.entityActions.refresh({ data: data }));

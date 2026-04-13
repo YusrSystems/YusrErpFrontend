@@ -37,7 +37,7 @@ export default function ChangePaymentMethodDialog({
     isInvalid
   } = useReduxEntityForm<PaymentMethod>(
     PaymentMethodSlice.formActions,
-    (state) => state.unitForm,
+    (state) => state.paymentMethodForm,
     PaymentMethodValidationRules.validationRules,
     initialValues
   );
