@@ -1,5 +1,5 @@
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, FormField, NumberField, SearchableSelect, SelectField, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, FormField, NumberField, SearchableSelect, SelectField, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
 import { AccountFilterColumns, BanksAndBoxesSlice } from "../../core/data/account";
 import type PaymentMethod from "../../core/data/paymentMethod";
@@ -28,23 +28,18 @@ export default function ChangePaymentMethodDialog({
     [entity]
   );
 
-  const {
+  const { formData, errors } = useAppSelector((state) => state.paymentMethodForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    errorInputClass,
-    isInvalid
-  } = useReduxEntityForm<PaymentMethod>(
-    PaymentMethodSlice.formActions,
-    (state) => state.paymentMethodForm,
     PaymentMethodValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(PaymentMethodSlice.formActions.setErrors(errors))
   );
+  useFormInit(PaymentMethodSlice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
-    dispatch(BanksAndBoxesSlice.entityActions.filter(undefined));
+    dispatch(BanksAndBoxesSlice.entityActions.filter());
   }, []);
 
   return (
@@ -64,7 +59,7 @@ export default function ChangePaymentMethodDialog({
             label="اسم طريقة الدفع"
             required
             value={ formData.name || "" }
-            onChange={ (e) => handleChange({ name: e.target.value }) }
+            onChange={ (e) => dispatch(PaymentMethodSlice.formActions.updateFormData({ name: e.target.value })) }
             isInvalid={ isInvalid("name") }
             error={ getError("name") }
           />
@@ -83,7 +78,7 @@ export default function ChangePaymentMethodDialog({
               value={ formData.accountId?.toString() || "" }
               columnsNames={ AccountFilterColumns.columnsNames }
               onSearch={ (condition) => dispatch(BanksAndBoxesSlice.entityActions.filter(condition)) }
-              errorInputClass={ errorInputClass("accountId") }
+              isInvalid={ isInvalid("accountId") }
               disabled={ accountState.isLoading }
               onValueChange={ (val) =>
               {
@@ -92,10 +87,10 @@ export default function ChangePaymentMethodDialog({
                 );
                 if (selected)
                 {
-                  handleChange({
+                  dispatch(PaymentMethodSlice.formActions.updateFormData({
                     accountId: selected.id,
                     accountName: selected.name
-                  });
+                  }));
                 }
               } }
             />
@@ -108,7 +103,10 @@ export default function ChangePaymentMethodDialog({
             required
             value={ formData.commissionType?.toString()
               || CommissionType.Percent.toString() }
-            onValueChange={ (val) => handleChange({ commissionType: Number(val) as CommissionType }) }
+            onValueChange={ (val) =>
+              dispatch(
+                PaymentMethodSlice.formActions.updateFormData({ commissionType: Number(val) as CommissionType })
+              ) }
             isInvalid={ isInvalid("commissionType") }
             error={ getError("commissionType") }
             options={ [{
@@ -121,7 +119,7 @@ export default function ChangePaymentMethodDialog({
             label="قيمة العمولة"
             required
             value={ formData.commissionAmount || "" }
-            onChange={ (e) => handleChange({ commissionAmount: Number(e) }) }
+            onChange={ (e) => dispatch(PaymentMethodSlice.formActions.updateFormData({ commissionAmount: Number(e) })) }
             isInvalid={ isInvalid("commissionAmount") }
             error={ getError("commissionAmount") }
           />

@@ -10,7 +10,6 @@ export default function BanksAccountsPage()
       dialogStateKey="banksDialog"
       title="إدارة حسابات البنوك"
       fixedType={ AccountType.Bank }
-      actions={ BanksSlice.formActions }
       selectFormState={ (state) => state.banksForm }
     />
   );

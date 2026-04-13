@@ -1,9 +1,10 @@
 import { CityFilterColumns } from "@yusr_systems/core";
-import type { CommonChangeDialogProps, FormSliceActions, IEntityState } from "@yusr_systems/ui";
-import { Button, ChangeDialog, FieldGroup, FieldsSection, Input, NumberField, SearchableSelect, TextAreaField, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import type { CommonChangeDialogProps, IEntityState } from "@yusr_systems/ui";
+import { Button, ChangeDialog, FieldGroup, FieldsSection, Input, NumberField, SearchableSelect, TextAreaField, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import Account, { AccountContact, AccountFilterColumns, AccountSlice, AccountType, AccountValidationRules } from "../../core/data/account";
+import { TaxSlice } from "../../core/data/tax";
 import { filterCities } from "../../core/state/shared/citySlice";
 import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
 
@@ -17,14 +18,12 @@ export default function ChangeAccountDialog({
   slice,
   stateKey,
   fixedType,
-  actions,
   selectFormState
 }: CommonChangeDialogProps<Account> & {
   slice: AccountSliceType;
   stateKey: keyof RootState;
   fixedType?: AccountType;
-  actions: FormSliceActions<Account>;
-  selectFormState: (state: any) => { data: Partial<Account>; errors: Record<string, string>; };
+  selectFormState: (state: any) => { formData: Partial<Account>; errors: Record<string, string>; };
 })
 {
   const dispatch = useAppDispatch();
@@ -41,18 +40,14 @@ export default function ChangeAccountDialog({
     [entity]
   );
 
-  const {
+  const { formData, errors } = useAppSelector(selectFormState);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    isInvalid
-  } = useReduxEntityForm<Account>(
-    actions,
-    selectFormState,
     AccountValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(TaxSlice.formActions.setErrors(errors))
   );
+  useFormInit(slice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
@@ -62,9 +57,9 @@ export default function ChangeAccountDialog({
 
   const addContact = () =>
   {
-    handleChange({
+    dispatch(slice.formActions.updateFormData({
       accountContacts: [...(formData.accountContacts || []), new AccountContact()]
-    });
+    }));
   };
 
   const updateContact = (
@@ -75,14 +70,14 @@ export default function ChangeAccountDialog({
   {
     const newContacts = [...(formData.accountContacts || [])];
     newContacts[index] = { ...newContacts[index], [field]: value };
-    handleChange({ accountContacts: newContacts });
+    dispatch(slice.formActions.updateFormData({ accountContacts: newContacts }));
   };
 
   const removeContact = (index: number) =>
   {
     const newContacts = [...(formData.accountContacts || [])];
     newContacts.splice(index, 1);
-    handleChange({ accountContacts: newContacts });
+    dispatch(slice.formActions.updateFormData({ accountContacts: newContacts }));
   };
 
   const isBank = formData?.type === AccountType.Bank;
@@ -128,7 +123,7 @@ export default function ChangeAccountDialog({
               label="اسم الحساب"
               required
               value={ formData.name || "" }
-              onChange={ (e) => handleChange({ name: e.target.value }) }
+              onChange={ (e) => dispatch(slice.formActions.updateFormData({ name: e.target.value })) }
               isInvalid={ isInvalid("name") }
               error={ getError("name") }
             />
@@ -139,7 +134,7 @@ export default function ChangeAccountDialog({
               required
               value={formData.type?.toString() || ""}
               onValueChange={(val) =>
-                handleChange({ type: Number(val) as AccountType })
+                dispatch(slice.formActions.updateFormData({ type: Number(val) as AccountType })
               }
               isInvalid={isInvalid("type")}
               error={getError("type")}
@@ -157,7 +152,7 @@ export default function ChangeAccountDialog({
             <NumberField
               label="الرصيد الافتتاحي"
               value={ formData.initialBalance || "" }
-              onChange={ (val) => handleChange({ initialBalance: val }) }
+              onChange={ (val) => dispatch(slice.formActions.updateFormData({ initialBalance: val })) }
             />
 
             <div className="flex flex-col gap-1.5 w-full">
@@ -175,10 +170,10 @@ export default function ChangeAccountDialog({
                   const selected = accountState.entities.data?.find(
                     (a) => a.id.toString() === val
                   );
-                  handleChange({
+                  dispatch(slice.formActions.updateFormData({
                     parentId: selected?.id,
                     parentName: selected?.name
-                  });
+                  }));
                 } }
               />
             </div>
@@ -194,13 +189,13 @@ export default function ChangeAccountDialog({
                   <TextField
                     label="الرقم الضريبي (VAT)"
                     value={ formData.vatNumber || "" }
-                    onChange={ (e) => handleChange({ vatNumber: e.target.value }) }
+                    onChange={ (e) => dispatch(slice.formActions.updateFormData({ vatNumber: e.target.value })) }
                     dir="ltr"
                   />
                   <TextField
                     label="السجل التجاري (CRN)"
                     value={ formData.crn || "" }
-                    onChange={ (e) => handleChange({ crn: e.target.value }) }
+                    onChange={ (e) => dispatch(slice.formActions.updateFormData({ crn: e.target.value })) }
                     dir="ltr"
                   />
                 </>
@@ -210,7 +205,7 @@ export default function ChangeAccountDialog({
                 <TextField
                   label="رقم الحساب البنكي"
                   value={ formData.bankAccountNumber || "" }
-                  onChange={ (e) => handleChange({ bankAccountNumber: e.target.value }) }
+                  onChange={ (e) => dispatch(slice.formActions.updateFormData({ bankAccountNumber: e.target.value })) }
                   dir="ltr"
                 />
               ) }
@@ -243,7 +238,7 @@ export default function ChangeAccountDialog({
                         const selected = cityState.entities.data?.find(
                           (c) => c.id.toString() === val
                         );
-                        handleChange({ cityId: selected?.id, city: selected });
+                        dispatch(slice.formActions.updateFormData({ cityId: selected?.id, city: selected }));
                       } }
                     />
                   </div>
@@ -251,24 +246,24 @@ export default function ChangeAccountDialog({
                     <TextField
                       label="الحي"
                       value={ formData.district || "" }
-                      onChange={ (e) => handleChange({ district: e.target.value }) }
+                      onChange={ (e) => dispatch(slice.formActions.updateFormData({ district: e.target.value })) }
                     />
                     <TextField
                       label="الشارع"
                       value={ formData.street || "" }
-                      onChange={ (e) => handleChange({ street: e.target.value }) }
+                      onChange={ (e) => dispatch(slice.formActions.updateFormData({ street: e.target.value })) }
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <TextField
                       label="رقم المبنى"
                       value={ formData.buildingNumber || "" }
-                      onChange={ (e) => handleChange({ buildingNumber: e.target.value }) }
+                      onChange={ (e) => dispatch(slice.formActions.updateFormData({ buildingNumber: e.target.value })) }
                     />
                     <TextField
                       label="الرمز البريدي"
                       value={ formData.postalCode || "" }
-                      onChange={ (e) => handleChange({ postalCode: e.target.value }) }
+                      onChange={ (e) => dispatch(slice.formActions.updateFormData({ postalCode: e.target.value })) }
                     />
                   </div>
                 </FieldsSection>
@@ -324,7 +319,7 @@ export default function ChangeAccountDialog({
             <TextAreaField
               label="ملاحظات"
               value={ formData.notes || "" }
-              onChange={ (e) => handleChange({ notes: e.target.value }) }
+              onChange={ (e) => dispatch(slice.formActions.updateFormData({ notes: e.target.value })) }
               rows={ 3 }
             />
           </FieldsSection>

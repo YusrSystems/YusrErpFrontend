@@ -10,7 +10,6 @@ export default function EmployeesAccountsPage()
       dialogStateKey="employeesDialog"
       title="إدارة حسابات الموظفين"
       fixedType={ AccountType.Employee }
-      actions={ EmployeesSlice.formActions }
       selectFormState={ (state) => state.employeesForm }
     />
   );

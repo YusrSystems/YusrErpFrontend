@@ -1,6 +1,6 @@
 import { Role } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { categorizePermissions, ChangeDialog, FieldGroup, PermissionCard, PermissionSkeleton, Skeleton, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { categorizePermissions, ChangeDialog, FieldGroup, PermissionCard, PermissionSkeleton, Skeleton, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import { RoleSlice, RoleValidationRules } from "../../core/data/role";
@@ -11,19 +11,14 @@ import { ActionIcons, ArabicLabels, PERMISSION_SECTIONS } from "./permissionConf
 export default function ChangeRoleDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<Role>)
 {
   const delimiter: string = ".";
-  const {
+  const { formData, errors } = useAppSelector((state) => state.roleForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    clearError,
-    isInvalid
-  } = useReduxEntityForm<Role>(
-    RoleSlice.formActions,
-    (state) => state.unitForm,
     RoleValidationRules.validationRules,
-    entity
+    (errors) => dispatch(RoleSlice.formActions.setErrors(errors))
   );
+  useFormInit(RoleSlice.formActions.setInitialData, entity ?? {});
   const systemState = useAppSelector((state) => state.system);
   const dispatch = useAppDispatch();
 
@@ -64,8 +59,8 @@ export default function ChangeRoleDialog({ entity, mode, service, onSuccess }: C
             error={ getError("name") }
             onChange={ (e) =>
             {
-              handleChange({ name: e.target.value });
-              clearError("name");
+              dispatch(RoleSlice.formActions.updateFormData({ name: e.target.value }));
+              dispatch(RoleSlice.formActions.clearError("name"));
             } }
           />
 
@@ -94,7 +89,8 @@ export default function ChangeRoleDialog({ entity, mode, service, onSuccess }: C
                           masterPermission={ item.get }
                           isMasterRequired={ item.resource === SystemPermissionsResources.Settings }
                           selectedPermissions={ formData.permissions || [] }
-                          onToggle={ (updated) => handleChange({ permissions: updated }) }
+                          onToggle={ (updated) =>
+                            dispatch(RoleSlice.formActions.updateFormData({ permissions: updated })) }
                           actions={ item.actions.map((perm) => ({
                             id: perm,
                             label: ArabicLabels[perm.split(delimiter)[1]] || perm.split(delimiter)[1],

@@ -1,40 +1,28 @@
-import { RoleFilterColumns, User, type ValidationRule, Validators } from "@yusr_systems/core";
+import { RoleFilterColumns, User } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, FormField, PasswordField, SearchableSelect, SelectField, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, FormField, PasswordField, SearchableSelect, SelectField, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
-import { BranchSlice } from "../../../core/data/branchLogic";
-import { RoleSlice } from "../../../core/data/role";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
+import { BranchSlice } from "../../core/data/branchLogic";
+import { RoleSlice } from "../../core/data/role";
+import { UserSlice, UserValidationRules } from "../../core/data/UserLogic";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 
 export default function ChangeUserDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<User>)
 {
   const roleState = useAppSelector((state) => state.role);
   const branchState = useAppSelector((state) => state.branch);
   const dispatch = useAppDispatch();
-  const validationRules: ValidationRule<Partial<User>>[] = useMemo(
-    () => [
-      {
-        field: "username",
-        selector: (d) => d.username,
-        validators: [Validators.required("يرجى إدخال اسم المستخدم")]
-      },
-      { field: "password", selector: (d) => d.password, validators: [Validators.required("يرجى إدخال كلمة مرور")] },
-      {
-        field: "roleId",
-        selector: (d) => d.roleId,
-        validators: [Validators.required("يرجى اختيار دور")]
-      },
-      { field: "branchId", selector: (d) => d.branchId, validators: [Validators.required("يرجى اختيار فرع")] }
-    ],
-    []
-  );
 
   const initialValues = useMemo(() => ({ ...entity, password: "" }), [entity]);
 
-  const { formData, handleChange, getError, isInvalid, validate, errorInputClass } = useEntityForm<User>(
-    initialValues,
-    validationRules
+  const { formData, errors } = useAppSelector((state) => state.userForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
+    formData,
+    UserValidationRules.validationRules,
+    (errors) => dispatch(UserSlice.formActions.setErrors(errors))
   );
+  useFormInit(UserSlice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
@@ -59,7 +47,7 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
             label="اسم المستخدم"
             required
             value={ formData.username || "" }
-            onChange={ (e) => handleChange({ username: e.target.value }) }
+            onChange={ (e) => dispatch(UserSlice.formActions.updateFormData({ username: e.target.value })) }
             isInvalid={ isInvalid("username") }
             error={ getError("username") }
           />
@@ -68,7 +56,7 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
             label="كلمة المرور"
             required
             value={ formData.password || "" }
-            onChange={ (e) => handleChange({ password: e.target.value }) }
+            onChange={ (e) => dispatch(UserSlice.formActions.updateFormData({ password: e.target.value })) }
             isInvalid={ isInvalid("password") }
             error={ getError("password") }
           />
@@ -83,15 +71,15 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
             value={ formData.roleId?.toString() || "" }
             columnsNames={ RoleFilterColumns.columnsNames }
             onSearch={ (condition) => dispatch(RoleSlice.entityActions.filter(condition)) }
-            errorInputClass={ errorInputClass("roleId") }
+            isInvalid={ isInvalid("roleId") }
             disabled={ roleState.isLoading }
             onValueChange={ (val) =>
             {
               const selected = roleState.entities.data?.find((r) => r.id.toString() === val);
               if (selected)
               {
-                handleChange({ roleId: selected.id });
-                handleChange({ role: selected });
+                dispatch(UserSlice.formActions.updateFormData({ roleId: selected.id }));
+                dispatch(UserSlice.formActions.updateFormData({ role: selected }));
               }
             } }
           />
@@ -106,15 +94,15 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
             value={ formData.branchId?.toString() || "" }
             columnsNames={ RoleFilterColumns.columnsNames }
             onSearch={ (condition) => dispatch(BranchSlice.entityActions.filter(condition)) }
-            errorInputClass={ errorInputClass("branchId") }
+            isInvalid={ isInvalid("branchId") }
             disabled={ branchState.isLoading }
             onValueChange={ (val) =>
             {
               const selected = branchState.entities.data?.find((b) => b.id.toString() === val);
               if (selected)
               {
-                handleChange({ branchId: selected.id });
-                handleChange({ branch: selected });
+                dispatch(UserSlice.formActions.updateFormData({ branchId: selected.id }));
+                dispatch(UserSlice.formActions.updateFormData({ branch: selected }));
               }
             } }
           />
@@ -123,7 +111,7 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
         <SelectField
           label="حالة المستخدم"
           value={ formData.isActive ? "active" : "inactive" }
-          onValueChange={ (val) => handleChange({ isActive: val === "active" }) }
+          onValueChange={ (val) => dispatch(UserSlice.formActions.updateFormData({ isActive: val === "active" })) }
           required={ true }
           options={ [{ label: "نشط", value: "active" }, { label: "غير نشط", value: "inactive" }] }
         />

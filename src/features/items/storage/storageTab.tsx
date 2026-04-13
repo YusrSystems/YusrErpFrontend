@@ -1,21 +1,21 @@
-import { Button, FormField, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
+import { Button, type DialogMode, FormField, NumberField, SearchableSelect, TextField, useFormErrors } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
-import { ItemStore } from "../../../core/data/item";
+import { ItemSlice, ItemStore } from "../../../core/data/item";
 import { StoreFilterColumns, StoreSlice } from "../../../core/data/store";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { useItemContext } from "../itemContext";
 
-export default function StorageTab()
+export default function StorageTab({ mode }: { mode: DialogMode; })
 {
   const dispatch = useAppDispatch();
 
-  const { formData, handleChange, isInvalid, getError, mode } = useItemContext();
+  const { formData, errors } = useAppSelector((state) => state.itemForm);
+  const { getError, isInvalid } = useFormErrors(errors);
   const storeState = useAppSelector((state) => state.store);
 
   const addStore = () =>
-    handleChange({
+    dispatch(ItemSlice.formActions.updateFormData({
       itemStores: [...(formData.itemStores || []), new ItemStore({ quantity: 0, initialQuantity: 0 })]
-    });
+    }));
   const updateStore = (index: number, updates: Partial<ItemStore>) =>
   {
     const list = [...(formData.itemStores || [])];
@@ -27,11 +27,11 @@ export default function StorageTab()
         (sum, store) => sum + (Number(store.initialQuantity) || 0),
         0
       );
-      handleChange({ itemStores: list, initialQuantity: totalInitial });
+      dispatch(ItemSlice.formActions.updateFormData({ itemStores: list, initialQuantity: totalInitial }));
     }
     else
     {
-      handleChange({ itemStores: list });
+      dispatch(ItemSlice.formActions.updateFormData({ itemStores: list }));
     }
   };
   const removeStore = (index: number) =>
@@ -42,7 +42,7 @@ export default function StorageTab()
       (sum, store) => sum + (Number(store.initialQuantity) || 0),
       0
     );
-    handleChange({ itemStores: list, initialQuantity: totalInitial });
+    dispatch(ItemSlice.formActions.updateFormData({ itemStores: list, initialQuantity: totalInitial }));
   };
 
   return (
@@ -51,17 +51,17 @@ export default function StorageTab()
         <NumberField
           label="الحد الأدنى للكمية"
           value={ formData.minQuantity || "" }
-          onChange={ (val) => handleChange({ minQuantity: val }) }
+          onChange={ (val) => dispatch(ItemSlice.formActions.updateFormData({ minQuantity: val })) }
         />
         <NumberField
           label="الحد الأعلى للكمية"
           value={ formData.maxQuantity || "" }
-          onChange={ (val) => handleChange({ maxQuantity: val }) }
+          onChange={ (val) => dispatch(ItemSlice.formActions.updateFormData({ maxQuantity: val })) }
         />
         <TextField
           label="موقع المادة في المخزن"
           value={ formData.location || "" }
-          onChange={ (e) => handleChange({ location: e.target.value }) }
+          onChange={ (e) => dispatch(ItemSlice.formActions.updateFormData({ location: e.target.value })) }
         />
         <NumberField
           label="الكمية الافتتاحية الإجمالية"

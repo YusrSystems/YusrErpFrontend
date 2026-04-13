@@ -1,13 +1,13 @@
-import { Checkbox, FormField, NumberField, SearchableSelect } from "@yusr_systems/ui";
-import { ItemType } from "../../../core/data/item";
+import { Checkbox, type DialogMode, FormField, NumberField, SearchableSelect, useFormErrors } from "@yusr_systems/ui";
+import { ItemSlice, ItemType } from "../../../core/data/item";
 import { UnitFilterColumns, UnitSlice } from "../../../core/data/unit";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { useItemContext } from "../itemContext";
 import PricingMethodsTable from "./pricingMethodsTable";
 
-export default function PricingTab()
+export default function PricingTab({ mode }: { mode: DialogMode; })
 {
-  const { formData, handleChange, isInvalid, getError, mode } = useItemContext();
+  const { formData, errors } = useAppSelector((state) => state.itemForm);
+  const { getError, isInvalid } = useFormErrors(errors);
   const unitState = useAppSelector((state) => state.unit);
   const dispatch = useAppDispatch();
 
@@ -30,10 +30,10 @@ export default function PricingTab()
               const selected = unitState.entities.data?.find(
                 (u) => u.id.toString() === val
               );
-              handleChange({
+              dispatch(ItemSlice.formActions.updateFormData({
                 sellUnitId: selected?.id,
                 sellUnitName: selected?.name
-              });
+              }));
             } }
             columnsNames={ UnitFilterColumns.columnsNames }
             onSearch={ (condition) => dispatch(UnitSlice.entityActions.filter(condition)) }
@@ -46,7 +46,7 @@ export default function PricingTab()
           required
           disabled={ mode === "update" }
           value={ formData.initialCost ?? "0" }
-          onChange={ (val) => handleChange({ initialCost: val }) }
+          onChange={ (val) => dispatch(ItemSlice.formActions.updateFormData({ initialCost: val })) }
           isInvalid={ isInvalid("initialCost") }
           error={ getError("initialCost") }
         />
@@ -54,7 +54,7 @@ export default function PricingTab()
           label="التكلفة"
           disabled
           value={ formData.cost || "0" }
-          onChange={ (val) => handleChange({ cost: val }) }
+          onChange={ (val) => dispatch(ItemSlice.formActions.updateFormData({ cost: val })) }
         />
       </div>
 
@@ -62,7 +62,8 @@ export default function PricingTab()
         <Checkbox
           id="rememberMe"
           checked={ formData.taxIncluded }
-          onCheckedChange={ (checked) => handleChange({ taxIncluded: checked as boolean }) }
+          onCheckedChange={ (checked) =>
+            dispatch(ItemSlice.formActions.updateFormData({ taxIncluded: checked as boolean })) }
         />
         <label htmlFor="taxIncluded" className="text-sm font-bold">
           سعر البيع يشمل الضريبة

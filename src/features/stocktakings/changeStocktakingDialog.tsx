@@ -1,5 +1,5 @@
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, Loading, SearchableSelect, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, Loading, SearchableSelect, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
 import Stocktaking, { StocktakingItem, StocktakingSlice, StocktakingValidationRules } from "../../core/data/stocktaking";
@@ -22,19 +22,14 @@ export default function ChangeStocktakingDialog(
     stocktakingItems: entity?.stocktakingItems || []
   }), [entity]);
 
-  const {
+  const { formData, errors } = useAppSelector((state) => state.stocktakingForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    clearError,
-    isInvalid
-  } = useReduxEntityForm<Stocktaking>(
-    StocktakingSlice.formActions,
-    (state) => state.stocktakingForm,
     StocktakingValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(StocktakingSlice.formActions.setErrors(errors))
   );
+  useFormInit(StocktakingSlice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
@@ -63,7 +58,10 @@ export default function ChangeStocktakingDialog(
       const getItem = async () =>
       {
         const res = await service.Get(entity.id);
-        handleChange({ ...res.data });
+        if (res.data != undefined)
+        {
+          dispatch(StocktakingSlice.formActions.setInitialData(res.data));
+        }
         setInitLoading(false);
       };
       getItem();
@@ -73,12 +71,12 @@ export default function ChangeStocktakingDialog(
   const handleStoreChange = (val: string) =>
   {
     const selected = storeState.entities.data?.find((s) => s.id.toString() === val);
-    handleChange({
+    dispatch(StocktakingSlice.formActions.updateFormData({
       storeId: selected?.id,
       storeName: selected?.name,
       stocktakingItems: []
-    });
-    clearError("storeId");
+    }));
+    StocktakingSlice.formActions.clearError("storeId");
   };
 
   if (initLoading)
@@ -141,14 +139,18 @@ export default function ChangeStocktakingDialog(
           <TextField
             label="الوصف"
             value={ formData.description || "" }
-            onChange={ (e) => handleChange({ description: e.target.value }) }
+            onChange={ (e) => dispatch(StocktakingSlice.formActions.updateFormData({ description: e.target.value })) }
           />
 
           { formData.storeId && (
             <StocktakingItemsTable
               formData={ formData }
               handleChange={ (update) =>
-                handleChange(update as Partial<Stocktaking> | ((prev: Partial<Stocktaking>) => Partial<Stocktaking>)) }
+                dispatch(
+                  StocktakingSlice.formActions.updateFormData(
+                    update as Partial<Stocktaking> | ((prev: Partial<Stocktaking>) => Partial<Stocktaking>)
+                  )
+                ) }
               createInstance={ () => new StocktakingItem() }
               mode={ mode }
             />

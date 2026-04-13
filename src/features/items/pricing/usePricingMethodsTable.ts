@@ -1,51 +1,60 @@
-import { ItemUnitPricingMethod } from "../../../core/data/item";
+import { useFormErrors } from "@yusr_systems/ui";
+import { ItemSlice, ItemUnitPricingMethod } from "../../../core/data/item";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { useItemContext } from "../itemContext";
 
 export default function usePricingMethodsTable()
 {
   const dispatch = useAppDispatch();
-  const { formData, handleChange, isInvalid, getError } = useItemContext();
+  const { formData, errors } = useAppSelector((state) => state.itemForm);
+  const { getError, isInvalid } = useFormErrors(errors);
   const unitState = useAppSelector((state) => state.unit);
   const pricingMethodState = useAppSelector((state) => state.pricingMethod);
 
-  const addPricingMethod = () =>
-    handleChange({
-      itemUnitPricingMethods: [...(formData.itemUnitPricingMethods || []), new ItemUnitPricingMethod()]
-    });
-
-  const updatePricingMethod = (
-    index: number,
-    updates: Partial<ItemUnitPricingMethod>
-  ) =>
+  const updatePricingMethod = (index: number, updates: Partial<ItemUnitPricingMethod>) =>
   {
-    const list = [...(formData.itemUnitPricingMethods || [])];
-    let iupm = list[index];
-    let suggestName = `${updates.unitName || iupm.unitName || ""} ${
-      updates.pricingMethodName || iupm.pricingMethodName || ""
-    }`;
-    iupm.itemUnitPricingMethodName = updates.itemUnitPricingMethodName || suggestName;
-
-    if (updates.unitId === formData.sellUnitId)
+    dispatch(ItemSlice.formActions.updateFormData((prev) =>
     {
-      updates.quantityMultiplier = 1;
-    }
+      const list = [...(prev.itemUnitPricingMethods || [])];
+      const iupm = { ...list[index] };
 
-    list[index] = { ...list[index], ...updates };
-    handleChange({ itemUnitPricingMethods: list });
+      const suggestName = `${updates.unitName || iupm.unitName || ""} ${
+        updates.pricingMethodName || iupm.pricingMethodName || ""
+      }`;
+
+      if (updates.unitId === prev.sellUnitId)
+      {
+        updates.quantityMultiplier = 1;
+      }
+
+      list[index] = {
+        ...iupm,
+        ...updates,
+        itemUnitPricingMethodName: updates.itemUnitPricingMethodName || suggestName
+      };
+      return { itemUnitPricingMethods: list };
+    }));
+  };
+
+  const addPricingMethod = () =>
+  {
+    dispatch(ItemSlice.formActions.updateFormData((prev) => ({
+      itemUnitPricingMethods: [...(prev.itemUnitPricingMethods || []), new ItemUnitPricingMethod()]
+    })));
   };
 
   const removePricingMethod = (index: number) =>
   {
-    const list = [...(formData.itemUnitPricingMethods || [])];
-    list.splice(index, 1);
-    handleChange({ itemUnitPricingMethods: list });
+    dispatch(ItemSlice.formActions.updateFormData((prev) =>
+    {
+      const list = [...(prev.itemUnitPricingMethods || [])];
+      list.splice(index, 1);
+      return { itemUnitPricingMethods: list };
+    }));
   };
 
   return {
     dispatch,
     formData,
-    handleChange,
     unitState,
     pricingMethodState,
     addPricingMethod,

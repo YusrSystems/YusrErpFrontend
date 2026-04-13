@@ -1,6 +1,6 @@
 import { NumbertoWordsService } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, SelectField, TextAreaField, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, SelectField, TextAreaField, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../core/data/account";
 import { CommissionType, PaymentMethodFilterColumns, PaymentMethodSlice } from "../../core/data/paymentMethod";
@@ -23,19 +23,14 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
     commissionAmount: entity?.commissionAmount || 0
   }), [entity]);
 
-  const {
+  const { formData, errors } = useAppSelector((state) => state.voucherForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    errorInputClass,
-    isInvalid
-  } = useReduxEntityForm<Voucher>(
-    VoucherSlice.formActions,
-    (state) => state.voucherForm,
     VoucherValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(VoucherSlice.formActions.setErrors(errors))
   );
+  useFormInit(VoucherSlice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
@@ -79,32 +74,32 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
   const handleTypeChange = (val: string) =>
   {
     const newType = Number(val) as VoucherType;
-    handleChange({
+    dispatch(VoucherSlice.formActions.updateFormData({
       type: newType,
       amountDue: newType === VoucherType.Payment ? formData.amountDue : undefined,
       commissionAmount: newType === VoucherType.Receipt
         ? calculateCommission(formData.amount, formData.paymentMethodId)
         : 0
-    });
+    }));
   };
 
   const handleAmountChange = (val: number | undefined) =>
   {
-    handleChange({
+    dispatch(VoucherSlice.formActions.updateFormData({
       amount: val,
       commissionAmount: formData.type === VoucherType.Receipt ? calculateCommission(val, formData.paymentMethodId) : 0
-    });
+    }));
   };
 
   const handlePaymentMethodChange = (val: string) =>
   {
     const methodId = Number(val);
     const selected = paymentMethodState.entities.data?.find((m) => m.id === methodId);
-    handleChange({
+    dispatch(VoucherSlice.formActions.updateFormData({
       paymentMethodId: methodId,
       paymentMethod: selected,
       commissionAmount: formData.type === VoucherType.Receipt ? calculateCommission(formData.amount, methodId) : 0
-    });
+    }));
   };
 
   const isPayment = formData.type === VoucherType.Payment;
@@ -141,7 +136,7 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
               label="التاريخ"
               required
               value={ formData.date ? new Date(formData.date) : undefined }
-              onChange={ (date) => handleChange({ date: date }) }
+              onChange={ (date) => dispatch(VoucherSlice.formActions.updateFormData({ date: date })) }
               isInvalid={ isInvalid("date") }
               error={ getError("date") }
             />
@@ -178,11 +173,13 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
                 columnsNames={ AccountFilterColumns.columnsNames }
                 onSearch={ (condition) => dispatch(ClientsAndSuppliersSlice.entityActions.filter(condition)) }
                 disabled={ accountState.isLoading }
-                errorInputClass={ errorInputClass("accountId") }
+                isInvalid={ isInvalid("accountId") }
                 onValueChange={ (val) =>
                 {
                   const selected = accountState.entities.data?.find((a) => a.id.toString() === val);
-                  handleChange({ accountId: selected?.id, accountName: selected?.name });
+                  dispatch(
+                    VoucherSlice.formActions.updateFormData({ accountId: selected?.id, accountName: selected?.name })
+                  );
                 } }
               />
               { isInvalid("accountId") && <span className="text-xs text-red-500">{ getError("accountId") }</span> }
@@ -201,7 +198,7 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
                 columnsNames={ PaymentMethodFilterColumns.columnsNames }
                 onSearch={ (condition) => dispatch(PaymentMethodSlice.entityActions.filter(condition)) }
                 disabled={ paymentMethodState.isLoading }
-                errorInputClass={ errorInputClass("paymentMethodId") }
+                isInvalid={ isInvalid("paymentMethodId") }
                 onValueChange={ handlePaymentMethodChange }
               />
               { isInvalid("paymentMethodId") && (
@@ -215,7 +212,7 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
               <NumberField
                 label="المبلغ المستحق"
                 value={ formData.amountDue || 0 }
-                onChange={ (val) => handleChange({ amountDue: val }) }
+                onChange={ (val) => dispatch(VoucherSlice.formActions.updateFormData({ amountDue: val })) }
               />
             ) }
 
@@ -233,17 +230,17 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
             <TextField
               label={ "المعطي" }
               value={ formData.giver || "" }
-              onChange={ (e) => handleChange({ giver: e.target.value }) }
+              onChange={ (e) => dispatch(VoucherSlice.formActions.updateFormData({ giver: e.target.value })) }
             />
             <TextField
               label={ "المستلم" }
               value={ formData.recipient || "" }
-              onChange={ (e) => handleChange({ recipient: e.target.value }) }
+              onChange={ (e) => dispatch(VoucherSlice.formActions.updateFormData({ recipient: e.target.value })) }
             />
             <TextField
               label="سبب الدفع / القبض"
               value={ formData.paymentReason || "" }
-              onChange={ (e) => handleChange({ paymentReason: e.target.value }) }
+              onChange={ (e) => dispatch(VoucherSlice.formActions.updateFormData({ paymentReason: e.target.value })) }
             />
           </FieldsSection>
 
@@ -263,13 +260,13 @@ export default function ChangeVoucherDialog({ entity, mode, service, onSuccess }
               <TextAreaField
                 label="البيان"
                 value={ formData.description || "" }
-                onChange={ (e) => handleChange({ description: e.target.value }) }
+                onChange={ (e) => dispatch(VoucherSlice.formActions.updateFormData({ description: e.target.value })) }
                 rows={ 3 }
               />
               <TextAreaField
                 label="ملاحظات إضافية"
                 value={ formData.notes || "" }
-                onChange={ (e) => handleChange({ notes: e.target.value }) }
+                onChange={ (e) => dispatch(VoucherSlice.formActions.updateFormData({ notes: e.target.value })) }
                 rows={ 3 }
               />
             </div>

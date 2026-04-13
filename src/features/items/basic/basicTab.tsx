@@ -1,27 +1,30 @@
-import { SelectField, StorageFileField, TextAreaField, TextField } from "@yusr_systems/ui";
-import { ItemType, ItemUnitPricingMethod } from "../../../core/data/item";
-import { useAppSelector } from "../../../core/state/store";
-import { useItemContext } from "../itemContext";
+import { type DialogMode, SelectField, StorageFileField, TextAreaField, TextField, useFormErrors, useStorageFile } from "@yusr_systems/ui";
+import { useEffect } from "react";
+import Item, { ItemSlice, ItemType, ItemUnitPricingMethod } from "../../../core/data/item";
+import { useAppDispatch, useAppSelector } from "../../../core/state/store";
 import TaxesSection from "./taxesSection";
 
-export default function BasicTab()
+export default function BasicTab({ mode }: { mode: DialogMode; })
 {
+  const dispatch = useAppDispatch();
   const {
-    mode,
-    formData,
-    handleChange,
-    isInvalid,
-    getError,
-    clearError,
     fileInputRef,
-    getFileSrc,
-    handleDownload,
     handleFileChange,
     handleRemoveFile,
-    showFilePreview
-  } = useItemContext();
+    handleDownload,
+    showFilePreview,
+    getFileSrc
+  } = useStorageFile((data) => dispatch(ItemSlice.formActions.updateFormData(data as Partial<Item>)), "itemImages");
+
+  const { formData, errors } = useAppSelector((state) => state.itemForm);
+  const { getError, isInvalid } = useFormErrors(errors);
 
   const serviceIdsState = useAppSelector((state) => state.serviceIds);
+
+  useEffect(() =>
+  {
+    console.log(formData);
+  }, [formData]);
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -36,8 +39,8 @@ export default function BasicTab()
               error={ getError("name") }
               onChange={ (e) =>
               {
-                handleChange({ name: e.target.value });
-                clearError("name");
+                dispatch(ItemSlice.formActions.updateFormData({ name: e.target.value }));
+                dispatch(ItemSlice.formActions.clearError("name"));
               } }
             />
             <SelectField
@@ -46,7 +49,7 @@ export default function BasicTab()
               disabled={ mode === "update" }
               value={ formData.type?.toString() || "" }
               onValueChange={ (val) =>
-                handleChange({
+                dispatch(ItemSlice.formActions.updateFormData({
                   type: Number(val) as ItemType,
                   itemStores: [],
                   initialQuantity: 0,
@@ -66,7 +69,7 @@ export default function BasicTab()
                       })
                     ]
                     : []
-                }) }
+                })) }
               options={ [{ label: "منتج", value: ItemType.Product.toString() }, {
                 label: "خدمة",
                 value: ItemType.Service.toString()
@@ -78,13 +81,13 @@ export default function BasicTab()
             <TextField
               label="الصنف"
               value={ formData.class || "" }
-              onChange={ (e) => handleChange({ class: e.target.value }) }
+              onChange={ (e) => dispatch(ItemSlice.formActions.updateFormData({ class: e.target.value })) }
             />
             <SelectField
               label="الحالة"
               required
               value={ formData.statusId?.toString() || "1" }
-              onValueChange={ (val) => handleChange({ statusId: Number(val) }) }
+              onValueChange={ (val) => dispatch(ItemSlice.formActions.updateFormData({ statusId: Number(val) })) }
               options={ [{ label: "مفعل", value: "1" }, { label: "غير مفعل", value: "0" }] }
             />
           </div>
@@ -92,14 +95,14 @@ export default function BasicTab()
           <TextAreaField
             label="وصف المادة"
             value={ formData.description || "" }
-            onChange={ (e) => handleChange({ description: e.target.value }) }
+            onChange={ (e) => dispatch(ItemSlice.formActions.updateFormData({ description: e.target.value })) }
             rows={ 2 }
           />
 
           <TextAreaField
             label="ملاحظات"
             value={ formData.notes || "" }
-            onChange={ (e) => handleChange({ notes: e.target.value }) }
+            onChange={ (e) => dispatch(ItemSlice.formActions.updateFormData({ notes: e.target.value })) }
             rows={ 2 }
           />
         </div>
@@ -118,7 +121,7 @@ export default function BasicTab()
         </div>
       </div>
 
-      <TaxesSection />
+      <TaxesSection mode={ mode } />
     </div>
   );
 }

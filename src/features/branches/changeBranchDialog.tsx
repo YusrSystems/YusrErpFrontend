@@ -1,5 +1,5 @@
 import { Branch, CityFilterColumns } from "@yusr_systems/core";
-import { ChangeDialog, type CommonChangeDialogProps, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, type CommonChangeDialogProps, FieldGroup, FieldsSection, FormField, SearchableSelect, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect } from "react";
 import { BranchSlice, BranchValidationRules } from "../../core/data/branchLogic";
 import { filterCities } from "../../core/state/shared/citySlice";
@@ -15,18 +15,14 @@ export default function ChangeBranchDialog({ entity, mode, service, onSuccess }:
     dispatch(filterCities(undefined));
   }, [dispatch]);
 
-  const {
+  const { formData, errors } = useAppSelector((state) => state.branchForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    isInvalid
-  } = useReduxEntityForm<Branch>(
-    BranchSlice.formActions,
-    (state) => state.branchForm,
     BranchValidationRules.validationRules,
-    entity
+    (errors) => dispatch(BranchSlice.formActions.setErrors(errors))
   );
+  useFormInit(BranchSlice.formActions.setInitialData, entity ?? {});
 
   return (
     <ChangeDialog<Branch>
@@ -42,7 +38,7 @@ export default function ChangeBranchDialog({ entity, mode, service, onSuccess }:
         <TextField
           label="اسم الفرع"
           value={ formData.name || "" }
-          onChange={ (e) => handleChange({ name: e.target.value }) }
+          onChange={ (e) => dispatch(BranchSlice.formActions.updateFormData({ name: e.target.value })) }
           isInvalid={ isInvalid("name") }
           error={ getError("name") }
           required={ true }
@@ -55,10 +51,10 @@ export default function ChangeBranchDialog({ entity, mode, service, onSuccess }:
             itemValueKey="id"
             placeholder="اختر المدينة"
             value={ formData.cityId?.toString() || "" }
-            onValueChange={ (val) => handleChange({ cityId: Number(val) }) }
+            onValueChange={ (val) => dispatch(BranchSlice.formActions.updateFormData({ cityId: Number(val) })) }
             columnsNames={ CityFilterColumns.columnsNames }
             onSearch={ (condition) => dispatch(filterCities(condition)) }
-            errorInputClass={ isInvalid("cityId") ? "border-red-500 ring-red-500" : "" }
+            isInvalid={ isInvalid("cityId") }
             disabled={ cityState.isLoading }
           />
         </FormField>
@@ -67,22 +63,22 @@ export default function ChangeBranchDialog({ entity, mode, service, onSuccess }:
           <TextField
             label="الشارع"
             value={ formData.street || "" }
-            onChange={ (e) => handleChange({ street: e.target.value }) }
+            onChange={ (e) => dispatch(BranchSlice.formActions.updateFormData({ street: e.target.value })) }
           />
           <TextField
             label="الحي"
             value={ formData.district || "" }
-            onChange={ (e) => handleChange({ district: e.target.value }) }
+            onChange={ (e) => dispatch(BranchSlice.formActions.updateFormData({ district: e.target.value })) }
           />
           <TextField
             label="رقم المبنى"
             value={ formData.buildingNumber || "" }
-            onChange={ (e) => handleChange({ buildingNumber: e.target.value }) }
+            onChange={ (e) => dispatch(BranchSlice.formActions.updateFormData({ buildingNumber: e.target.value })) }
           />
           <TextField
             label="الرمز البريدي"
             value={ formData.postalCode || "" }
-            onChange={ (e) => handleChange({ postalCode: e.target.value }) }
+            onChange={ (e) => dispatch(BranchSlice.formActions.updateFormData({ postalCode: e.target.value })) }
           />
         </FieldsSection>
       </FieldGroup>

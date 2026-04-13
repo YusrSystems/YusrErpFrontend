@@ -1,5 +1,5 @@
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, TextAreaField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, TextAreaField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
 import { AccountFilterColumns, BanksAndBoxesSlice } from "../../core/data/account";
 import type BalanceTransfer from "../../core/data/balanceTransfer";
@@ -19,19 +19,14 @@ export default function ChangeBalanceTransferDialog(
     amount: entity?.amount || 0
   }), [entity]);
 
-  const {
+  const { formData, errors } = useAppSelector((state) => state.balanceTransferForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    errorInputClass,
-    isInvalid
-  } = useReduxEntityForm<BalanceTransfer>(
-    BalanceTransferSlice.formActions,
-    (state) => state.balanceTransferForm,
     BalanceTransferValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(BalanceTransferSlice.formActions.setErrors(errors))
   );
+  useFormInit(BalanceTransferSlice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
@@ -66,7 +61,7 @@ export default function ChangeBalanceTransferDialog(
               label="تاريخ التحويل"
               required
               value={ formData.date ? new Date(formData.date) : undefined }
-              onChange={ (date) => handleChange({ date: date }) }
+              onChange={ (date) => dispatch(BalanceTransferSlice.formActions.updateFormData({ date: date })) }
               isInvalid={ isInvalid("date") }
               error={ getError("date") }
             />
@@ -75,7 +70,7 @@ export default function ChangeBalanceTransferDialog(
               label="المبلغ"
               required
               value={ formData.amount || 0 }
-              onChange={ (val) => handleChange({ amount: val }) }
+              onChange={ (val) => dispatch(BalanceTransferSlice.formActions.updateFormData({ amount: val })) }
               isInvalid={ isInvalid("amount") }
               error={ getError("amount") }
             />
@@ -95,11 +90,16 @@ export default function ChangeBalanceTransferDialog(
                 columnsNames={ AccountFilterColumns.columnsNames }
                 onSearch={ (condition) => dispatch(BanksAndBoxesSlice.entityActions.filter(condition)) }
                 disabled={ accountState.isLoading }
-                errorInputClass={ errorInputClass("fromAccountId") }
+                isInvalid={ isInvalid("fromAccountId") }
                 onValueChange={ (val) =>
                 {
                   const selected = availableFromAccounts.find((a) => a.id.toString() === val);
-                  handleChange({ fromAccountId: selected?.id, fromAccountName: selected?.name });
+                  dispatch(
+                    BalanceTransferSlice.formActions.updateFormData({
+                      fromAccountId: selected?.id,
+                      fromAccountName: selected?.name
+                    })
+                  );
                 } }
               />
               { isInvalid("fromAccountId") && (
@@ -120,11 +120,16 @@ export default function ChangeBalanceTransferDialog(
                 columnsNames={ AccountFilterColumns.columnsNames }
                 onSearch={ (condition) => dispatch(BanksAndBoxesSlice.entityActions.filter(condition)) }
                 disabled={ accountState.isLoading }
-                errorInputClass={ errorInputClass("toAccountId") }
+                isInvalid={ isInvalid("toAccountId") }
                 onValueChange={ (val) =>
                 {
                   const selected = availableToAccounts.find((a) => a.id.toString() === val);
-                  handleChange({ toAccountId: selected?.id, toAccountName: selected?.name });
+                  dispatch(
+                    BalanceTransferSlice.formActions.updateFormData({
+                      toAccountId: selected?.id,
+                      toAccountName: selected?.name
+                    })
+                  );
                 } }
               />
               { isInvalid("toAccountId") && <span className="text-xs text-red-500">{ getError("toAccountId") }</span> }
@@ -135,7 +140,8 @@ export default function ChangeBalanceTransferDialog(
             <TextAreaField
               label="البيان / الوصف"
               value={ formData.description || "" }
-              onChange={ (e) => handleChange({ description: e.target.value }) }
+              onChange={ (e) =>
+                dispatch(BalanceTransferSlice.formActions.updateFormData({ description: e.target.value })) }
               rows={ 3 }
               placeholder="اكتب سبب التحويل أو أي ملاحظات أخرى..."
             />

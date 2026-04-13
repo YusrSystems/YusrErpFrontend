@@ -1,20 +1,22 @@
-import { Button, Checkbox, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
+import { Button, Checkbox, type DialogMode, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect } from "react";
-import { ItemTax } from "../../../core/data/item";
+import { ItemSlice, ItemTax } from "../../../core/data/item";
 import { type Tax, TaxFilterColumns, TaxSlice } from "../../../core/data/tax";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { useItemContext } from "../itemContext";
 
-export default function TaxesSection()
+export default function TaxesSection({ mode }: { mode: DialogMode; })
 {
   const dispatch = useAppDispatch();
   const taxState = useAppSelector((state) => state.tax);
-  const { formData, handleChange, mode } = useItemContext();
+  const { formData } = useAppSelector((state) => state.itemForm);
+
   useEffect(() =>
   {
-    if(mode === "create")
+    if (mode === "create")
+    {
       handleTaxableChange(formData.taxable ?? false);
+    }
   }, [taxState.entities?.data]);
 
   const handleTaxableChange = (isTaxable: boolean) =>
@@ -32,36 +34,37 @@ export default function TaxesSection()
             }) as ItemTax
         );
 
-      handleChange((prev) => ({
+      dispatch(ItemSlice.formActions.updateFormData((prev) => ({
         ...prev,
         taxable: true,
         itemTaxes: primaryTaxes,
         exemptionReason: "",
         exemptionReasonCode: ""
-      }));
+      })));
     }
     else
     {
-      handleChange((prev) => ({
+      dispatch(ItemSlice.formActions.updateFormData((prev) => ({
         ...prev,
         taxable: false,
         itemTaxes: []
-      }));
+      })));
     }
   };
 
-  const addTax = () => handleChange({ itemTaxes: [...(formData.itemTaxes || []), new ItemTax()] });
+  const addTax = () =>
+    dispatch(ItemSlice.formActions.updateFormData({ itemTaxes: [...(formData.itemTaxes || []), new ItemTax()] }));
   const updateTax = (index: number, updates: Partial<ItemTax>) =>
   {
     const list = [...(formData.itemTaxes || [])];
     list[index] = { ...list[index], ...updates };
-    handleChange({ itemTaxes: list });
+    dispatch(ItemSlice.formActions.updateFormData({ itemTaxes: list }));
   };
   const removeTax = (index: number) =>
   {
     const list = [...(formData.itemTaxes || [])];
     list.splice(index, 1);
-    handleChange({ itemTaxes: list });
+    dispatch(ItemSlice.formActions.updateFormData({ itemTaxes: list }));
   };
 
   return (
@@ -93,20 +96,20 @@ export default function TaxesSection()
               placeholder="أدخل رمز الإعفاء (مثال: VATEX-SA-29)"
               value={ formData.exemptionReasonCode || "" }
               onChange={ (e) =>
-                handleChange((prev) => ({
+                dispatch(ItemSlice.formActions.updateFormData((prev) => ({
                   ...prev,
                   exemptionReasonCode: e.target.value
-                })) }
+                }))) }
             />
             <TextField
               label="سبب الإعفاء"
               placeholder="أدخل سبب الإعفاء من الضريبة"
               value={ formData.exemptionReason || "" }
               onChange={ (e) =>
-                handleChange((prev) => ({
+                dispatch(ItemSlice.formActions.updateFormData((prev) => ({
                   ...prev,
                   exemptionReason: e.target.value
-                })) }
+                }))) }
             />
           </div>
         )

@@ -10,7 +10,6 @@ export default function BoxesAccountsPage()
       dialogStateKey="boxesDialog"
       title="إدارة حسابات الصناديق"
       fixedType={ AccountType.Box }
-      actions={ BoxesSlice.formActions }
       selectFormState={ (state) => state.boxesForm }
     />
   );

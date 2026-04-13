@@ -6,8 +6,6 @@ import dashboardReducer from "../../features/dashboard/logic/dashboardSlice";
 import invoiceReducerUI from "../../features/invoices/logic/invoiceSliceUI";
 import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTransferSlice";
 import registerReducer from "../../features/register/logic/registerSlice";
-import userDialogReducer from "../../features/users/logic/userDialogSlice";
-import userReducer from "../../features/users/logic/userSlice";
 import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsAndSuppliersSlice, ClientsSlice, EmployeesSlice, SuppliersSlice } from "../data/account";
 import { BalanceTransferSlice } from "../data/balanceTransfer";
 import { BranchSlice } from "../data/branchLogic";
@@ -23,6 +21,7 @@ import { StocktakingSlice } from "../data/stocktaking";
 import { StoreSlice } from "../data/store";
 import { TaxSlice } from "../data/tax";
 import { UnitSlice } from "../data/unit";
+import { UserSlice } from "../data/UserLogic";
 import { VoucherSlice } from "../data/voucher";
 import cityReducer from "./shared/citySlice";
 import countryReducer from "./shared/countrySlice";
@@ -49,8 +48,9 @@ export const store = configureStore({
     role: RoleSlice.entityReducer,
     roleForm: RoleSlice.formReducer,
     roleDialog: RoleSlice.dialogReducer,
-    user: userReducer,
-    userDialog: userDialogReducer,
+    user: UserSlice.entityReducer,
+    userForm: UserSlice.formReducer,
+    userDialog: UserSlice.dialogReducer,
     city: cityReducer,
     country: countryReducer,
     currency: currencyReducer,
@@ -88,6 +88,7 @@ export const store = configureStore({
     invoice: InvoiceSlice.entityReducer,
     invoiceDialog: InvoiceSlice.dialogReducer,
     paymentMethod: PaymentMethodSlice.entityReducer,
+    paymentMethodForm: PaymentMethodSlice.formReducer,
     paymentMethodDialog: PaymentMethodSlice.dialogReducer,
     balanceTransfer: BalanceTransferSlice.entityReducer,
     balanceTransferForm: BalanceTransferSlice.formReducer,
@@ -96,6 +97,7 @@ export const store = configureStore({
     voucherForm: VoucherSlice.formReducer,
     voucherDialog: VoucherSlice.dialogReducer,
     item: ItemSlice.entityReducer,
+    itemForm: ItemSlice.formReducer,
     itemDialog: ItemSlice.dialogReducer,
     pricingMethod: PricingMethodSlice.entityReducer,
     pricingMethodForm: PricingMethodSlice.formReducer,

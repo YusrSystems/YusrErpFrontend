@@ -1,4 +1,4 @@
-import { ChangeDialog, type CommonChangeDialogProps, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, FormField, Loading, SearchableSelect, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, type CommonChangeDialogProps, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, FormField, Loading, SearchableSelect, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
 import ItemTransfer, { ItemTransfersItem, ItemTransferSlice, ItemTransferValidationRules } from "../../core/data/itemTransfer";
@@ -31,19 +31,14 @@ export default function ChangeItemTransferDialog({
     [entity]
   );
 
-  const {
+  const { formData, errors } = useAppSelector((state) => state.itemTransferForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    errorInputClass,
-    isInvalid
-  } = useReduxEntityForm<ItemTransfer>(
-    ItemTransferSlice.formActions,
-    (state) => state.taxForm,
     ItemTransferValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(ItemTransferSlice.formActions.setErrors(errors))
   );
+  useFormInit(ItemTransferSlice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
@@ -73,7 +68,7 @@ export default function ChangeItemTransferDialog({
           itemUnitPricingMethods: item.itemUnitPricingMethods as any
         })
     );
-    handleChange({ itemTransfersItems: mappedItems });
+    dispatch(ItemTransferSlice.formActions.updateFormData({ itemTransfersItems: mappedItems }));
   }, [items]);
 
   useEffect(() =>
@@ -84,7 +79,7 @@ export default function ChangeItemTransferDialog({
       const getItem = async () =>
       {
         const res = await service.Get(entity.id);
-        handleChange({ ...res.data });
+        dispatch(ItemTransferSlice.formActions.updateFormData({ ...res.data }));
         dispatch(initializeItems(res.data?.itemTransfersItems ?? []));
         setInitLoading(false);
       };
@@ -186,7 +181,7 @@ export default function ChangeItemTransferDialog({
               value={ formData.fromStoreId?.toString() || "" }
               columnsNames={ StoreFilterColumns.columnsNames }
               onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
-              errorInputClass={ errorInputClass("fromStoreId") }
+              isInvalid={ isInvalid("fromStoreId") }
               disabled={ storeState.isLoading || mode === "update" }
               onValueChange={ (val) =>
               {
@@ -194,7 +189,12 @@ export default function ChangeItemTransferDialog({
                 if (selected)
                 {
                   ItemTransferActions.clear(dispatch);
-                  handleChange({ fromStoreId: selected.id, fromStoreName: selected.name });
+                  dispatch(
+                    ItemTransferSlice.formActions.updateFormData({
+                      fromStoreId: selected.id,
+                      fromStoreName: selected.name
+                    })
+                  );
                 }
               } }
             />
@@ -214,14 +214,16 @@ export default function ChangeItemTransferDialog({
               value={ formData.toStoreId?.toString() || "" }
               columnsNames={ StoreFilterColumns.columnsNames }
               onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
-              errorInputClass={ errorInputClass("toStoreId") }
+              isInvalid={ isInvalid("toStoreId") }
               disabled={ storeState.isLoading || mode === "update" }
               onValueChange={ (val) =>
               {
                 const selected = availableToStores.find((s) => s.id.toString() === val);
                 if (selected)
                 {
-                  handleChange({ toStoreId: selected.id, toStoreName: selected.name });
+                  dispatch(
+                    ItemTransferSlice.formActions.updateFormData({ toStoreId: selected.id, toStoreName: selected.name })
+                  );
                 }
               } }
             />
@@ -232,7 +234,7 @@ export default function ChangeItemTransferDialog({
           <TextField
             label="البيان والملاحظات"
             value={ formData.description || "" }
-            onChange={ (e) => handleChange({ description: e.target.value }) }
+            onChange={ (e) => dispatch(ItemTransferSlice.formActions.updateFormData({ description: e.target.value })) }
           />
         </FieldsSection>
 

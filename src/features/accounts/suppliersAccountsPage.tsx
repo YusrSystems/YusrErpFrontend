@@ -10,7 +10,6 @@ export default function SuppliersAccountsPage()
       stateKey="suppliers"
       dialogStateKey="suppliersDialog"
       fixedType={ AccountType.Supplier }
-      actions={ SuppliersSlice.formActions }
       selectFormState={ (state) => state.suppliersForm }
     />
   );

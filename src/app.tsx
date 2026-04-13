@@ -28,7 +28,7 @@ import StocktakingsPage from "./features/stocktakings/stocktakingsPage";
 import StoresPage from "./features/stores/storePage";
 import TaxesPage from "./features/taxes/taxesPage";
 import UnitsPage from "./features/units/unitsPage";
-import UsersPage from "./features/users/presentation/usersPage";
+import UsersPage from "./features/users/usersPage";
 import VouchersPage from "./features/vouchers/vouchersPage";
 
 function App()

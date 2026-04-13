@@ -1,4 +1,4 @@
-import { CrudPage, type FormSliceActions, type IDialogState, type IEntityState } from "@yusr_systems/ui";
+import { CrudPage, type IDialogState, type IEntityState } from "@yusr_systems/ui";
 import { WalletIcon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
@@ -14,7 +14,6 @@ export default function AccountsPage({
   stateKey,
   dialogStateKey,
   fixedType,
-  actions, 
   selectFormState
 }: {
   title: string;
@@ -22,8 +21,7 @@ export default function AccountsPage({
   stateKey: keyof RootState;
   dialogStateKey: keyof RootState;
   fixedType?: AccountType;
-  actions: FormSliceActions<Account>;
-  selectFormState: (state: any) => { data: Partial<Account>; errors: Record<string, string>; };
+  selectFormState: (state: any) => { formData: Partial<Account>; errors: Record<string, string>; };
 })
 {
   const dispatch = useAppDispatch();
@@ -95,8 +93,7 @@ export default function AccountsPage({
           slice={ slice }
           stateKey={ stateKey }
           fixedType={ fixedType }
-          actions={ actions }
-          selectFormState={selectFormState}
+          selectFormState={ selectFormState }
           onSuccess={ (data, mode) =>
           {
             dispatch(slice.entityActions.refresh({ data: data }));

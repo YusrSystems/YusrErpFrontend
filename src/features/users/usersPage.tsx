@@ -2,11 +2,10 @@ import { User, UserFilterColumns, UsersApiService } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { User2Icon } from "lucide-react";
 import { useMemo } from "react";
-import { selectPermissionsByResource } from "../../../core/auth/authSelectors";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { openUserChangeDialog, openUserDeleteDialog, setIsUserChangeDialogOpen, setIsUserDeleteDialogOpen } from "../logic/userDialogSlice";
-import { filterUsers, refreshUsers, setCurrentUsersPage } from "../logic/userSlice";
+import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import { UserSlice } from "../../core/data/UserLogic";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import ChangeUserDialog from "./changeUserDialog";
 
 export default function UsersPage()
@@ -45,13 +44,13 @@ export default function UsersPage()
         } text-slate-800`
       }] }
       actions={ {
-        filter: filterUsers,
-        openChangeDialog: (entity) => openUserChangeDialog(entity),
-        openDeleteDialog: (entity) => openUserDeleteDialog(entity),
-        setIsChangeDialogOpen: (open) => setIsUserChangeDialogOpen(open),
-        setIsDeleteDialogOpen: (open) => setIsUserDeleteDialogOpen(open),
-        refresh: refreshUsers,
-        setCurrentPage: (page) => setCurrentUsersPage(page)
+        filter: UserSlice.entityActions.filter,
+        openChangeDialog: (entity) => UserSlice.dialogActions.openChangeDialog(entity),
+        openDeleteDialog: (entity) => UserSlice.dialogActions.openDeleteDialog(entity),
+        setIsChangeDialogOpen: (open) => UserSlice.dialogActions.setIsChangeDialogOpen(open),
+        setIsDeleteDialogOpen: (open) => UserSlice.dialogActions.setIsDeleteDialogOpen(open),
+        refresh: UserSlice.entityActions.refresh,
+        setCurrentPage: (page) => UserSlice.entityActions.setCurrentPage(page)
       } }
       ChangeDialog={ 
         <ChangeUserDialog
@@ -60,10 +59,10 @@ export default function UsersPage()
           service={ service }
           onSuccess={ (data, mode) =>
           {
-            dispatch(refreshUsers({ data: data }));
+            dispatch(UserSlice.entityActions.refresh({ data: data }));
             if (mode === "create")
             {
-              dispatch(setIsUserChangeDialogOpen(false));
+              dispatch(UserSlice.dialogActions.setIsChangeDialogOpen(false));
             }
           } }
         />

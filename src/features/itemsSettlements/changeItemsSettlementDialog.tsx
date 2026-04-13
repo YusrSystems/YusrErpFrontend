@@ -1,5 +1,5 @@
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, Loading, SearchableSelect, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, Loading, SearchableSelect, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
 import { ItemType } from "../../core/data/item";
 import ItemsSettlement, { ItemsSettlementItem, ItemsSettlementSlice, ItemsSettlementValidationRules } from "../../core/data/itemsSettlement";
@@ -23,19 +23,14 @@ export default function ChangeItemsSettlementDialog(
     itemsSettlementItems: entity?.itemsSettlementItems || []
   }), [entity]);
 
-  const {
+  const { formData, errors } = useAppSelector((state) => state.itemsSettlementForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    clearError,
-    isInvalid
-  } = useReduxEntityForm<ItemsSettlement>(
-    ItemsSettlementSlice.formActions,
-    (state) => state.itemsSettlementForm,
     ItemsSettlementValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(ItemsSettlementSlice.formActions.setErrors(errors))
   );
+  useFormInit(ItemsSettlementSlice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
@@ -64,7 +59,7 @@ export default function ChangeItemsSettlementDialog(
       const getItem = async () =>
       {
         const res = await service.Get(entity.id);
-        handleChange({ ...res.data });
+        dispatch(ItemsSettlementSlice.formActions.updateFormData({ ...res.data }));
         setInitLoading(false);
       };
       getItem();
@@ -74,12 +69,12 @@ export default function ChangeItemsSettlementDialog(
   const handleStoreChange = (val: string) =>
   {
     const selected = storeState.entities.data?.find((s) => s.id.toString() === val);
-    handleChange({
+    dispatch(ItemsSettlementSlice.formActions.updateFormData({
       storeId: selected?.id,
       storeName: selected?.name,
       itemsSettlementItems: []
-    });
-    clearError("storeId");
+    }));
+    ItemsSettlementSlice.formActions.clearError("storeId");
   };
 
   // ==========================================
@@ -98,7 +93,7 @@ export default function ChangeItemsSettlementDialog(
     if (typeof update === "function")
     {
       // في حال تم تمرير دالة (Callback)
-      handleChange((prev) =>
+      dispatch(ItemsSettlementSlice.formActions.updateFormData((prev) =>
       {
         const mappedPrev = { ...prev, stocktakingItems: prev.itemsSettlementItems };
         const result = update(mappedPrev);
@@ -107,18 +102,22 @@ export default function ChangeItemsSettlementDialog(
           return { ...prev, itemsSettlementItems: result.stocktakingItems as ItemsSettlementItem[] };
         }
         return { ...prev, ...result };
-      });
+      }));
     }
     else
     {
       // في حال تم تمرير كائن مباشر
       if (update.stocktakingItems !== undefined)
       {
-        handleChange({ itemsSettlementItems: update.stocktakingItems as ItemsSettlementItem[] });
+        dispatch(
+          ItemsSettlementSlice.formActions.updateFormData({
+            itemsSettlementItems: update.stocktakingItems as ItemsSettlementItem[]
+          })
+        );
       }
       else
       {
-        handleChange(update);
+        dispatch(ItemsSettlementSlice.formActions.updateFormData(update));
       }
     }
   };
@@ -183,7 +182,8 @@ export default function ChangeItemsSettlementDialog(
           <TextField
             label="الوصف"
             value={ formData.description || "" }
-            onChange={ (e) => handleChange({ description: e.target.value }) }
+            onChange={ (e) =>
+              dispatch(ItemsSettlementSlice.formActions.updateFormData({ description: e.target.value })) }
           />
 
           { /* استدعاء الجدول المشترك مع تمرير الـ Adapter والـ Factory */ }

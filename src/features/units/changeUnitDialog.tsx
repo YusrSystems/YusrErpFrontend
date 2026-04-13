@@ -1,8 +1,9 @@
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useMemo } from "react";
 import type Unit from "../../core/data/unit";
 import { UnitSlice, UnitValidationRules } from "../../core/data/unit";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 
 export default function ChangeUnitDialog({
   entity,
@@ -11,26 +12,17 @@ export default function ChangeUnitDialog({
   onSuccess
 }: CommonChangeDialogProps<Unit>)
 {
-  const initialValues = useMemo(
-    () => ({
-      ...entity,
-      name: entity?.name || ""
-    }),
-    [entity]
-  );
+  const dispatch = useAppDispatch();
+  const initialValues = useMemo(() => ({ ...entity, name: entity?.name || "" }), [entity]);
 
-  const {
+  const { formData, errors } = useAppSelector((state) => state.unitForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    isInvalid
-  } = useReduxEntityForm<Unit>(
-    UnitSlice.formActions,
-    (state) => state.unitForm,
     UnitValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(UnitSlice.formActions.setErrors(errors))
   );
+  useFormInit(UnitSlice.formActions.setInitialData, initialValues);
 
   return (
     <ChangeDialog<Unit>
@@ -48,7 +40,7 @@ export default function ChangeUnitDialog({
           label="اسم الوحدة"
           required
           value={ formData.name || "" }
-          onChange={ (e) => handleChange({ name: e.target.value }) }
+          onChange={ (e) => dispatch(UnitSlice.formActions.updateFormData({ name: e.target.value })) }
           isInvalid={ isInvalid("name") }
           error={ getError("name") }
         />

@@ -1,8 +1,9 @@
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, TextField, useReduxEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useMemo } from "react";
 import type PricingMethod from "../../core/data/pricingMethod";
 import { PricingMethodSlice, PricingMethodValidationRules } from "../../core/data/pricingMethod";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 
 export default function ChangePricingMethodDialog({
   entity,
@@ -19,18 +20,15 @@ export default function ChangePricingMethodDialog({
     [entity]
   );
 
-  const {
+  const dispatch = useAppDispatch();
+  const { formData, errors } = useAppSelector((state) => state.pricingMethodForm);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const { validate } = useValidate(
     formData,
-    handleChange,
-    validate,
-    getError,
-    isInvalid
-  } = useReduxEntityForm<PricingMethod>(
-    PricingMethodSlice.formActions,
-    (state) => state.pricingMethodForm,
     PricingMethodValidationRules.validationRules,
-    initialValues
+    (errors) => dispatch(PricingMethodSlice.formActions.setErrors(errors))
   );
+  useFormInit(PricingMethodSlice.formActions.setInitialData, initialValues);
 
   return (
     <ChangeDialog<PricingMethod>
@@ -48,7 +46,7 @@ export default function ChangePricingMethodDialog({
           label="اسم طريقة التسعير"
           required
           value={ formData.name || "" }
-          onChange={ (e) => handleChange({ name: e.target.value }) }
+          onChange={ (e) => dispatch(PricingMethodSlice.formActions.updateFormData({ name: e.target.value })) }
           isInvalid={ isInvalid("name") }
           error={ getError("name") }
         />
