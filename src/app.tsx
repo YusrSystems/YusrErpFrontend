@@ -25,8 +25,8 @@ import RegisterPage from "./features/register/presentation/registerPage";
 import RolesPage from "./features/roles/presentation/rolesPage";
 import SettingPage from "./features/setting/settingPage";
 import StocktakingsPage from "./features/stocktakings/stocktakingsPage";
-import StoresPage from "./features/stores/presentation/storePage";
-import TaxesPage from "./features/taxes/presentation/taxesPage";
+import StoresPage from "./features/stores/storePage";
+import TaxesPage from "./features/taxes/taxesPage";
 import UnitsPage from "./features/units/unitsPage";
 import UsersPage from "./features/users/presentation/usersPage";
 import VouchersPage from "./features/vouchers/vouchersPage";
@@ -94,7 +94,7 @@ function AppRoutes()
             <Route path="/boxes" element={ <BoxesAccountsPage /> } />
             <Route path="/paymentMethods" element={ <PaymentMethodsPage /> } />
             <Route path="/balanceTransfer" element={ <BalanceTransfersPage /> } />
-            <Route path="/sales/:invoiceId" element={ <SellInvoicesPage /> } />
+            <Route path="/sales" element={ <SellInvoicesPage /> } />
             <Route path="/purchases" element={ <PurchaseInvoicesPage /> } />
             <Route path="/vouchers" element={ <VouchersPage /> } />
             <Route path="/items" element={ <ItemsPage /> } />
