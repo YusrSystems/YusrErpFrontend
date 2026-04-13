@@ -1,23 +1,28 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
+import { Role } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { categorizePermissions, ChangeDialog, FieldGroup, PermissionCard, PermissionSkeleton, Skeleton, TextField, useEntityForm } from "@yusr_systems/ui";
+import { categorizePermissions, ChangeDialog, FieldGroup, PermissionCard, PermissionSkeleton, Skeleton, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
-import type { Role } from "../../../core/data/role";
-import { fetchSystemPermissions } from "../../../core/state/shared/systemSlice";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import { RoleSlice, RoleValidationRules } from "../../core/data/role";
+import { fetchSystemPermissions } from "../../core/state/shared/systemSlice";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import { ActionIcons, ArabicLabels, PERMISSION_SECTIONS } from "./permissionConfig";
 
 export default function ChangeRoleDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<Role>)
 {
   const delimiter: string = ".";
-  const validationRules: ValidationRule<Partial<Role>>[] = useMemo(
-    () => [{ field: "name", selector: (d) => d.name, validators: [Validators.required("يرجى اختيار اسم للدور")] }],
-    []
-  );
-  const { formData, handleChange, getError, isInvalid, validate, clearError } = useEntityForm<Role>(
-    entity,
-    validationRules
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    clearError,
+    isInvalid
+  } = useReduxEntityForm<Role>(
+    RoleSlice.formActions,
+    (state) => state.unitForm,
+    RoleValidationRules.validationRules,
+    entity
   );
   const systemState = useAppSelector((state) => state.system);
   const dispatch = useAppDispatch();

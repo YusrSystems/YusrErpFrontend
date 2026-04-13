@@ -2,9 +2,9 @@ import { RoleFilterColumns, User, type ValidationRule, Validators } from "@yusr_
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, FieldGroup, FormField, PasswordField, SearchableSelect, SelectField, TextField, useEntityForm } from "@yusr_systems/ui";
 import { useEffect, useMemo } from "react";
+import { RoleSlice } from "../../../core/data/role";
 import { useAppDispatch, useAppSelector } from "../../../core/state/store";
 import { filterBranches } from "../../branches/logic/branchSlice";
-import { filterRoles } from "../../roles/logic/roleSlice";
 
 export default function ChangeUserDialog({ entity, mode, service, onSuccess }: CommonChangeDialogProps<User>)
 {
@@ -38,7 +38,7 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
 
   useEffect(() =>
   {
-    dispatch(filterRoles(undefined));
+    dispatch(RoleSlice.entityActions.filter());
     dispatch(filterBranches(undefined));
   }, [dispatch]);
 
@@ -82,7 +82,7 @@ export default function ChangeUserDialog({ entity, mode, service, onSuccess }: C
             placeholder="اختر الدور"
             value={ formData.roleId?.toString() || "" }
             columnsNames={ RoleFilterColumns.columnsNames }
-            onSearch={ (condition) => dispatch(filterRoles(condition)) }
+            onSearch={ (condition) => dispatch(RoleSlice.entityActions.filter(condition)) }
             errorInputClass={ errorInputClass("roleId") }
             disabled={ roleState.isLoading }
             onValueChange={ (val) =>

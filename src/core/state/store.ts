@@ -8,8 +8,6 @@ import dashboardReducer from "../../features/dashboard/logic/dashboardSlice";
 import invoiceReducerUI from "../../features/invoices/logic/invoiceSliceUI";
 import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTransferSlice";
 import registerReducer from "../../features/register/logic/registerSlice";
-import roleDialogReducer from "../../features/roles/logic/roleDialogSlice";
-import roleReducer from "../../features/roles/logic/roleSlice";
 import userDialogReducer from "../../features/users/logic/userDialogSlice";
 import userReducer from "../../features/users/logic/userSlice";
 import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsAndSuppliersSlice, ClientsSlice, EmployeesSlice, SuppliersSlice } from "../data/account";
@@ -20,6 +18,7 @@ import { ItemsSettlementSlice } from "../data/itemsSettlement";
 import { ItemTransferSlice } from "../data/itemTransfer";
 import { PaymentMethodSlice } from "../data/paymentMethod";
 import { PricingMethodSlice } from "../data/pricingMethod";
+import { RoleSlice } from "../data/role";
 import type { Setting } from "../data/setting";
 import { StocktakingSlice } from "../data/stocktaking";
 import { StoreSlice } from "../data/store";
@@ -47,8 +46,9 @@ export const store = configureStore({
   reducer: {
     branch: branchReducer,
     branchDialog: branchDialogReducer,
-    role: roleReducer,
-    roleDialog: roleDialogReducer,
+    role: RoleSlice.entityReducer,
+    roleForm: RoleSlice.formReducer,
+    roleDialog: RoleSlice.dialogReducer,
     user: userReducer,
     userDialog: userDialogReducer,
     city: cityReducer,

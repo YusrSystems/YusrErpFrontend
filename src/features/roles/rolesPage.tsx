@@ -1,13 +1,11 @@
-import { RolesApiService } from "@yusr_systems/core";
+import { Role, RoleFilterColumns, RolesApiService } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { Settings2 } from "lucide-react";
 import { useMemo } from "react";
-import { selectPermissionsByResource } from "../../../core/auth/authSelectors";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
-import { type Role, RoleFilterColumns } from "../../../core/data/role";
-import { useAppDispatch, useAppSelector } from "../../../core/state/store";
-import { openRoleChangeDialog, openRoleDeleteDialog, setIsRoleChangeDialogOpen, setIsRoleDeleteDialogOpen } from "../logic/roleDialogSlice";
-import { filterRoles, refreshRoles, setCurrentRolesPage } from "../logic/roleSlice";
+import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import { RoleSlice } from "../../core/data/role";
+import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import ChangeRoleDialog from "./changeRoleDialog";
 
 export default function RolesPage()
@@ -41,13 +39,13 @@ export default function RolesPage()
         role: Role
       ) => [{ rowName: `#${role.id}`, rowStyles: "" }, { rowName: role.name, rowStyles: "font-semibold" }] }
       actions={ {
-        filter: filterRoles,
-        openChangeDialog: (entity) => openRoleChangeDialog(entity),
-        openDeleteDialog: (entity) => openRoleDeleteDialog(entity),
-        setIsChangeDialogOpen: (open) => setIsRoleChangeDialogOpen(open),
-        setIsDeleteDialogOpen: (open) => setIsRoleDeleteDialogOpen(open),
-        refresh: refreshRoles,
-        setCurrentPage: (page) => setCurrentRolesPage(page)
+        filter: RoleSlice.entityActions.filter,
+        openChangeDialog: (entity) => RoleSlice.dialogActions.openChangeDialog(entity),
+        openDeleteDialog: (entity) => RoleSlice.dialogActions.openDeleteDialog(entity),
+        setIsChangeDialogOpen: (open) => RoleSlice.dialogActions.setIsChangeDialogOpen(open),
+        setIsDeleteDialogOpen: (open) => RoleSlice.dialogActions.setIsDeleteDialogOpen(open),
+        refresh: RoleSlice.entityActions.refresh,
+        setCurrentPage: (page) => RoleSlice.entityActions.setCurrentPage(page)
       } }
       ChangeDialog={ 
         <ChangeRoleDialog
@@ -56,10 +54,10 @@ export default function RolesPage()
           service={ service }
           onSuccess={ (data, mode) =>
           {
-            dispatch(refreshRoles({ data: data }));
+            dispatch(RoleSlice.entityActions.refresh({ data: data }));
             if (mode === "create")
             {
-              dispatch(setIsRoleChangeDialogOpen(false));
+              dispatch(RoleSlice.dialogActions.setIsChangeDialogOpen(false));
             }
           } }
         />

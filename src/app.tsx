@@ -22,7 +22,7 @@ import NotFoundPage from "./features/notFound/notFoundPage";
 import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 import PricingMethodsPage from "./features/pricingMethods/pricingMethodsPage";
 import RegisterPage from "./features/register/presentation/registerPage";
-import RolesPage from "./features/roles/presentation/rolesPage";
+import RolesPage from "./features/roles/rolesPage";
 import SettingPage from "./features/setting/settingPage";
 import StocktakingsPage from "./features/stocktakings/stocktakingsPage";
 import StoresPage from "./features/stores/storePage";

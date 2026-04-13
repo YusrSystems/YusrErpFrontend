@@ -1,6 +1,6 @@
 import { Database, FileBarChart, LayoutDashboard, Pencil, Plus, ShoppingCart, Trash2, Wallet } from "lucide-react";
-import { SystemPermissionsActions } from "../../../core/auth/systemPermissionsActions";
-import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 
 export const ArabicLabels: Record<string, string> = {
   // Resources
@@ -113,7 +113,7 @@ export const PERMISSION_SECTIONS = [{
     SystemPermissionsResources.InvoiceSellBelowSellingPrice,
     SystemPermissionsResources.InvoiceSellBeyondAvailableQuantity,
     SystemPermissionsResources.InvoiceSell,
-    SystemPermissionsResources.InvoicePurchase,
+    SystemPermissionsResources.InvoicePurchase
   ]
 }, {
   id: "accounts",
