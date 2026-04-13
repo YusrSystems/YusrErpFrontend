@@ -1,5 +1,5 @@
 import { createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import { InvoiceSlice, type InvoiceType } from "../../../core/data/invoice";
+import { InvoiceItem, type InvoiceType } from "../../../core/data/invoice";
 import type { StoreItem } from "../../../core/data/item";
 import InvoicesApiService from "../../../core/networking/invoiceApiService";
 import InvoiceItemsMath from "./invoiceItemsMath";
@@ -196,6 +196,11 @@ export default class InvoiceItemsActions
   public static resetItems(state: InvoiceState)
   {
     state.items = [];
+  }
+
+  public static initItems(state: InvoiceState, action: PayloadAction<InvoiceItem[]>)
+  {
+    state.items = action.payload || [];
   }
 
   public static onInvoiceSettlementAmountChange(state: InvoiceState, action: PayloadAction<number>)

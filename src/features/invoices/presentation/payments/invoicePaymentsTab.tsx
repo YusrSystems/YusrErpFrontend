@@ -10,7 +10,6 @@ import { addVoucher, removeVoucher, updateVoucher } from "../../logic/invoiceSli
 export default function InvoicePaymentsTab()
 {
   const {
-    mode,
     formData,
     authState,
     dispatch
@@ -34,8 +33,8 @@ export default function InvoicePaymentsTab()
                 invoiceId: formData.id,
                 paymentMethodId: authState.setting?.mainPaymentMethodId,
                 paymentMethodName: authState.setting?.mainPaymentMethodName,
-                accountId: undefined,
-                accountName: undefined,
+                accountId: formData.actionAccountId,
+                accountName: formData.actionAccountName,
                 invoiceRelationType: InvoiceRelationType.Payment,
                 amount: 0,
                 amountReceived: 0,
@@ -76,7 +75,7 @@ export default function InvoicePaymentsTab()
                       value={ row.paymentMethodId?.toString() }
                       columnsNames={ PaymentMethodFilterColumns.columnsNames }
                       onSearch={ (condition) => dispatch(PaymentMethodSlice.entityActions.filter(condition)) }
-                      disabled={ paymentMethodState.isLoading || mode === "update" }
+                      disabled={ paymentMethodState.isLoading }
                       onValueChange={ (val) =>
                       {
                         const selected = paymentMethodState.entities.data?.find((a) => a.id.toString() === val);

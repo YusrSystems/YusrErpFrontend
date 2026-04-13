@@ -41,6 +41,7 @@ export const invoiceSliceUI = createSlice({
     removeItem: InvoiceItemsActions.removeItem,
     updateItem: InvoiceItemsActions.updateItem,
     resetItems: InvoiceItemsActions.resetItems,
+    initItems: InvoiceItemsActions.initItems,
     onInvoiceItemIupmChange: InvoiceItemsActions.onInvoiceItemIupmChange,
     onInvoiceItemQuantityChange: InvoiceItemsActions.onInvoiceItemQuantityChange,
     onInvoiceItemTaxInclusivePriceChange: InvoiceItemsActions.onInvoiceItemTaxInclusivePriceChange,
@@ -53,6 +54,7 @@ export const invoiceSliceUI = createSlice({
     removeVoucher: InvoiceVouchersActions.removeVoucher,
     updateVoucher: InvoiceVouchersActions.updateVoucher,
     resetVouchers: InvoiceVouchersActions.resetVouchers,
+    initVouchers: InvoiceVouchersActions.initVouchers,
     resetPaymentVouchers: InvoiceVouchersActions.resetPaymentVouchers,
     resetCostVouchers: InvoiceVouchersActions.resetCostVouchers
   },
@@ -74,6 +76,7 @@ export const {
   removeItem,
   updateItem,
   resetItems,
+  initItems,
   onInvoiceItemIupmChange,
   onInvoiceItemQuantityChange,
   onInvoiceItemTaxInclusivePriceChange,
@@ -86,6 +89,7 @@ export const {
   removeVoucher,
   updateVoucher,
   resetVouchers,
+  initVouchers,
   resetPaymentVouchers,
   resetCostVouchers
 } = invoiceSliceUI.actions;

@@ -35,9 +35,6 @@ export const ArabicLabels: Record<string, string> = {
   // Allowed Invoice Types
   [SystemPermissionsResources.InvoiceSell]: "فاتورة بيع",
   [SystemPermissionsResources.InvoicePurchase]: "فاتورة شراء",
-  [SystemPermissionsResources.InvoiceSellReturn]: "فاتورة مرتجع بيع",
-  [SystemPermissionsResources.InvoicePurchaseReturn]: "فاتورة مرتجع شراء",
-  [SystemPermissionsResources.InvoiceQuotation]: "عرض سعر",
 
   // Allowed Account Types
   [SystemPermissionsResources.AccountShowBalance]: "عرض الرصيد",
@@ -117,9 +114,6 @@ export const PERMISSION_SECTIONS = [{
     SystemPermissionsResources.InvoiceSellBeyondAvailableQuantity,
     SystemPermissionsResources.InvoiceSell,
     SystemPermissionsResources.InvoicePurchase,
-    SystemPermissionsResources.InvoiceSellReturn,
-    SystemPermissionsResources.InvoicePurchaseReturn,
-    SystemPermissionsResources.InvoiceQuotation
   ]
 }, {
   id: "accounts",

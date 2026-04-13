@@ -50,6 +50,11 @@ export default class InvoiceVouchersActions
     state.vouchers = [];
   }
 
+  public static initVouchers(state: InvoiceState, action: PayloadAction<InvoiceVoucher[]>)
+  {
+    state.vouchers = action.payload || [];
+  }
+
   public static resetPaymentVouchers(state: InvoiceState)
   {
     state.vouchers = state.vouchers.filter((v) => v.invoiceRelationType !== InvoiceRelationType.Payment);
