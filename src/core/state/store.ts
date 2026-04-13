@@ -92,6 +92,7 @@ export const store = configureStore({
     item: ItemSlice.entityReducer,
     itemDialog: ItemSlice.dialogReducer,
     pricingMethod: PricingMethodSlice.entityReducer,
+    pricingMethodForm: PricingMethodSlice.formReducer,
     pricingMethodDialog: PricingMethodSlice.dialogReducer,
     stocktaking: StocktakingSlice.entityReducer,
     stocktakingForm: StocktakingSlice.formReducer,

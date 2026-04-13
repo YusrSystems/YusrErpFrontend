@@ -1,8 +1,8 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, FieldGroup, TextField, useEntityForm } from "@yusr_systems/ui";
+import { ChangeDialog, FieldGroup, TextField, useReduxEntityForm } from "@yusr_systems/ui";
 import { useMemo } from "react";
 import type PricingMethod from "../../core/data/pricingMethod";
+import { PricingMethodSlice, PricingMethodValidationRules } from "../../core/data/pricingMethod";
 
 export default function ChangePricingMethodDialog({
   entity,
@@ -11,26 +11,25 @@ export default function ChangePricingMethodDialog({
   onSuccess
 }: CommonChangeDialogProps<PricingMethod>)
 {
-  const validationRules: ValidationRule<Partial<PricingMethod>>[] = useMemo(
-    () => [{
-      field: "pricingMethodName",
-      selector: (d) => d.pricingMethodName,
-      validators: [Validators.required("يرجى إدخال اسم طريقة التسعير")]
-    }],
-    []
-  );
-
   const initialValues = useMemo(
     () => ({
       ...entity,
-      pricingMethodName: entity?.pricingMethodName || ""
+      pricingMethodName: entity?.name || ""
     }),
     [entity]
   );
 
-  const { formData, handleChange, getError, isInvalid, validate } = useEntityForm<PricingMethod>(
-    initialValues,
-    validationRules
+  const {
+    formData,
+    handleChange,
+    validate,
+    getError,
+    isInvalid
+  } = useReduxEntityForm<PricingMethod>(
+    PricingMethodSlice.formActions,
+    (state) => state.pricingMethodForm,
+    PricingMethodValidationRules.validationRules,
+    initialValues
   );
 
   return (
@@ -48,10 +47,10 @@ export default function ChangePricingMethodDialog({
         <TextField
           label="اسم طريقة التسعير"
           required
-          value={ formData.pricingMethodName || "" }
-          onChange={ (e) => handleChange({ pricingMethodName: e.target.value }) }
-          isInvalid={ isInvalid("pricingMethodName") }
-          error={ getError("pricingMethodName") }
+          value={ formData.name || "" }
+          onChange={ (e) => handleChange({ name: e.target.value }) }
+          isInvalid={ isInvalid("name") }
+          error={ getError("name") }
         />
       </FieldGroup>
     </ChangeDialog>

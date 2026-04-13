@@ -47,7 +47,7 @@ export default function PricingMethodsPage()
         rowStyles: "w-70"
       }] }
       tableRowMapper={ (pricingMethod: PricingMethod) => [{ rowName: `#${pricingMethod.id}`, rowStyles: "" }, {
-        rowName: pricingMethod.pricingMethodName,
+        rowName: pricingMethod.name,
         rowStyles: "font-semibold"
       }] }
       actions={ {
