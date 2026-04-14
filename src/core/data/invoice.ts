@@ -140,12 +140,7 @@ export default class Invoice extends BaseEntity
 
 export class InvoiceFilterColumns
 {
-  public static columnsNames: ColumnName[] = [
-    { label: "رقم الفاتورة", value: "Id" },
-    { label: "اسم الحساب", value: "ActionAccountName" },
-    { label: "المستودع", value: "StoreName" },
-    { label: "المندوب", value: "DelegateEmp" }
-  ];
+  public static columnsNames: ColumnName[] = [{ label: "رقم الفاتورة", value: "Id" }];
 }
 
 export class InvoiceValidationRules
@@ -169,7 +164,7 @@ export class InvoiceValidationRules
   }, {
     field: "invoiceItems",
     selector: (d) => d.invoiceItems,
-    validators: [Validators.arrayMinLength(1, ("يرجى إضافة بند واحد على الأقل للفاتورة"))]
+    validators: [Validators.arrayMinLength(1, "يرجى إضافة بند واحد على الأقل للفاتورة")]
   }];
 }
 

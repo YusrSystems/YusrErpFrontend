@@ -6,15 +6,17 @@ import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import Account, { type AccountSliceType } from "../../core/data/account";
 import { FilterByTypeRequest } from "../../core/data/filterByTypeRequest";
 import type Invoice from "../../core/data/invoice";
-import { InvoiceRelationType, InvoiceSlice, InvoiceStatus, InvoiceType, InvoiceValidationRules } from "../../core/data/invoice";
+import { InvoiceRelationType, InvoiceSlice, InvoiceStatus, InvoiceType, InvoiceValidationRules, InvoiceVoucher } from "../../core/data/invoice";
 import { ItemType } from "../../core/data/item";
 import { PaymentMethodSlice } from "../../core/data/paymentMethod";
 import { StoreSlice } from "../../core/data/store";
+import InvoicesApiService from "../../core/networking/invoiceApiService";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
 import { InvoiceContext } from "./logic/invoiceContext";
 import InvoiceItemsMath from "./logic/invoiceItemsMath";
 import InvoiceBasicTab from "./presentation/basic/invoiceBasicTab";
+import AlertConvertDialog from "./presentation/conversionToSell/alertConvertDialog";
 import InvoiceCostsTab from "./presentation/costs/invoiceCostsTab";
 import InvoiceFilesTab from "./presentation/files/invoiceFilesTab";
 import InvoicePaymentsTab from "./presentation/payments/invoicePaymentsTab";
@@ -76,6 +78,10 @@ export default function ChangeInvoiceDialog({
 
   const { formData, errors } = useAppSelector(selectFormState);
   const { getError, isInvalid } = useFormErrors(errors);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [warnings, setWarnings] = useState<string[]>([]);
+  const [showWarnings, setShowWarnings] = useState(false);
+
   const paymentVouchers = () =>
     formData.invoiceVouchers?.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment) ?? [];
   const { validate } = useValidate(
@@ -110,20 +116,7 @@ export default function ChangeInvoiceDialog({
     if (paymentVouchers().length === 0)
     {
       dispatch(slice.formActions.resetPaymentVouchers({}));
-      dispatch(slice.formActions.addVoucher(
-        {
-          voucherId: 0,
-          invoiceId: formData.id ?? 0,
-          paymentMethodId: authState.setting?.mainPaymentMethodId ?? 0,
-          paymentMethodName: authState.setting?.mainPaymentMethodName ?? "",
-          accountId: formData.actionAccountId ?? 0,
-          accountName: formData.actionAccountName ?? "",
-          invoiceRelationType: InvoiceRelationType.Payment,
-          amount: invoiceTaxInclusivePrice(),
-          amountReceived: invoiceTaxInclusivePrice(),
-          description: undefined
-        }
-      ));
+      dispatch(slice.formActions.addVoucher(createInitialPaymentVoucher()));
     }
     else if (paymentVouchers().length === 1)
     {
@@ -134,19 +127,23 @@ export default function ChangeInvoiceDialog({
       };
       dispatch(slice.formActions.updateVoucher(updatedVoucher));
     }
-    console.log(invoiceTaxInclusivePrice());
     dispatch(slice.formActions.updateFormData({ fullAmount: invoiceTaxInclusivePrice() }));
   }, [formData.invoiceItems]);
 
   useEffect(() =>
   {
-    if (mode === "update" && entity?.id)
+    if (mode === "update" && formData?.id != undefined)
     {
       setInitLoading(true);
 
       const getItem = async () =>
       {
-        const res = await service.Get(entity.id);
+        if (formData.id == undefined)
+        {
+          return;
+        }
+
+        const res = await service.Get(formData.id);
         if (res.data != undefined)
         {
           dispatch(slice.formActions.setInitialData(res.data));
@@ -156,7 +153,51 @@ export default function ChangeInvoiceDialog({
 
       getItem();
     }
-  }, [entity?.id, mode]);
+  }, [formData?.id, mode]);
+
+  const createInitialPaymentVoucher = (): InvoiceVoucher =>
+  {
+    return {
+      voucherId: 0,
+      invoiceId: formData.id ?? 0,
+      paymentMethodId: authState.setting?.mainPaymentMethodId ?? 0,
+      paymentMethodName: authState.setting?.mainPaymentMethodName ?? "",
+      accountId: formData.actionAccountId ?? 0,
+      accountName: formData.actionAccountName ?? "",
+      invoiceRelationType: InvoiceRelationType.Payment,
+      amount: invoiceTaxInclusivePrice(),
+      amountReceived: invoiceTaxInclusivePrice(),
+      description: undefined
+    } as InvoiceVoucher;
+  };
+
+  const convertToSell = async (ignoreWarnings = false) =>
+  {
+    if (!formData?.id)
+    {
+      return;
+    }
+
+    setInitLoading(true);
+    setShowConfirm(false);
+    const res = await new InvoicesApiService().ConvertToSell(formData.id, ignoreWarnings, [
+      createInitialPaymentVoucher()
+    ]);
+    if (res.status === 412)
+    {
+      setWarnings(res.errorDetails?.split("\n") ?? []);
+      setShowWarnings(true);
+      setInitLoading(false);
+      return;
+    }
+
+    if (res.data != undefined)
+    {
+      dispatch(slice.formActions.updateFormData(res.data));
+      onSuccess?.(res.data, "update");
+    }
+    setInitLoading(false);
+  };
 
   if (initLoading)
   {
@@ -196,13 +237,25 @@ export default function ChangeInvoiceDialog({
     >
       <ChangeDialogTabbed<Invoice>
         changeDialogProps={ {
-          title: `${mode === "create" ? "إنشاء" : "تعديل"} فاتورة`,
+          title: `${mode === "create" ? "إضافة" : "تعديل"} فاتورة`,
           className: "sm:max-w-[90vw]",
           formData,
           dialogMode: mode,
           service,
           onSuccess: (data) => onSuccess?.(data, mode),
-          validate
+          validate,
+          actionButtons: formData.type === InvoiceType.Quotation && mode === "update"
+            ? (
+              <AlertConvertDialog
+                showConfirm={ showConfirm }
+                setShowConfirm={ setShowConfirm }
+                convertToSell={ convertToSell }
+                warnings={ warnings }
+                showWarnings={ showWarnings }
+                setShowWarnings={ setShowWarnings }
+              />
+            )
+            : undefined
         } }
         tabs={ [
           {

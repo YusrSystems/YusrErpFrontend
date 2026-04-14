@@ -5,7 +5,8 @@ import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type Account from "../../core/data/account";
 import type { AccountSliceType } from "../../core/data/account";
-import Invoice, { InvoiceFilterColumns, InvoiceSlice, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
+import Invoice, { EInvoiceStatus, InvoiceFilterColumns, InvoiceSlice, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
+import { EInvoicingEnvironmentType } from "../../core/data/setting";
 import InvoicesApiService from "../../core/networking/invoiceApiService";
 import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
 import ChangeInvoiceDialog from "./changeInvoiceDialog";
@@ -32,12 +33,65 @@ export default function InvoicesPage({
 {
   const dispatch = useAppDispatch();
   const invoiceState = useAppSelector((state) => state[stateKey] as IEntityState<Invoice>);
+  const authState = useAppSelector((state) => state.auth);
   const invoiceDialogState = useAppSelector((state) => state[dialogStateKey] as IDialogState<Invoice>);
 
   // Update with your actual permission resource enum
   const permissions = useAppSelector((state) =>
     selectPermissionsByResource(state, SystemPermissionsResources.Invoices)
   );
+
+  const getPaymentStatus = (invoice: Invoice): { message: string; styles: string; } =>
+  {
+    if (invoice.paidAmount === 0)
+    {
+      return { message: "غير مدفوعة", styles: "bg-red-100 text-red-800" };
+    }
+
+    if (invoice.paidAmount === invoice.fullAmount)
+    {
+      return { message: "مدفوعة بالكامل", styles: "bg-green-100 text-green-800" };
+    }
+
+    if (invoice.paidAmount > invoice.fullAmount)
+    {
+      return { message: "مدفوعة أكثر من اللازم", styles: "bg-red-100 text-red-800" };
+    }
+
+    return {
+      message: `مدفوعة جزئيا (${invoice.paidAmount} ${authState.setting?.currency?.code})`,
+      styles: "bg-orange-100 text-orange-800"
+    };
+  };
+
+  const getEInvoiceStatus = (invoice: Invoice): { message: string; styles: string; } =>
+  {
+    if (
+      authState.setting?.eInvoicingEnvironmentType === EInvoicingEnvironmentType.NotRegistered
+      || invoice.statusId !== InvoiceStatus.Valid
+      || (invoice.type !== InvoiceType.Sell && invoice.type !== InvoiceType.SellReturn)
+    )
+    {
+      return { message: "", styles: "" };
+    }
+
+    if (invoice.eInvoiceStatus === EInvoiceStatus.NotSent)
+    {
+      return { message: "لم ترسل", styles: "bg-red-100 text-red-800" };
+    }
+
+    if (invoice.eInvoiceStatus === EInvoiceStatus.SentWithWarnings)
+    {
+      return { message: "أرسلت مع تحذيرات", styles: "bg-orange-100 text-orange-800" };
+    }
+
+    if (invoice.eInvoiceStatus === EInvoiceStatus.SentCorrectly)
+    {
+      return { message: "أرسلت", styles: "bg-green-100 text-green-800" };
+    }
+
+    return { message: "", styles: "" };
+  };
 
   const service = useMemo(() => new InvoicesApiService(), []);
 
@@ -64,7 +118,11 @@ export default function InvoicesPage({
         { rowName: "الحساب", rowStyles: "w-48" },
         { rowName: "المستودع", rowStyles: "w-32" },
         { rowName: "الإجمالي", rowStyles: "w-32" },
-        { rowName: "الحالة", rowStyles: "" }
+        { rowName: "الحالة", rowStyles: "w-32" },
+        { rowName: "", rowStyles: "w-32" },
+        ...(authState.setting?.eInvoicingEnvironmentType !== EInvoicingEnvironmentType.NotRegistered
+          ? [{ rowName: "حالة الفاتورة الإلكترونية", rowStyles: "w-32" }]
+          : [])
       ] }
       tableRowMapper={ (invoice: Invoice) => [
         { rowName: `#${invoice.id}`, rowStyles: "" },
@@ -89,7 +147,21 @@ export default function InvoicesPage({
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
           }`
-        }
+        },
+        {
+          rowName: getPaymentStatus(invoice).message,
+          rowStyles: `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            getPaymentStatus(invoice).styles
+          }`
+        },
+        ...(authState.setting?.eInvoicingEnvironmentType !== EInvoicingEnvironmentType.NotRegistered
+          ? [{
+            rowName: getEInvoiceStatus(invoice).message,
+            rowStyles: `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              getEInvoiceStatus(invoice).styles
+            }`
+          }]
+          : [])
       ] }
       actions={ {
         filter: slice.entityActions.filter,
