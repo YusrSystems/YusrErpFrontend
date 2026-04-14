@@ -1,66 +1,50 @@
-import { type ValidationRule, Validators } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useEntityForm } from "@yusr_systems/ui";
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { BanknoteArrowDown, BanknoteArrowUp, Box, FolderKanban, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
 import type Invoice from "../../core/data/invoice";
-import { InvoiceRelationType, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
+import { InvoiceRelationType, InvoiceSlice, InvoiceStatus, InvoiceType, InvoiceValidationRules } from "../../core/data/invoice";
 import { ItemType } from "../../core/data/item";
 import { PaymentMethodSlice } from "../../core/data/paymentMethod";
 import { StoreSlice } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
-import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
 import { InvoiceContext } from "./logic/invoiceContext";
-import { CalcInvoicePaidPrice, CalcInvoiceTaxInclusivePrice } from "./logic/invoiceItemsMath";
-import { addVoucher, initItems, initVouchers, resetItems, resetPaymentVouchers, resetVouchers, updateVoucher } from "./logic/invoiceSliceUI";
+import InvoiceItemsMath from "./logic/invoiceItemsMath";
 import InvoiceBasicTab from "./presentation/basic/invoiceBasicTab";
 import InvoiceCostsTab from "./presentation/costs/invoiceCostsTab";
 import InvoiceFilesTab from "./presentation/files/invoiceFilesTab";
 import InvoicePaymentsTab from "./presentation/payments/invoicePaymentsTab";
 import InvoicePolicyTab from "./presentation/policy/invoicePolicyTab";
 
+export type InvoiceSliceType = ReturnType<typeof InvoiceSlice.create>;
+
 export default function ChangeInvoiceDialog({
   entity,
   mode,
   service,
-  onSuccess
-}: CommonChangeDialogProps<Invoice>)
+  onSuccess,
+  slice,
+  fixedType,
+  selectFormState
+}: CommonChangeDialogProps<Invoice> & {
+  slice: InvoiceSliceType;
+  stateKey: keyof RootState;
+  fixedType?: InvoiceType;
+  selectFormState: (state: any) => { formData: Partial<Invoice>; errors: Record<string, string>; };
+})
 {
   const [initLoading, setInitLoading] = useState(false);
   const dispatch = useAppDispatch();
   const authState = useAppSelector((state) => state.auth);
-  const { items, vouchers } = useAppSelector((state) => state.invoiceUI);
-  const paymentVouchers = () => vouchers.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment);
-  const invoiceTaxInclusivePrice = useAppSelector(CalcInvoiceTaxInclusivePrice);
-  const invoicePaidPrice = useAppSelector(CalcInvoicePaidPrice);
-
-  const validationRules: ValidationRule<Partial<Invoice>>[] = useMemo(
-    () => [{
-      field: "type",
-      selector: (d) => d.type,
-      validators: [Validators.required("يرجى اختيار نوع الفاتورة")]
-    }, {
-      field: "date",
-      selector: (d) => d.date,
-      validators: [Validators.required("يرجى إدخال تاريخ الفاتورة")]
-    }, {
-      field: "storeId",
-      selector: (d) => d.storeId,
-      validators: [Validators.required("يرجى تحديد المستودع")]
-    }, {
-      field: "actionAccountId",
-      selector: (d) => d.actionAccountId,
-      validators: [Validators.required("يرجى تحديد الحساب")]
-    }],
-    []
-  );
+  const invoiceTaxInclusivePrice = () => InvoiceItemsMath.CalcInvoiceTaxInclusivePrice(formData?.invoiceItems ?? []);
 
   const initialValues = useMemo(
     () => ({
       ...entity,
-      type: entity?.type ?? InvoiceType.Sell,
+      type: entity?.type ?? fixedType,
       actionAccountId: entity?.actionAccountId
         ?? (entity?.type === InvoiceType.Purchase
           ? authState.setting?.purchaseAccountId
@@ -78,15 +62,23 @@ export default function ChangeInvoiceDialog({
       settlementAmount: entity?.settlementAmount ?? 0,
       settlementPercent: entity?.settlementPercent ?? 0,
       paidAmount: entity?.paidAmount ?? 0,
-      fullAmount: entity?.fullAmount ?? 0
+      fullAmount: entity?.fullAmount ?? 0,
+      invoiceItems: entity?.invoiceItems ?? [],
+      invoiceVouchers: entity?.invoiceVouchers ?? [],
     }),
     [entity]
   );
 
-  const { formData, handleChange, getError, clearError, isInvalid, validate } = useEntityForm<Invoice>(
-    initialValues,
-    validationRules
+  const { formData, errors } = useAppSelector(selectFormState);
+  const { getError, isInvalid } = useFormErrors(errors);
+  const paymentVouchers = () =>
+    formData.invoiceVouchers?.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment) ?? [];
+  const { validate } = useValidate(
+    formData,
+    InvoiceValidationRules.validationRules,
+    (errors) => dispatch(slice.formActions.setErrors(errors))
   );
+  useFormInit(slice.formActions.setInitialData, initialValues);
 
   useEffect(() =>
   {
@@ -113,8 +105,8 @@ export default function ChangeInvoiceDialog({
   {
     if (paymentVouchers().length === 0)
     {
-      dispatch(resetPaymentVouchers());
-      dispatch(addVoucher(
+      dispatch(slice.formActions.resetPaymentVouchers({}));
+      dispatch(slice.formActions.addVoucher(
         {
           voucherId: 0,
           invoiceId: formData.id ?? 0,
@@ -123,8 +115,8 @@ export default function ChangeInvoiceDialog({
           accountId: formData.actionAccountId ?? 0,
           accountName: formData.actionAccountName ?? "",
           invoiceRelationType: InvoiceRelationType.Payment,
-          amount: invoiceTaxInclusivePrice,
-          amountReceived: invoiceTaxInclusivePrice,
+          amount: invoiceTaxInclusivePrice(),
+          amountReceived: invoiceTaxInclusivePrice(),
           description: undefined
         }
       ));
@@ -133,30 +125,15 @@ export default function ChangeInvoiceDialog({
     {
       const updatedVoucher = {
         ...paymentVouchers()[0],
-        amount: invoiceTaxInclusivePrice,
-        amountReceived: invoiceTaxInclusivePrice
+        amount: invoiceTaxInclusivePrice(),
+        amountReceived: invoiceTaxInclusivePrice()
       };
-      dispatch(updateVoucher(updatedVoucher));
+      dispatch(slice.formActions.updateVoucher(updatedVoucher));
     }
-
-    handleChange({ fullAmount: invoiceTaxInclusivePrice, invoiceItems: items });
-  }, [items, invoiceTaxInclusivePrice]);
+  }, [formData.invoiceItems]);
 
   useEffect(() =>
   {
-    handleChange({ paidAmount: invoicePaidPrice });
-  }, [items, invoicePaidPrice]);
-
-  useEffect(() =>
-  {
-    handleChange({ paidAmount: invoicePaidPrice, invoiceVouchers: vouchers });
-  }, [vouchers, invoicePaidPrice]);
-
-  useEffect(() =>
-  {
-    dispatch(resetItems());
-    dispatch(resetVouchers());
-
     if (mode === "update" && entity?.id)
     {
       setInitLoading(true);
@@ -164,9 +141,10 @@ export default function ChangeInvoiceDialog({
       const getItem = async () =>
       {
         const res = await service.Get(entity.id);
-        handleChange({ ...res.data });
-        dispatch(initItems(res.data?.invoiceItems ?? []));
-        dispatch(initVouchers(res.data?.invoiceVouchers ?? []));
+        if (res.data != undefined)
+        {
+          dispatch(slice.formActions.setInitialData(res.data));
+        }
         setInitLoading(false);
       };
 
@@ -192,12 +170,12 @@ export default function ChangeInvoiceDialog({
   return (
     <InvoiceContext.Provider
       value={ {
-        mode,
         formData,
-        handleChange,
-        isInvalid,
+        errors,
         getError,
-        clearError,
+        isInvalid,
+        slice,
+        mode,
         authState,
         dispatch
       } }

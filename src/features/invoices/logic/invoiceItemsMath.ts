@@ -1,7 +1,6 @@
 import { InvoiceItem, InvoiceRelationType, InvoiceVoucher } from "../../../core/data/invoice";
 import type { InvoiceItemProfitResult } from "../../../core/data/InvoiceItemProfitResult";
 import type { InvoiceProfitResult } from "../../../core/data/InvoiceProfitResult";
-import type { RootState } from "../../../core/state/store";
 
 export default class InvoiceItemsMath
 {
@@ -120,23 +119,16 @@ export default class InvoiceItemsMath
       profit: profit
     };
   }
+
+  public static CalcInvoicePaidPrice(invoiceVouchers: InvoiceVoucher[])
+  {
+    let paymentVouchers = invoiceVouchers?.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment) ?? [];
+    return paymentVouchers?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0;
+  }
+
+  public static CalcInvoiceUnpaidPrice(invoiceItems: InvoiceItem[], invoiceVouchers: InvoiceVoucher[])
+  {
+    return InvoiceItemsMath.CalcInvoiceTaxInclusivePrice(invoiceItems)
+      - InvoiceItemsMath.CalcInvoicePaidPrice(invoiceVouchers);
+  }
 }
-
-export const CalcInvoicePaidPrice = (state: RootState) =>
-{
-  let paymentVouchers = state.invoiceUI.vouchers.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment);
-  return paymentVouchers?.reduce((sum, i) => sum + (i.amount ?? 0), 0) ?? 0;
-};
-
-export const CalcInvoiceUnpaidPrice = (state: RootState) =>
-  CalcInvoiceTaxInclusivePrice(state) - CalcInvoicePaidPrice(state);
-
-export const CalcInvoiceTaxExclusivePrice = (state: RootState) =>
-{
-  return InvoiceItemsMath.CalcInvoiceTaxExclusivePrice(state.invoiceUI.items);
-};
-
-export const CalcInvoiceTaxInclusivePrice = (state: RootState) =>
-{
-  return InvoiceItemsMath.CalcInvoiceTaxInclusivePrice(state.invoiceUI.items);
-};

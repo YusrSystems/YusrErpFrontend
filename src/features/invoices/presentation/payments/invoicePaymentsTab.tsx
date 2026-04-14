@@ -4,20 +4,23 @@ import { InvoiceRelationType } from "../../../../core/data/invoice";
 import { PaymentMethodFilterColumns, PaymentMethodSlice } from "../../../../core/data/paymentMethod";
 import { useAppSelector } from "../../../../core/state/store";
 import { useInvoiceContext } from "../../logic/invoiceContext";
-import { CalcInvoiceUnpaidPrice } from "../../logic/invoiceItemsMath";
-import { addVoucher, removeVoucher, updateVoucher } from "../../logic/invoiceSliceUI";
+import InvoiceItemsMath from "../../logic/invoiceItemsMath";
 
 export default function InvoicePaymentsTab()
 {
   const {
     formData,
     authState,
+    slice,
     dispatch
   } = useInvoiceContext();
-  const { vouchers } = useAppSelector((state) => state.invoiceUI);
   const paymentMethodState = useAppSelector((state) => state.paymentMethod);
-  const paymentVouchers = () => vouchers.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment);
-  const unpaidPrice = useAppSelector(CalcInvoiceUnpaidPrice);
+  const paymentVouchers = () =>
+    formData.invoiceVouchers?.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment) ?? [];
+  const unpaidPrice = InvoiceItemsMath.CalcInvoiceUnpaidPrice(
+    formData.invoiceItems ?? [],
+    formData.invoiceVouchers ?? []
+  );
 
   return (
     <div className="flex flex-col gap-2 items-end">
@@ -27,7 +30,7 @@ export default function InvoicePaymentsTab()
           className="max-w-40"
           size="lg"
           onClick={ () =>
-            dispatch(addVoucher(
+            dispatch(slice.formActions.addVoucher(
               {
                 voucherId: 0,
                 invoiceId: formData.id ?? 0,
@@ -81,7 +84,7 @@ export default function InvoicePaymentsTab()
                         const selected = paymentMethodState.entities.data?.find((a) => a.id.toString() === val);
                         if (selected)
                         {
-                          dispatch(updateVoucher({
+                          dispatch(slice.formActions.updateVoucher({
                             ...row,
                             paymentMethodId: selected?.id,
                             paymentMethodName: selected?.name
@@ -102,7 +105,7 @@ export default function InvoicePaymentsTab()
                     {
                       if (val != undefined)
                       {
-                        dispatch(updateVoucher({ ...row, amount: val }));
+                        dispatch(slice.formActions.updateVoucher({ ...row, amount: val }));
                       }
                     } }
                   />
@@ -112,7 +115,7 @@ export default function InvoicePaymentsTab()
                   <NumberField
                     label=""
                     value={ row.amountReceived || "0" }
-                    onChange={ (val) => dispatch(updateVoucher({ ...row, amountReceived: val })) }
+                    onChange={ (val) => dispatch(slice.formActions.updateVoucher({ ...row, amountReceived: val })) }
                   />
                 </td>
 
@@ -131,7 +134,7 @@ export default function InvoicePaymentsTab()
                     type="button"
                     onClick={ () =>
                     {
-                      dispatch(removeVoucher(row.voucherId));
+                      dispatch(slice.formActions.removeVoucher(row.voucherId));
                     } }
                     className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
                     aria-label="حذف السند"

@@ -1,7 +1,7 @@
 import { cn } from "@yusr_systems/ui";
 import { useEffect, useRef } from "react";
-import { useAppSelector } from "../../../../core/state/store";
-import { CalcInvoicePaidPrice, CalcInvoiceTaxExclusivePrice, CalcInvoiceTaxInclusivePrice, CalcInvoiceUnpaidPrice } from "../../logic/invoiceItemsMath";
+import { useInvoiceContext } from "../../logic/invoiceContext";
+import InvoiceItemsMath from "../../logic/invoiceItemsMath";
 
 interface StatCellProps
 {
@@ -32,7 +32,10 @@ function StatCell({ label, value, icon, variant = "default" }: StatCellProps)
           maximumFractionDigits: 2
         });
       }
-      if (t < 1) requestAnimationFrame(tick);
+      if (t < 1)
+      {
+        requestAnimationFrame(tick);
+      }
     };
 
     requestAnimationFrame(tick);
@@ -51,7 +54,7 @@ function StatCell({ label, value, icon, variant = "default" }: StatCellProps)
         className={ cn(
           "pointer-events-none select-none absolute -bottom-2 right-2",
           "text-[3.5rem] font-bold leading-none",
-          variant === "default" && "text-foreground/[0.04]",
+          variant === "default" && "text-foreground/4",
           variant === "paid" && "text-emerald-600/10 dark:text-emerald-400/10",
           variant === "remaining" && "text-red-600/10 dark:text-red-400/10"
         ) }
@@ -87,10 +90,11 @@ function StatCell({ label, value, icon, variant = "default" }: StatCellProps)
 
 export default function InvoiceItemsSummary()
 {
-  const taxExclusive = useAppSelector(CalcInvoiceTaxExclusivePrice);
-  const taxInclusive = useAppSelector(CalcInvoiceTaxInclusivePrice);
-  const paid = useAppSelector(CalcInvoicePaidPrice);
-  const unpaid = useAppSelector(CalcInvoiceUnpaidPrice);
+  const { formData } = useInvoiceContext();
+  const taxExclusive = InvoiceItemsMath.CalcInvoiceTaxExclusivePrice(formData.invoiceItems ?? []);
+  const taxInclusive = InvoiceItemsMath.CalcInvoiceTaxInclusivePrice(formData.invoiceItems ?? []);
+  const paid = InvoiceItemsMath.CalcInvoicePaidPrice(formData.invoiceVouchers ?? []);
+  const unpaid = InvoiceItemsMath.CalcInvoiceUnpaidPrice(formData.invoiceItems ?? [], formData.invoiceVouchers ?? []);
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 border border-border rounded-lg overflow-hidden bg-background rtl flex-1 divide-x divide-y divide-border [direction:rtl]">

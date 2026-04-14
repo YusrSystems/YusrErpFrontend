@@ -3,9 +3,9 @@ import { useInvoiceContext } from "../../logic/invoiceContext";
 
 export default function InvoiceFilesTab()
 {
-  const { formData, handleChange } = useInvoiceContext();
+  const { formData, slice, dispatch } = useInvoiceContext();
   const { fileInputRef, handleFileChange, handleRemoveFile, handleDownload, showFilePreview, getFileSrc } =
-    useStorageFile(handleChange, "invoiceFiles");
+    useStorageFile((files) => dispatch(slice.formActions.onInvoiceFilesChange(files)), "invoiceFiles");
 
   return (
     <div className="w-full flex items-center justify-center shrink-0 bg-muted/10 p-4 rounded-lg border">

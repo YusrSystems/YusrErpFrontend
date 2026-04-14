@@ -4,16 +4,15 @@ import { createContext, useContext } from "react";
 import type { ThunkDispatch } from "redux-thunk";
 import type Invoice from "../../../core/data/invoice";
 import type { Setting } from "../../../core/data/setting";
+import type { InvoiceSliceType } from "../changeInvoiceDialog";
 
 export type InvoiceContextType = {
-  mode: DialogMode;
   formData: Partial<Invoice>;
-  handleChange: (
-    update: Partial<Invoice> | ((prev: Partial<Invoice>) => Partial<Invoice>)
-  ) => void;
-  isInvalid: (field: string) => boolean;
+  errors: Record<string, string>;
   getError: (field: string) => string;
-  clearError: (field: string) => void;
+  isInvalid: (field: string) => boolean;
+  slice: InvoiceSliceType;
+  mode: DialogMode;
   authState: AuthState<User, Setting>;
   dispatch: ThunkDispatch<any, any, any>;
 };

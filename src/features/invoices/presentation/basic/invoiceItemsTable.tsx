@@ -5,21 +5,25 @@ import React from "react";
 import { SystemPermissionsActions } from "../../../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../../../core/auth/systemPermissionsResources";
 import { InvoiceType } from "../../../../core/data/invoice";
-import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
+import { useInvoiceContext } from "../../logic/invoiceContext";
 import InvoiceItemsMath from "../../logic/invoiceItemsMath";
-import { onInvoiceItemIupmChange, onInvoiceItemQuantityChange, onInvoiceItemSettlementChange, onInvoiceItemTaxInclusivePriceChange, removeItem, updateItem } from "../../logic/invoiceSliceUI";
 import { ItemProfitDialog } from "../profit/ItemProfitDialog";
 import EmptyTable from "./emptyTable";
 
 export default function InvoiceItemsTable()
 {
-  const dispatch = useAppDispatch();
-  const { items, errors, mode, type } = useAppSelector((state) => state.invoiceUI);
-  const authState = useAppSelector((state) => state.auth);
+  const {
+    mode,
+    formData,
+    errors,
+    slice,
+    authState,
+    dispatch
+  } = useInvoiceContext();
 
   const getMaxAllowedQuantity = (storeQuantity: number) =>
   {
-    if (type !== InvoiceType.Sell && type !== InvoiceType.Quotation)
+    if (formData.type !== InvoiceType.Sell && formData.type !== InvoiceType.Quotation)
     {
       return Number.MAX_SAFE_INTEGER;
     }
@@ -35,7 +39,7 @@ export default function InvoiceItemsTable()
 
   const getMinAllowedTaxInclusivePrice = (originaltaxInclusivePrice: number) =>
   {
-    if (type !== InvoiceType.Sell && type !== InvoiceType.Quotation)
+    if (formData.type !== InvoiceType.Sell && formData.type !== InvoiceType.Quotation)
     {
       return 0;
     }
@@ -49,7 +53,7 @@ export default function InvoiceItemsTable()
       : originaltaxInclusivePrice;
   };
 
-  if (items.length === 0)
+  if (formData.invoiceItems?.length === 0)
   {
     return <EmptyTable />;
   }
@@ -90,7 +94,7 @@ export default function InvoiceItemsTable()
             </tr>
           </thead>
           <tbody>
-            { items.map((row, index) => (
+            { formData.invoiceItems?.map((row, index) => (
               <React.Fragment key={ row.id }>
                 <tr
                   key={ row.id }
@@ -107,7 +111,7 @@ export default function InvoiceItemsTable()
                       label=""
                       value={ row.itemUnitPricingMethodId?.toString() || "" }
                       onValueChange={ (val: string) =>
-                        dispatch(onInvoiceItemIupmChange({ index: index, iupmId: Number(val) })) }
+                        dispatch(slice.formActions.onInvoiceItemIupmChange({ index: index, iupmId: Number(val) })) }
                       options={ row.itemUnitPricingMethods?.map((m) => ({
                         label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
                         value: m.id.toString()
@@ -129,7 +133,7 @@ export default function InvoiceItemsTable()
                       max={ getMaxAllowedQuantity(row.originalQuantity) }
                       value={ row.quantity ?? 1 }
                       onChange={ (newValue) =>
-                        dispatch(onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
+                        dispatch(slice.formActions.onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
                       disabled={ mode === "update" }
                     />
                   </td>
@@ -154,7 +158,12 @@ export default function InvoiceItemsTable()
                       min={ getMinAllowedTaxInclusivePrice(row.originaltaxInclusivePrice) }
                       value={ row.taxInclusivePrice || "0" }
                       onChange={ (newVal) =>
-                        dispatch(onInvoiceItemTaxInclusivePriceChange({ index: index, newPrice: Number(newVal) })) }
+                        dispatch(
+                          slice.formActions.onInvoiceItemTaxInclusivePriceChange({
+                            index: index,
+                            newPrice: Number(newVal)
+                          })
+                        ) }
                     />
                   </td>
 
@@ -169,7 +178,12 @@ export default function InvoiceItemsTable()
                         value={ row.settlement || "0" }
                         onChange={ (newValue) =>
                         {
-                          dispatch(onInvoiceItemSettlementChange({ index: index, newSettlement: Number(newValue) }));
+                          dispatch(
+                            slice.formActions.onInvoiceItemSettlementChange({
+                              index: index,
+                              newSettlement: Number(newValue)
+                            })
+                          );
                         } }
                       />
                     </td>
@@ -215,7 +229,7 @@ export default function InvoiceItemsTable()
                         type="button"
                         onClick={ () =>
                         {
-                          dispatch(removeItem(index));
+                          dispatch(slice.formActions.removeItem(index));
                         } }
                         className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
                         aria-label="حذف المادة"
@@ -234,7 +248,7 @@ export default function InvoiceItemsTable()
                       onChange={ (val) =>
                       {
                         dispatch(
-                          updateItem({
+                          slice.formActions.updateItem({
                             index: index,
                             item: { ...row, notes: typeof val === "string" ? val : val.target.value }
                           })

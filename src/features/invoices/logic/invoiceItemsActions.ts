@@ -1,37 +1,39 @@
-import { createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import { InvoiceItem, type InvoiceType } from "../../../core/data/invoice";
+import { type PayloadAction } from "@reduxjs/toolkit";
+import type { FormState } from "@yusr_systems/ui";
+import Invoice, { InvoiceItem } from "../../../core/data/invoice";
 import type { StoreItem } from "../../../core/data/item";
-import InvoicesApiService from "../../../core/networking/invoiceApiService";
 import InvoiceItemsMath from "./invoiceItemsMath";
-import type { InvoiceSettlments, InvoiceState } from "./invoiceSliceUI";
 
 export default class InvoiceItemsActions
 {
-  public static removeItem(state: InvoiceState, action: PayloadAction<number>)
+  public static removeItem(state: FormState<Invoice>, action: PayloadAction<number>)
   {
     const index = action.payload;
-    state.items.splice(index, 1);
+    state.formData.invoiceItems?.splice(index, 1);
   }
 
   public static updateItem(
-    state: InvoiceState,
-    action: PayloadAction<{ index: number; item: InvoiceState["items"][0]; }>
+    state: FormState<Invoice>,
+    action: PayloadAction<{ index: number; item: InvoiceItem; }>
   )
   {
     const item = action.payload.item;
-    state.items[action.payload.index] = item;
+    if (state.formData.invoiceItems != undefined)
+    {
+      state.formData.invoiceItems[action.payload.index] = item;
+    }
   }
 
-  public static addItem(state: InvoiceState, action: PayloadAction<StoreItem>)
+  public static addItem(state: FormState<Invoice>, action: PayloadAction<StoreItem>)
   {
     const storeItem = action.payload;
     const baseItem = storeItem.item;
 
-    const existingItem = state.items.find((item) => item.itemId === baseItem.id);
+    const existingItem = state.formData.invoiceItems?.find((item) => item.itemId === baseItem.id);
 
     if (existingItem)
     {
-      state.items = state.items.map((item) =>
+      state.formData.invoiceItems = state.formData.invoiceItems?.map((item) =>
         item.itemId === baseItem.id
           ? { ...item, quantity: item.quantity + 1 }
           : item
@@ -50,7 +52,7 @@ export default class InvoiceItemsActions
     );
     const taxInclusivePrice = InvoiceItemsMath.CalcTaxInclusivePrice(taxExclusivePrice, baseItem.totalTaxes || 0);
 
-    state.items.push({
+    state.formData.invoiceItems?.push({
       id: 0,
       invoiceId: 0,
       itemId: baseItem.id!,
@@ -68,7 +70,7 @@ export default class InvoiceItemsActions
       taxExclusivePrice: taxExclusivePrice,
       taxInclusivePrice: taxInclusivePrice,
       originaltaxInclusivePrice: taxInclusivePrice,
-      settlement: state.settlements.amount || 0,
+      settlement: state.formData.settlementAmount || 0,
       taxExclusiveTotalPrice: taxExclusivePrice,
       taxInclusiveTotalPrice: taxInclusivePrice,
 
@@ -83,12 +85,17 @@ export default class InvoiceItemsActions
   }
 
   public static onInvoiceItemIupmChange(
-    state: InvoiceState,
+    state: FormState<Invoice>,
     action: PayloadAction<{ index: number; iupmId: number; }>
   )
   {
+    if (state.formData.invoiceItems == undefined)
+    {
+      return;
+    }
+
     const { index, iupmId } = action.payload;
-    let row = state.items[index];
+    let row = state.formData.invoiceItems[index];
     const selectedMethod = row.itemUnitPricingMethods?.find((p) => p.id === iupmId);
     row.itemUnitPricingMethodId = iupmId;
     row.itemUnitPricingMethodName = selectedMethod?.itemUnitPricingMethodName || "";
@@ -114,16 +121,16 @@ export default class InvoiceItemsActions
   }
 
   public static onInvoiceItemQuantityChange(
-    state: InvoiceState,
+    state: FormState<Invoice>,
     action: PayloadAction<{ index: number; newQtn: number | undefined; }>
   )
   {
-    if (action.payload.newQtn == undefined)
+    if (action.payload.newQtn == undefined || state.formData.invoiceItems == undefined)
     {
       return;
     }
     const { index, newQtn } = action.payload;
-    let row = state.items[index];
+    let row = state.formData.invoiceItems[index];
     row.quantity = newQtn!;
     row.taxExclusiveTotalPrice = InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
       row.taxExclusivePrice,
@@ -141,16 +148,16 @@ export default class InvoiceItemsActions
   }
 
   public static onInvoiceItemSettlementChange(
-    state: InvoiceState,
+    state: FormState<Invoice>,
     action: PayloadAction<{ index: number; newSettlement: number | undefined; }>
   )
   {
-    if (action.payload.newSettlement == undefined)
+    if (action.payload.newSettlement == undefined || state.formData.invoiceItems == undefined)
     {
       return;
     }
     const { index, newSettlement } = action.payload;
-    let row = state.items[index];
+    let row = state.formData.invoiceItems[index];
     row.settlement = newSettlement || 0;
     row.taxExclusiveTotalPrice = InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
       row.taxExclusivePrice,
@@ -167,16 +174,16 @@ export default class InvoiceItemsActions
   }
 
   public static onInvoiceItemTaxInclusivePriceChange(
-    state: InvoiceState,
+    state: FormState<Invoice>,
     action: PayloadAction<{ index: number; newPrice: number | undefined; }>
   )
   {
-    if (action.payload.newPrice == undefined)
+    if (action.payload.newPrice == undefined || state.formData.invoiceItems == undefined)
     {
       return;
     }
     const { index, newPrice } = action.payload;
-    let row = state.items[index];
+    let row = state.formData.invoiceItems[index];
     row.taxInclusivePrice = newPrice!;
     row.taxExclusivePrice = InvoiceItemsMath.CalcTaxExclusivePrice(newPrice!, row.totalTaxesPerc);
     row.taxExclusiveTotalPrice = InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
@@ -193,33 +200,25 @@ export default class InvoiceItemsActions
     InvoiceItemsActions.updateItem(state, { payload: { index, item: row }, type: "updateItem" });
   }
 
-  public static resetItems(state: InvoiceState)
+  public static onInvoiceSettlementAmountChange(state: FormState<Invoice>, action: PayloadAction<number>)
   {
-    state.items = [];
-  }
-
-  public static initItems(state: InvoiceState, action: PayloadAction<InvoiceItem[]>)
-  {
-    state.items = action.payload || [];
-  }
-
-  public static onInvoiceSettlementAmountChange(state: InvoiceState, action: PayloadAction<number>)
-  {
-    state.settlements.amount = action.payload || 0;
-    state.items.forEach((_, i) =>
+    state.formData.settlementAmount = action.payload || 0;
+    state.formData.invoiceItems?.forEach((_, i) =>
       InvoiceItemsActions.onInvoiceItemSettlementChange(state, {
-        payload: { index: i, newSettlement: state.settlements.amount },
+        payload: { index: i, newSettlement: state.formData.settlementAmount },
         type: "onInvoiceItemSettlementChange"
       })
     );
   }
 
-  public static onInvoiceSettlementPercentChange(state: InvoiceState, action: PayloadAction<number>)
+  public static onInvoiceSettlementPercentChange(state: FormState<Invoice>, action: PayloadAction<number>)
   {
-    state.settlements.percent = action.payload || 0;
-    state.items.forEach((item, i) =>
+    state.formData.settlementPercent = action.payload || 0;
+    state.formData.invoiceItems?.forEach((item, i) =>
     {
-      const newSettlement = Number((item.taxInclusivePrice * (state.settlements.percent / 100)).toFixed(2));
+      const newSettlement = Number(
+        (item.taxInclusivePrice * ((state.formData.settlementPercent ?? 0) / 100)).toFixed(2)
+      );
 
       InvoiceItemsActions.onInvoiceItemSettlementChange(state, {
         payload: { index: i, newSettlement: newSettlement },
@@ -227,36 +226,4 @@ export default class InvoiceItemsActions
       });
     });
   }
-
-  public static setInvoiceType(state: InvoiceState, action: PayloadAction<InvoiceType>)
-  {
-    state.type = action.payload;
-  }
-
-  public static fetchInvoiceAsync = createAsyncThunk(
-    "invoice/fetchInvoice",
-    async (id: number): Promise<InvoiceState> =>
-    {
-      const service = new InvoicesApiService();
-      const response = await service.Get(id);
-
-      if (response.status !== 200)
-      {
-        return {} as InvoiceState;
-      }
-      const invoice = response.data;
-      const items = invoice?.invoiceItems;
-      const vouchers = invoice?.invoiceVouchers;
-      const settlement: InvoiceSettlments = {
-        amount: invoice?.settlementAmount ?? 0,
-        percent: invoice?.settlementPercent ?? 0
-      };
-
-      return {
-        items: items,
-        vouchers: vouchers,
-        settlements: settlement
-      } as InvoiceState;
-    }
-  );
 }

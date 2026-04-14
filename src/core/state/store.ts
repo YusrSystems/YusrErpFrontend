@@ -3,13 +3,12 @@ import { createAuthSlice, User } from "@yusr_systems/core";
 import { setupAuthListeners } from "@yusr_systems/ui";
 import { type TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import dashboardReducer from "../../features/dashboard/logic/dashboardSlice";
-import invoiceReducerUI from "../../features/invoices/logic/invoiceSliceUI";
 import { itemTransferReducer } from "../../features/itemTransfers/logic/itemTransferSlice";
 import registerReducer from "../../features/register/logic/registerSlice";
 import { BanksAndBoxesSlice, BanksSlice, BoxesSlice, ClientsAndSuppliersSlice, ClientsSlice, EmployeesSlice, SuppliersSlice } from "../data/account";
 import { BalanceTransferSlice } from "../data/balanceTransfer";
 import { BranchSlice } from "../data/branchLogic";
-import { InvoiceSlice } from "../data/invoice";
+import { PurchasesSlice, SalesSlice } from "../data/invoice";
 import { ItemSlice } from "../data/item";
 import { ItemsSettlementSlice } from "../data/itemsSettlement";
 import { ItemTransferSlice } from "../data/itemTransfer";
@@ -85,8 +84,12 @@ export const store = configureStore({
     boxesDialog: BoxesSlice.dialogReducer,
     banksAndBoxes: BanksAndBoxesSlice.entityReducer,
     clientsAndSuppliers: ClientsAndSuppliersSlice.entityReducer,
-    invoice: InvoiceSlice.entityReducer,
-    invoiceDialog: InvoiceSlice.dialogReducer,
+    sales: SalesSlice.entityReducer,
+    salesForm: SalesSlice.formReducer,
+    salesDialog: SalesSlice.dialogReducer,
+    purchases: PurchasesSlice.entityReducer,
+    purchasesForm: PurchasesSlice.formReducer,
+    purchasesDialog: PurchasesSlice.dialogReducer,
     paymentMethod: PaymentMethodSlice.entityReducer,
     paymentMethodForm: PaymentMethodSlice.formReducer,
     paymentMethodDialog: PaymentMethodSlice.dialogReducer,
@@ -113,8 +116,7 @@ export const store = configureStore({
     itemsSettlementDialog: ItemsSettlementSlice.dialogReducer,
     itemTransferUI: itemTransferReducer,
     dashboard: dashboardReducer,
-    register: registerReducer,
-    invoiceUI: invoiceReducerUI
+    register: registerReducer
   }
 });
 

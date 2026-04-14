@@ -1,6 +1,9 @@
-import { BaseEntity, type ColumnName, StorageFile } from "@yusr_systems/core";
-import { createGenericDialogSlice, createGenericEntitySlice } from "@yusr_systems/ui";
+import { BaseEntity, type ColumnName, StorageFile, type ValidationRule, Validators } from "@yusr_systems/core";
+import { createGenericDialogSlice, createGenericEntitySlice, createGenericFormSlice } from "@yusr_systems/ui";
+import InvoiceItemsActions from "../../features/invoices/logic/invoiceItemsActions";
+import InvoiceVouchersActions from "../../features/invoices/logic/invoiceVouchersActions";
 import InvoicesApiService from "../networking/invoiceApiService";
+import { FilterByTypeRequest } from "./filterByTypeRequest";
 import type { ItemUnitPricingMethod } from "./item";
 
 export const InvoiceType = {
@@ -145,18 +148,76 @@ export class InvoiceFilterColumns
   ];
 }
 
+export class InvoiceValidationRules
+{
+  public static validationRules: ValidationRule<Partial<Invoice>>[] = [{
+    field: "type",
+    selector: (d) => d.type,
+    validators: [Validators.required("يرجى اختيار نوع الفاتورة")]
+  }, {
+    field: "date",
+    selector: (d) => d.date,
+    validators: [Validators.required("يرجى إدخال تاريخ الفاتورة")]
+  }, {
+    field: "storeId",
+    selector: (d) => d.storeId,
+    validators: [Validators.required("يرجى تحديد المستودع")]
+  }, {
+    field: "actionAccountId",
+    selector: (d) => d.actionAccountId,
+    validators: [Validators.required("يرجى تحديد الحساب")]
+  }];
+}
+
 export class InvoiceSlice
 {
-  private static entitySliceInstance = createGenericEntitySlice(
-    "invoice",
-    new InvoicesApiService()
-  );
+  static create(sliceName: string, types: InvoiceType[])
+  {
+    const entitySliceInstance = createGenericEntitySlice(
+      sliceName,
+      new InvoicesApiService(),
+      (pageNumber, rowsPerPage, condition) =>
+        new InvoicesApiService().FilterByTypes(
+          pageNumber,
+          rowsPerPage,
+          new FilterByTypeRequest({ types, condition })
+        )
+    );
 
-  public static entityActions = InvoiceSlice.entitySliceInstance.actions;
-  public static entityReducer = InvoiceSlice.entitySliceInstance.reducer;
+    const dialogSliceInstance = createGenericDialogSlice<Invoice>(sliceName + "Dialog");
+    const formSliceInstance = createGenericFormSlice<Invoice>(sliceName + "Form", undefined, {
+      // items
+      addItem: InvoiceItemsActions.addItem,
+      removeItem: InvoiceItemsActions.removeItem,
+      updateItem: InvoiceItemsActions.updateItem,
+      onInvoiceItemIupmChange: InvoiceItemsActions.onInvoiceItemIupmChange,
+      onInvoiceItemQuantityChange: InvoiceItemsActions.onInvoiceItemQuantityChange,
+      onInvoiceItemTaxInclusivePriceChange: InvoiceItemsActions.onInvoiceItemTaxInclusivePriceChange,
+      onInvoiceItemSettlementChange: InvoiceItemsActions.onInvoiceItemSettlementChange,
+      onInvoiceSettlementAmountChange: InvoiceItemsActions.onInvoiceSettlementAmountChange,
+      onInvoiceSettlementPercentChange: InvoiceItemsActions.onInvoiceSettlementPercentChange,
 
-  private static dialogSliceInstance = createGenericDialogSlice<Invoice>("invoiceDialog");
+      // vouchers
+      addVoucher: InvoiceVouchersActions.addVoucher,
+      removeVoucher: InvoiceVouchersActions.removeVoucher,
+      updateVoucher: InvoiceVouchersActions.updateVoucher,
+      resetPaymentVouchers: InvoiceVouchersActions.resetPaymentVouchers
+    });
 
-  public static dialogActions = InvoiceSlice.dialogSliceInstance.actions;
-  public static dialogReducer = InvoiceSlice.dialogSliceInstance.reducer;
+    return {
+      entityActions: entitySliceInstance.actions,
+      entityReducer: entitySliceInstance.reducer,
+      dialogActions: dialogSliceInstance.actions,
+      dialogReducer: dialogSliceInstance.reducer,
+      formActions: formSliceInstance.actions,
+      formReducer: formSliceInstance.reducer
+    };
+  }
 }
+
+export const SalesSlice = InvoiceSlice.create("sales", [
+  InvoiceType.Sell,
+  InvoiceType.SellReturn,
+  InvoiceType.Quotation
+]);
+export const PurchasesSlice = InvoiceSlice.create("purchases", [InvoiceType.Purchase, InvoiceType.PurchaseReturn]);

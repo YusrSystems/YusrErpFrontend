@@ -1,37 +1,38 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { InvoiceRelationType, InvoiceVoucher } from "../../../core/data/invoice";
-import type { InvoiceState } from "./invoiceSliceUI";
+import type { FormState } from "@yusr_systems/ui";
+import Invoice, { InvoiceRelationType, InvoiceVoucher } from "../../../core/data/invoice";
 
 export default class InvoiceVouchersActions
 {
-  public static removeVoucher(state: InvoiceState, action: PayloadAction<number>)
+  public static removeVoucher(state: FormState<Invoice>, action: PayloadAction<number>)
   {
     const id = action.payload;
-    state.vouchers = state.vouchers.filter((voucher) => voucher.voucherId !== id);
+    state.formData.invoiceVouchers = state.formData.invoiceVouchers?.filter((voucher) => voucher.voucherId !== id);
     delete state.errors[id];
     delete state.errors[`${id}_method`];
   }
 
   public static updateVoucher(
-    state: InvoiceState,
-    action: PayloadAction<InvoiceState["vouchers"][0]>
+    state: FormState<Invoice>,
+    action: PayloadAction<InvoiceVoucher>
   )
   {
-    const index = state.vouchers.findIndex((v) => v.voucherId === action.payload.voucherId);
+    const index = state.formData.invoiceVouchers?.findIndex((v) => v.voucherId === action.payload.voucherId);
     if (index === -1)
     {
       return;
     }
-    state.vouchers[index] = action.payload;
+    if(index != undefined && state.formData.invoiceVouchers != undefined)
+      (state.formData.invoiceVouchers)[index] = action.payload;
   }
 
-  public static addVoucher(state: InvoiceState, action: PayloadAction<InvoiceVoucher>)
+  public static addVoucher(state: FormState<Invoice>, action: PayloadAction<InvoiceVoucher>)
   {
     const baseVoucher = action.payload;
 
     const tempId = -(Math.floor(Date.now() / 1000) * 1000 + Math.floor(Math.random() * 1000));
 
-    state.vouchers.push({
+    state.formData.invoiceVouchers?.push({
       invoiceId: baseVoucher.invoiceId,
       voucherId: tempId,
       accountId: baseVoucher.accountId,
@@ -45,23 +46,10 @@ export default class InvoiceVouchersActions
     });
   }
 
-  public static resetVouchers(state: InvoiceState)
+  public static resetPaymentVouchers(state: FormState<Invoice>, _action: PayloadAction<void>)
   {
-    state.vouchers = [];
-  }
-
-  public static initVouchers(state: InvoiceState, action: PayloadAction<InvoiceVoucher[]>)
-  {
-    state.vouchers = action.payload || [];
-  }
-
-  public static resetPaymentVouchers(state: InvoiceState)
-  {
-    state.vouchers = state.vouchers.filter((v) => v.invoiceRelationType !== InvoiceRelationType.Payment);
-  }
-
-  public static resetCostVouchers(state: InvoiceState)
-  {
-    state.vouchers = state.vouchers.filter((v) => v.invoiceRelationType !== InvoiceRelationType.Cost);
+    state.formData.invoiceVouchers = state.formData.invoiceVouchers?.filter((v) =>
+      v.invoiceRelationType !== InvoiceRelationType.Payment
+    );
   }
 }

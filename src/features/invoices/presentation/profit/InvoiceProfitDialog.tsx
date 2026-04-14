@@ -3,7 +3,7 @@ import { Banknote } from "lucide-react";
 import { useState } from "react";
 import { InvoiceRelationType } from "../../../../core/data/invoice";
 import type { InvoiceProfitResult } from "../../../../core/data/InvoiceProfitResult";
-import { useAppSelector } from "../../../../core/state/store";
+import { useInvoiceContext } from "../../logic/invoiceContext";
 import InvoiceItemsMath from "../../logic/invoiceItemsMath";
 
 interface ProfitRowProps
@@ -35,10 +35,13 @@ function ProfitRow({ label, value, variant = "default" }: ProfitRowProps)
 export default function InvoiceProfitDialog()
 {
   const [open, setOpen] = useState(false);
-  const { items, vouchers } = useAppSelector((state) => state.invoiceUI);
-  const costVouchers = vouchers.filter((v) => v.invoiceRelationType === InvoiceRelationType.Cost);
+  const {
+    formData
+  } = useInvoiceContext();
+  const costVouchers = formData.invoiceVouchers?.filter((v) => v.invoiceRelationType === InvoiceRelationType.Cost)
+    ?? [];
 
-  const profit: InvoiceProfitResult = InvoiceItemsMath.CalcInvoiceProfit(items, costVouchers);
+  const profit: InvoiceProfitResult = InvoiceItemsMath.CalcInvoiceProfit(formData.invoiceItems ?? [], costVouchers);
 
   return (
     <>

@@ -1,19 +1,32 @@
-import { CrudPage } from "@yusr_systems/ui";
+import { CrudPage, type IDialogState, type IEntityState } from "@yusr_systems/ui";
 import { FileTextIcon } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import Invoice, { InvoiceFilterColumns, InvoiceSlice, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import InvoicesApiService from "../../core/networking/invoiceApiService";
-import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
 import ChangeInvoiceDialog from "./changeInvoiceDialog";
-import { setInvoiceType } from "./logic/invoiceSliceUI";
 
-export default function InvoicesPage({ type }: { type: InvoiceType; })
+export default function InvoicesPage({
+  title,
+  slice,
+  stateKey,
+  dialogStateKey,
+  fixedType,
+  selectFormState
+}: {
+  title: string;
+  slice: ReturnType<typeof InvoiceSlice.create>;
+  stateKey: keyof RootState;
+  dialogStateKey: keyof RootState;
+  fixedType?: InvoiceType;
+  selectFormState: (state: any) => { formData: Partial<Invoice>; errors: Record<string, string>; };
+})
 {
   const dispatch = useAppDispatch();
-  const invoiceState = useAppSelector((state) => state.invoice);
-  const invoiceDialogState = useAppSelector((state) => state.invoiceDialog);
+  const invoiceState = useAppSelector((state) => state[stateKey] as IEntityState<Invoice>);
+  const invoiceDialogState = useAppSelector((state) => state[dialogStateKey] as IDialogState<Invoice>);
 
   // Update with your actual permission resource enum
   const permissions = useAppSelector((state) =>
@@ -22,14 +35,9 @@ export default function InvoicesPage({ type }: { type: InvoiceType; })
 
   const service = useMemo(() => new InvoicesApiService(), []);
 
-  const titleText = getTitleText(type);
-  useEffect(() =>
-  {
-    dispatch(setInvoiceType(type));
-  }, []);
   return (
     <CrudPage<Invoice>
-      title={ titleText }
+      title={ title }
       entityName="الفاتورة"
       addNewItemTitle="إنشاء فاتورة جديدة"
       permissions={ permissions }
@@ -78,25 +86,29 @@ export default function InvoicesPage({ type }: { type: InvoiceType; })
         }
       ] }
       actions={ {
-        filter: InvoiceSlice.entityActions.filter,
-        openChangeDialog: (entity) => InvoiceSlice.dialogActions.openChangeDialog(entity),
-        openDeleteDialog: (entity) => InvoiceSlice.dialogActions.openDeleteDialog(entity),
-        setIsChangeDialogOpen: (open) => InvoiceSlice.dialogActions.setIsChangeDialogOpen(open),
-        setIsDeleteDialogOpen: (open) => InvoiceSlice.dialogActions.setIsDeleteDialogOpen(open),
-        refresh: InvoiceSlice.entityActions.refresh,
-        setCurrentPage: (page) => InvoiceSlice.entityActions.setCurrentPage(page)
+        filter: slice.entityActions.filter,
+        openChangeDialog: (entity) => slice.dialogActions.openChangeDialog(entity),
+        openDeleteDialog: (entity) => slice.dialogActions.openDeleteDialog(entity),
+        setIsChangeDialogOpen: (open) => slice.dialogActions.setIsChangeDialogOpen(open),
+        setIsDeleteDialogOpen: (open) => slice.dialogActions.setIsDeleteDialogOpen(open),
+        refresh: slice.entityActions.refresh,
+        setCurrentPage: (page) => slice.entityActions.setCurrentPage(page)
       } }
       ChangeDialog={ 
         <ChangeInvoiceDialog
           entity={ invoiceDialogState.selectedRow || undefined }
           mode={ invoiceDialogState.selectedRow ? "update" : "create" }
           service={ service }
+          slice={ slice }
+          stateKey={ stateKey }
+          selectFormState={ selectFormState }
+          fixedType={ fixedType }
           onSuccess={ (data, mode) =>
           {
-            dispatch(InvoiceSlice.entityActions.refresh({ data: data }));
+            dispatch(slice.entityActions.refresh({ data: data }));
             if (mode === "create")
             {
-              dispatch(InvoiceSlice.dialogActions.setIsChangeDialogOpen(false));
+              dispatch(slice.dialogActions.setIsChangeDialogOpen(false));
             }
           } }
         />
@@ -119,25 +131,6 @@ const getInvoiceTypeName = (type: InvoiceType) =>
       return "عرض سعر";
     case InvoiceType.PurchaseReturn:
       return "مرتجع مشتريات";
-    default:
-      return "غير معروف";
-  }
-};
-
-const getTitleText = (type: InvoiceType): string =>
-{
-  switch (type)
-  {
-    case InvoiceType.Sell:
-      return "ادارة فواتير المبيعات";
-    case InvoiceType.Purchase:
-      return "ادارة فواتير الشراء";
-    case InvoiceType.SellReturn:
-      return "ادارة فواتير المرتجعات المبيعات";
-    case InvoiceType.Quotation:
-      return "ادارة فواتير العروض السعرية";
-    case InvoiceType.PurchaseReturn:
-      return "ادارة فواتير المرتجعات المشتريات";
     default:
       return "غير معروف";
   }

@@ -1,12 +1,16 @@
-import { Minus, Percent } from "lucide-react";
 import { NumberInput } from "@yusr_systems/ui";
-import { useAppDispatch, useAppSelector } from "../../../../core/state/store";
-import { onInvoiceSettlementAmountChange, onInvoiceSettlementPercentChange } from "../../logic/invoiceSliceUI";
+import { Minus, Percent } from "lucide-react";
+import { useInvoiceContext } from "../../logic/invoiceContext";
 
 export default function InvoiceGlobalSettlements()
 {
-  const dispatch = useAppDispatch();
-  const { settlements, mode } = useAppSelector((state) => state.invoiceUI);
+  const {
+    mode,
+    formData,
+    dispatch,
+    slice
+  } = useInvoiceContext();
+
   const disabled = mode === "update";
 
   return (
@@ -19,23 +23,31 @@ export default function InvoiceGlobalSettlements()
 
       <div className="flex items-center gap-2">
         <div className="relative">
-          <Minus size={ 13 } className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10" />
+          <Minus
+            size={ 13 }
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-10"
+          />
           <NumberInput
             className="w-28 pr-8"
-            value={ settlements.amount ?? 0 }
-            onChange={ (newValue) => dispatch(onInvoiceSettlementAmountChange(Number(newValue) ?? 0)) }
+            value={ formData.settlementAmount ?? 0 }
+            onChange={ (newValue) =>
+              dispatch(slice.formActions.onInvoiceSettlementAmountChange(Number(newValue) ?? 0)) }
             disabled={ disabled }
           />
         </div>
 
         <div className="relative">
-          <Percent size={ 13 } className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <Percent
+            size={ 13 }
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+          />
           <NumberInput
             min={ -100 }
             max={ 100 }
             className="w-28 pr-8"
-            value={ settlements.percent ?? 0 }
-            onChange={ (newValue) => dispatch(onInvoiceSettlementPercentChange(Number(newValue) ?? 0)) }
+            value={ formData.settlementPercent ?? 0 }
+            onChange={ (newValue) =>
+              dispatch(slice.formActions.onInvoiceSettlementPercentChange(Number(newValue) ?? 0)) }
             disabled={ disabled }
           />
         </div>

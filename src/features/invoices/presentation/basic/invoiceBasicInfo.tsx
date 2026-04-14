@@ -4,16 +4,15 @@ import { ImportExportType, InvoiceType } from "../../../../core/data/invoice";
 import { StoreFilterColumns, StoreSlice } from "../../../../core/data/store";
 import { useAppSelector } from "../../../../core/state/store";
 import { useInvoiceContext } from "../../logic/invoiceContext";
-import { resetItems } from "../../logic/invoiceSliceUI";
 
 export default function InvoiceBasicInfo()
 {
   const {
     mode,
     formData,
-    handleChange,
     isInvalid,
     getError,
+    slice,
     authState,
     dispatch
   } = useInvoiceContext();
@@ -23,8 +22,6 @@ export default function InvoiceBasicInfo()
   let selectedAccount: Account | undefined = accountState.entities?.data?.find((account) =>
     account.id === formData.actionAccountId
   );
-
-  const invoiceType = useAppSelector((state) => state.invoiceUI.type);
 
   const canBeExportInvoice = () =>
   {
@@ -58,12 +55,12 @@ export default function InvoiceBasicInfo()
 
   return (
     <FieldsSection title="البيانات الأساسية" columns={ { base: 1, md: 2, lg: 4 } }>
-      { invoiceType === InvoiceType.Sell && (
+      { (formData.type === InvoiceType.Sell || formData.type === InvoiceType.Quotation) && (
         <SelectField
           label="نوع الفاتورة"
           required
           value={ formData.type?.toString() || "" }
-          onValueChange={ (val) => handleChange({ type: Number(val) as InvoiceType }) }
+          onValueChange={ (val) => dispatch(slice.formActions.updateFormData({ type: Number(val) as InvoiceType })) }
           isInvalid={ isInvalid("type") }
           error={ getError("type") }
           disabled={ mode === "update" }
@@ -90,7 +87,7 @@ export default function InvoiceBasicInfo()
           label="تاريخ الفاتورة"
           required
           value={ formData.date ? new Date(formData.date) : undefined }
-          onChange={ (e) => handleChange({ date: e }) }
+          onChange={ (e) => dispatch(slice.formActions.updateFormData({ date: e })) }
           isInvalid={ isInvalid("date") }
           error={ getError("date") }
         />
@@ -108,8 +105,9 @@ export default function InvoiceBasicInfo()
           onValueChange={ (val) =>
           {
             const selected = storeState.entities.data?.find((a) => a.id.toString() === val);
-            handleChange({ storeId: selected?.id, storeName: selected?.name, invoiceItems: [] });
-            dispatch(resetItems());
+            dispatch(
+              slice.formActions.updateFormData({ storeId: selected?.id, storeName: selected?.name, invoiceItems: [] })
+            );
           } }
         />
       </FormField>
@@ -132,7 +130,9 @@ export default function InvoiceBasicInfo()
           {
             const selected = accountState.entities.data?.find((a) => a.id.toString() === val);
             selectedAccount = selected;
-            handleChange({ actionAccountId: selected?.id, actionAccountName: selected?.name });
+            dispatch(
+              slice.formActions.updateFormData({ actionAccountId: selected?.id, actionAccountName: selected?.name })
+            );
           } }
         />
       </FormField>
@@ -148,7 +148,7 @@ export default function InvoiceBasicInfo()
       <TextField
         label="الموظف المندوب"
         value={ formData.delegateEmp || "" }
-        onChange={ (e) => handleChange({ delegateEmp: e.target.value }) }
+        onChange={ (e) => dispatch(slice.formActions.updateFormData({ delegateEmp: e.target.value })) }
       />
 
       { canBeExportInvoice() && (
@@ -156,7 +156,8 @@ export default function InvoiceBasicInfo()
           label="فاتورة استيراد"
           required
           value={ formData.importExportType?.toString() || "" }
-          onValueChange={ (val) => handleChange({ importExportType: Number(val) as ImportExportType }) }
+          onValueChange={ (val) =>
+            dispatch(slice.formActions.updateFormData({ importExportType: Number(val) as ImportExportType })) }
           isInvalid={ isInvalid("importExportType") }
           error={ getError("importExportType") }
           options={ [{ label: "استيراد وفق آلية الاحتساب العكسي", value: "2" }, {
@@ -179,7 +180,7 @@ export default function InvoiceBasicInfo()
         <TextField
           label="ملاحظات"
           value={ formData.notes || "" }
-          onChange={ (e) => handleChange({ notes: e.target.value }) }
+          onChange={ (e) => dispatch(slice.formActions.updateFormData({ notes: e.target.value })) }
         />
       </div>
     </FieldsSection>

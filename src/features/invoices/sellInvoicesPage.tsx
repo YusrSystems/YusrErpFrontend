@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
-import { InvoiceType } from "../../core/data/invoice";
+import { InvoiceType, SalesSlice } from "../../core/data/invoice";
 import { useAppSelector } from "../../core/state/store";
 import UnauthorizedPage from "../unauthorized/unauthorizedPage";
 import InvoicesPage from "./invoicesPage";
@@ -33,5 +33,14 @@ export default function SellInvoicesPage()
     return <UnauthorizedPage />;
   }
 
-  return <InvoicesPage type={ InvoiceType.Sell } />;
+  return (
+    <InvoicesPage
+      slice={ SalesSlice }
+      stateKey="sales"
+      dialogStateKey="salesDialog"
+      title="إدارة المبيعات"
+      fixedType={ InvoiceType.Sell }
+      selectFormState={ (state) => state.salesForm }
+    />
+  );
 }
