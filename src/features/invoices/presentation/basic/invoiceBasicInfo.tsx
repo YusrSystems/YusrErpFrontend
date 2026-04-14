@@ -1,5 +1,6 @@
 import { Checkbox, DateField, FieldsSection, FormField, SearchableSelect, SelectField, TextField } from "@yusr_systems/ui";
-import Account, { AccountFilterColumns, ClientsAndSuppliersSlice } from "../../../../core/data/account";
+import { useEffect } from "react";
+import Account, { AccountFilterColumns } from "../../../../core/data/account";
 import { ImportExportType, InvoiceType } from "../../../../core/data/invoice";
 import { StoreFilterColumns, StoreSlice } from "../../../../core/data/store";
 import { useAppSelector } from "../../../../core/state/store";
@@ -14,10 +15,10 @@ export default function InvoiceBasicInfo()
     getError,
     slice,
     authState,
-    dispatch
+    dispatch,
+    accountState,
+    accountSlice
   } = useInvoiceContext();
-
-  const accountState = useAppSelector((state) => state.clientsAndSuppliers);
   const storeState = useAppSelector((state) => state.store);
   let selectedAccount: Account | undefined = accountState.entities?.data?.find((account) =>
     account.id === formData.actionAccountId
@@ -49,9 +50,26 @@ export default function InvoiceBasicInfo()
     }
     else
     {
-      return (formData.type === InvoiceType.Sell && accountCountryId !== settingsCountryId);
+      return ((formData.type === InvoiceType.Sell || formData.type === InvoiceType.Quotation)
+        && accountCountryId !== settingsCountryId);
     }
   };
+
+  useEffect(() =>
+  {
+    if (canBeExportInvoice())
+    {
+      dispatch(
+        slice.formActions.updateFormData({
+          importExportType: ImportExportType.ImportAccordingToTheReverseChargeMechanism
+        })
+      );
+    }
+    else
+    {
+      dispatch(slice.formActions.updateFormData({ importExportType: undefined }));
+    }
+  }, [canBeExportInvoice()]);
 
   return (
     <FieldsSection title="البيانات الأساسية" columns={ { base: 1, md: 2, lg: 4 } }>
@@ -124,7 +142,7 @@ export default function InvoiceBasicInfo()
           itemValueKey="id"
           value={ formData.actionAccountId?.toString() || "" }
           columnsNames={ AccountFilterColumns.columnsNames }
-          onSearch={ (condition) => dispatch(ClientsAndSuppliersSlice.entityActions.filter(condition)) }
+          onSearch={ (condition) => dispatch(accountSlice.entityActions.filter(condition)) }
           disabled={ accountState.isLoading || mode === "update" }
           onValueChange={ (val) =>
           {

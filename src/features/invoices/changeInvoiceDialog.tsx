@@ -1,9 +1,9 @@
-import type { CommonChangeDialogProps } from "@yusr_systems/ui";
+import type { CommonChangeDialogProps, IEntityState } from "@yusr_systems/ui";
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { BanknoteArrowDown, BanknoteArrowUp, Box, FolderKanban, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
-import { ClientsAndSuppliersSlice } from "../../core/data/account";
+import Account, { type AccountSliceType } from "../../core/data/account";
 import { FilterByTypeRequest } from "../../core/data/filterByTypeRequest";
 import type Invoice from "../../core/data/invoice";
 import { InvoiceRelationType, InvoiceSlice, InvoiceStatus, InvoiceType, InvoiceValidationRules } from "../../core/data/invoice";
@@ -29,12 +29,16 @@ export default function ChangeInvoiceDialog({
   onSuccess,
   slice,
   fixedType,
-  selectFormState
+  selectFormState,
+  accountSlice,
+  accountState
 }: CommonChangeDialogProps<Invoice> & {
   slice: InvoiceSliceType;
   stateKey: keyof RootState;
   fixedType?: InvoiceType;
   selectFormState: (state: any) => { formData: Partial<Invoice>; errors: Record<string, string>; };
+  accountSlice: AccountSliceType;
+  accountState: IEntityState<Account>;
 })
 {
   const [initLoading, setInitLoading] = useState(false);
@@ -47,11 +51,11 @@ export default function ChangeInvoiceDialog({
       ...entity,
       type: entity?.type ?? fixedType,
       actionAccountId: entity?.actionAccountId
-        ?? (entity?.type === InvoiceType.Purchase
+        ?? ((entity?.type ?? fixedType) === InvoiceType.Purchase
           ? authState.setting?.purchaseAccountId
           : authState.setting?.sellAccountId),
       actionAccountName: entity?.actionAccountName
-        ?? (entity?.type === InvoiceType.Purchase
+        ?? ((entity?.type ?? fixedType) === InvoiceType.Purchase
           ? authState.setting?.purchaseAccountName
           : authState.setting?.sellAccountName),
       storeId: entity?.storeId ?? authState.setting?.mainStoreId,
@@ -83,19 +87,19 @@ export default function ChangeInvoiceDialog({
 
   useEffect(() =>
   {
-    dispatch(ClientsAndSuppliersSlice.entityActions.filter());
+    dispatch(accountSlice.entityActions.filter());
     dispatch(PaymentMethodSlice.entityActions.filter());
     dispatch(StoreSlice.entityActions.filter());
   }, [dispatch]);
 
   useEffect(() =>
   {
-    if (formData.statusId)
+    if (formData.storeId)
     {
       dispatch(fetchStoreItems({
         pageNumber: 1,
         rowsPerPage: 100,
-        storeId: formData.storeId ?? 0,
+        storeId: formData.type === InvoiceType.Purchase ? undefined : formData.storeId ?? 0,
         request: new FilterByTypeRequest({ condition: undefined, types: [ItemType.Product, ItemType.Service] })
       }));
     }
@@ -130,6 +134,8 @@ export default function ChangeInvoiceDialog({
       };
       dispatch(slice.formActions.updateVoucher(updatedVoucher));
     }
+    console.log(invoiceTaxInclusivePrice());
+    dispatch(slice.formActions.updateFormData({ fullAmount: invoiceTaxInclusivePrice() }));
   }, [formData.invoiceItems]);
 
   useEffect(() =>
@@ -167,6 +173,10 @@ export default function ChangeInvoiceDialog({
     );
   }
 
+  const disabled = mode === "update"
+    && (formData.type === InvoiceType.Sell || formData.type === InvoiceType.SellReturn);
+  const returnDisabled = formData.type === InvoiceType.PurchaseReturn || formData.type === InvoiceType.SellReturn;
+
   return (
     <InvoiceContext.Provider
       value={ {
@@ -177,7 +187,11 @@ export default function ChangeInvoiceDialog({
         slice,
         mode,
         authState,
-        dispatch
+        dispatch,
+        disabled,
+        returnDisabled,
+        accountSlice,
+        accountState
       } }
     >
       <ChangeDialogTabbed<Invoice>
@@ -190,32 +204,40 @@ export default function ChangeInvoiceDialog({
           onSuccess: (data) => onSuccess?.(data, mode),
           validate
         } }
-        tabs={ [{
-          label: "المعلومات الأساسية",
-          icon: Box,
-          active: true,
-          content: <InvoiceBasicTab />
-        }, {
-          label: "سندات الدفع",
-          icon: BanknoteArrowDown,
-          active: false,
-          content: <InvoicePaymentsTab />
-        }, {
-          label: "تكاليف الفاتورة",
-          icon: BanknoteArrowUp,
-          active: false,
-          content: <InvoiceCostsTab />
-        }, {
-          label: "سياسة الفاتورة",
-          icon: Siren,
-          active: false,
-          content: <InvoicePolicyTab />
-        }, {
-          label: "مرفقات الفاتورة",
-          icon: FolderKanban,
-          active: false,
-          content: <InvoiceFilesTab />
-        }] }
+        tabs={ [
+          {
+            label: "المعلومات الأساسية",
+            icon: Box,
+            active: true,
+            content: <InvoiceBasicTab />
+          },
+          ...(formData.type === InvoiceType.Sell || formData.type === InvoiceType.Purchase
+            ? [{
+              label: "سندات الدفع",
+              icon: BanknoteArrowDown,
+              active: false,
+              content: <InvoicePaymentsTab />
+            }]
+            : []),
+          {
+            label: "تكاليف الفاتورة",
+            icon: BanknoteArrowUp,
+            active: false,
+            content: <InvoiceCostsTab />
+          },
+          {
+            label: "سياسة الفاتورة",
+            icon: Siren,
+            active: false,
+            content: <InvoicePolicyTab />
+          },
+          {
+            label: "مرفقات الفاتورة",
+            icon: FolderKanban,
+            active: false,
+            content: <InvoiceFilesTab />
+          }
+        ] }
       />
     </InvoiceContext.Provider>
   );

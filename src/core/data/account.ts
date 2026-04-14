@@ -79,6 +79,8 @@ export class AccountValidationRules
   }];
 }
 
+export type AccountSliceType = ReturnType<typeof AccountSlice.create>;
+
 export class AccountSlice
 {
   static create(sliceName: string, types: AccountType[])

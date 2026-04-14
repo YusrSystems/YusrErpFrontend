@@ -3,6 +3,8 @@ import { FileTextIcon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import type Account from "../../core/data/account";
+import type { AccountSliceType } from "../../core/data/account";
 import Invoice, { InvoiceFilterColumns, InvoiceSlice, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
 import InvoicesApiService from "../../core/networking/invoiceApiService";
 import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
@@ -14,7 +16,9 @@ export default function InvoicesPage({
   stateKey,
   dialogStateKey,
   fixedType,
-  selectFormState
+  selectFormState,
+  accountSlice,
+  accountState
 }: {
   title: string;
   slice: ReturnType<typeof InvoiceSlice.create>;
@@ -22,6 +26,8 @@ export default function InvoicesPage({
   dialogStateKey: keyof RootState;
   fixedType?: InvoiceType;
   selectFormState: (state: any) => { formData: Partial<Invoice>; errors: Record<string, string>; };
+  accountSlice: AccountSliceType;
+  accountState: IEntityState<Account>;
 })
 {
   const dispatch = useAppDispatch();
@@ -103,6 +109,8 @@ export default function InvoicesPage({
           stateKey={ stateKey }
           selectFormState={ selectFormState }
           fixedType={ fixedType }
+          accountSlice={ accountSlice }
+          accountState={ accountState }
           onSuccess={ (data, mode) =>
           {
             dispatch(slice.entityActions.refresh({ data: data }));

@@ -8,21 +8,25 @@ import InvoiceBasicInfo from "./invoiceBasicInfo";
 import InvoiceGlobalSettlements from "./invoiceGlobalSettlements";
 import InvoiceItemsSummary from "./invoiceItemsSummary";
 import InvoiceItemsTable from "./invoiceItemsTable";
+import { InvoiceType } from "../../../../core/data/invoice";
 
 export default function InvoiceBasicTab()
 {
   const {
+    formData,
     slice,
     authState,
-    dispatch
+    dispatch,
+    disabled,
+    returnDisabled
   } = useInvoiceContext();
 
   return (
     <div className="flex flex-col gap-6">
       <InvoiceBasicInfo />
-      <StoreItemSelector onSelect={ (item) => {
-        console.log(item);
-        dispatch(slice.formActions.addItem(item)) }} />
+      { !disabled && !returnDisabled && (
+        <StoreItemSelector onSelect={ (item) => dispatch(slice.formActions.addItem(item)) } />
+      ) }
       <InvoiceItemsTable />
       <div className="flex flex-col-reverse lg:flex-row items-stretch gap-3">
         { SystemPermissions.hasAuth(
@@ -35,7 +39,7 @@ export default function InvoiceBasicTab()
           authState.loggedInUser?.role?.permissions ?? [],
           SystemPermissionsResources.InvoiceShowProfit,
           SystemPermissionsActions.Get
-        ) && <InvoiceProfitDialog /> }
+        ) && (formData.type === InvoiceType.Sell || formData.type === InvoiceType.Quotation) && <InvoiceProfitDialog /> }
         <InvoiceItemsSummary />
       </div>
     </div>

@@ -8,7 +8,9 @@ export default function InvoicePolicyTab()
     formData,
     slice,
     dispatch,
-    authState
+    authState,
+    disabled,
+    returnDisabled
   } = useInvoiceContext();
 
   return (
@@ -16,7 +18,7 @@ export default function InvoicePolicyTab()
       label="السياسة / الشروط (تظهر في أسفل الفاتورة)"
       value={ formData.policy || authState.setting?.invoicePolicy || "" }
       onChange={ (e) => dispatch(slice.formActions.updateFormData({ policy: e.target.value })) }
-      disabled={ mode === "update" }
+      disabled={ disabled || returnDisabled }
       className="h-100"
     />
   );

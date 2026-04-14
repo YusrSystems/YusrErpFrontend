@@ -74,7 +74,7 @@ export default function InvoiceCostsTab()
                       value={ row.accountId?.toString() }
                       columnsNames={ AccountFilterColumns.columnsNames }
                       onSearch={ (condition) => dispatch(ClientsAndSuppliersSlice.entityActions.filter(condition)) }
-                      disabled={ clientsAndSuppliersState.isLoading || mode === "update" }
+                      disabled={ clientsAndSuppliersState.isLoading }
                       onValueChange={ (val) =>
                       {
                         const selected = clientsAndSuppliersState.entities.data?.find((a) => a.id.toString() === val);
@@ -100,7 +100,7 @@ export default function InvoiceCostsTab()
                       value={ row.paymentMethodId?.toString() }
                       columnsNames={ PaymentMethodFilterColumns.columnsNames }
                       onSearch={ (condition) => dispatch(PaymentMethodSlice.entityActions.filter(condition)) }
-                      disabled={ paymentMethodState.isLoading || mode === "update" }
+                      disabled={ paymentMethodState.isLoading }
                       onValueChange={ (val) =>
                       {
                         const selected = paymentMethodState.entities.data?.find((a) => a.id.toString() === val);

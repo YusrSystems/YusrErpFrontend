@@ -5,13 +5,12 @@ import { useInvoiceContext } from "../../logic/invoiceContext";
 export default function InvoiceGlobalSettlements()
 {
   const {
-    mode,
     formData,
     dispatch,
-    slice
+    slice,
+    disabled,
+    returnDisabled
   } = useInvoiceContext();
-
-  const disabled = mode === "update";
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 px-4 py-2.5 border border-border rounded-lg bg-background rtl shrink-0">
@@ -32,7 +31,7 @@ export default function InvoiceGlobalSettlements()
             value={ formData.settlementAmount ?? 0 }
             onChange={ (newValue) =>
               dispatch(slice.formActions.onInvoiceSettlementAmountChange(Number(newValue) ?? 0)) }
-            disabled={ disabled }
+            disabled={ disabled || returnDisabled }
           />
         </div>
 
@@ -48,7 +47,7 @@ export default function InvoiceGlobalSettlements()
             value={ formData.settlementPercent ?? 0 }
             onChange={ (newValue) =>
               dispatch(slice.formActions.onInvoiceSettlementPercentChange(Number(newValue) ?? 0)) }
-            disabled={ disabled }
+            disabled={ disabled || returnDisabled }
           />
         </div>
       </div>

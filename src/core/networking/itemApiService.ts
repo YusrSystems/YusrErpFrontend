@@ -9,12 +9,14 @@ export default class ItemsApiService extends BaseApiService<Item>
   async FilterStoreItems(
     pageNumber: number,
     rowsPerPage: number,
-    storeId: number,
+    storeId: number | undefined,
     request: FilterByTypeRequest
   ): Promise<RequestResult<FilterResult<StoreItem>>>
   {
     return await YusrApiHelper.Post(
-      `${ApiConstants.baseUrl}/${this.routeName}/FilterStoreItems?pageNumber=${pageNumber}&rowsPerPage=${rowsPerPage}&storeId=${storeId}`,
+      `${ApiConstants.baseUrl}/${this.routeName}/FilterStoreItems?pageNumber=${pageNumber}&rowsPerPage=${rowsPerPage}&${
+        storeId == undefined ? "" : `storeId=${storeId}`
+      }`,
       request
     );
   }

@@ -166,6 +166,10 @@ export class InvoiceValidationRules
     field: "actionAccountId",
     selector: (d) => d.actionAccountId,
     validators: [Validators.required("يرجى تحديد الحساب")]
+  }, {
+    field: "invoiceItems",
+    selector: (d) => d.invoiceItems,
+    validators: [Validators.arrayMinLength(1, ("يرجى إضافة بند واحد على الأقل للفاتورة"))]
   }];
 }
 

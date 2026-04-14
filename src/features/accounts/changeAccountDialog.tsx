@@ -3,12 +3,10 @@ import type { CommonChangeDialogProps, IEntityState } from "@yusr_systems/ui";
 import { Button, ChangeDialog, FieldGroup, FieldsSection, Input, NumberField, SearchableSelect, TextAreaField, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import Account, { AccountContact, AccountFilterColumns, AccountSlice, AccountType, AccountValidationRules } from "../../core/data/account";
+import Account, { AccountContact, AccountFilterColumns, type AccountSliceType, AccountType, AccountValidationRules } from "../../core/data/account";
 import { TaxSlice } from "../../core/data/tax";
 import { filterCities } from "../../core/state/shared/citySlice";
 import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
-
-type AccountSliceType = ReturnType<typeof AccountSlice.create>;
 
 export default function ChangeAccountDialog({
   entity,

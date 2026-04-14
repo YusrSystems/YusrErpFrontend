@@ -13,12 +13,13 @@ import EmptyTable from "./emptyTable";
 export default function InvoiceItemsTable()
 {
   const {
-    mode,
     formData,
     errors,
     slice,
     authState,
-    dispatch
+    dispatch,
+    disabled,
+    returnDisabled
   } = useInvoiceContext();
 
   const getMaxAllowedQuantity = (storeQuantity: number) =>
@@ -88,7 +89,9 @@ export default function InvoiceItemsTable()
                 authState.loggedInUser?.role?.permissions ?? [],
                 SystemPermissionsResources.InvoiceShowItemProfit,
                 SystemPermissionsActions.Get
-              ) && <th className="p-4 font-semibold w-3 text-center"></th> }
+              ) && (formData.type === InvoiceType.Sell || formData.type === InvoiceType.Quotation) && (
+                <th className="p-4 font-semibold w-3 text-center"></th>
+              ) }
 
               <th className="p-4 font-semibold w-3 text-center"></th>
             </tr>
@@ -118,7 +121,7 @@ export default function InvoiceItemsTable()
                       })) || [] }
                       placeholder="اختر طريقة التسعير"
                       isInvalid={ !!errors[`${row.id}_method`] }
-                      disabled={ mode === "update" }
+                      disabled={ disabled || returnDisabled }
                     />
                   </td>
 
@@ -134,7 +137,7 @@ export default function InvoiceItemsTable()
                       value={ row.quantity ?? 1 }
                       onChange={ (newValue) =>
                         dispatch(slice.formActions.onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
-                      disabled={ mode === "update" }
+                      disabled={ disabled }
                     />
                   </td>
 
@@ -157,6 +160,7 @@ export default function InvoiceItemsTable()
                       label=""
                       min={ getMinAllowedTaxInclusivePrice(row.originaltaxInclusivePrice) }
                       value={ row.taxInclusivePrice || "0" }
+                      disabled={ disabled || returnDisabled }
                       onChange={ (newVal) =>
                         dispatch(
                           slice.formActions.onInvoiceItemTaxInclusivePriceChange({
@@ -176,6 +180,7 @@ export default function InvoiceItemsTable()
                       <NumberField
                         label=""
                         value={ row.settlement || "0" }
+                        disabled={ disabled || returnDisabled }
                         onChange={ (newValue) =>
                         {
                           dispatch(
@@ -217,14 +222,14 @@ export default function InvoiceItemsTable()
                     authState.loggedInUser?.role?.permissions ?? [],
                     SystemPermissionsResources.InvoiceShowItemProfit,
                     SystemPermissionsActions.Get
-                  ) && (
+                  ) && (formData.type === InvoiceType.Sell || formData.type === InvoiceType.Quotation) && (
                     <td className="px-2 pt-2">
                       <ItemProfitDialog item={ row } />
                     </td>
                   ) }
 
                   <td className="px-2 pt-2">
-                    { mode === "create" && (
+                    { !disabled && !returnDisabled && (
                       <button
                         type="button"
                         onClick={ () =>
@@ -245,6 +250,7 @@ export default function InvoiceItemsTable()
                       label=""
                       placeholder="أضف ملاحظات..."
                       value={ row.notes || "" }
+                      disabled={ disabled || returnDisabled }
                       onChange={ (val) =>
                       {
                         dispatch(

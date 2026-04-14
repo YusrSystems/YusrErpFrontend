@@ -8,7 +8,7 @@ export interface FetchStoreItemsProps
 {
   pageNumber: number;
   rowsPerPage: number;
-  storeId: number;
+  storeId: number | undefined;
   request: FilterByTypeRequest;
 }
 export const fetchStoreItems = createAsyncThunk<FilterResult<StoreItem>, FetchStoreItemsProps>(

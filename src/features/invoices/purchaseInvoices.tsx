@@ -5,10 +5,12 @@ import { InvoiceType, PurchasesSlice } from "../../core/data/invoice";
 import { useAppSelector } from "../../core/state/store";
 import UnauthorizedPage from "../unauthorized/unauthorizedPage";
 import InvoicesPage from "./invoicesPage";
+import { SuppliersSlice } from "../../core/data/account";
 
 export default function PurchaseInvoicesPage()
 {
   const authState = useAppSelector((state) => state.auth);
+  const suppliersState = useAppSelector((state) => state.suppliers);
   if (
     !SystemPermissions.hasAuth(
       authState.loggedInUser?.role?.permissions ?? [],
@@ -28,6 +30,8 @@ export default function PurchaseInvoicesPage()
       title="إدارة المشتريات"
       fixedType={ InvoiceType.Purchase }
       selectFormState={ (state) => state.purchasesForm }
+      accountSlice={SuppliersSlice}
+      accountState={suppliersState}
     />
   );
 }
