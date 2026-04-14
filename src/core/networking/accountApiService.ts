@@ -9,7 +9,7 @@ export default class AccountsApiService extends BaseApiService<Account>
   async FilterByTypes(
     pageNumber: number,
     rowsPerPage: number,
-    request?: FilterByTypeRequest
+    request: FilterByTypeRequest
   ): Promise<RequestResult<FilterResult<Account>>>
   {
     return await YusrApiHelper.Post(

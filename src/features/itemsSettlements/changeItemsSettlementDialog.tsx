@@ -8,6 +8,7 @@ import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
 import StocktakingItemsTable from "../stocktakings/stocktakingItemsTable";
+import { FilterByTypeRequest } from "../../core/data/filterByTypeRequest";
 
 export default function ChangeItemsSettlementDialog(
   { entity, mode, service, onSuccess }: CommonChangeDialogProps<ItemsSettlement>
@@ -44,9 +45,8 @@ export default function ChangeItemsSettlementDialog(
       dispatch(fetchStoreItems({
         pageNumber: 1,
         rowsPerPage: 100,
-        itemType: ItemType.Product,
         storeId: formData.storeId,
-        condition: undefined
+        request: new FilterByTypeRequest({ condition: undefined, types: [ItemType.Product] })
       }));
     }
   }, [dispatch, formData.storeId]);

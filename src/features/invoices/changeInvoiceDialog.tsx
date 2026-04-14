@@ -4,6 +4,7 @@ import { BanknoteArrowDown, BanknoteArrowUp, Box, FolderKanban, Siren } from "lu
 import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import { ClientsAndSuppliersSlice } from "../../core/data/account";
+import { FilterByTypeRequest } from "../../core/data/filterByTypeRequest";
 import type Invoice from "../../core/data/invoice";
 import { InvoiceRelationType, InvoiceSlice, InvoiceStatus, InvoiceType, InvoiceValidationRules } from "../../core/data/invoice";
 import { ItemType } from "../../core/data/item";
@@ -64,7 +65,7 @@ export default function ChangeInvoiceDialog({
       paidAmount: entity?.paidAmount ?? 0,
       fullAmount: entity?.fullAmount ?? 0,
       invoiceItems: entity?.invoiceItems ?? [],
-      invoiceVouchers: entity?.invoiceVouchers ?? [],
+      invoiceVouchers: entity?.invoiceVouchers ?? []
     }),
     [entity]
   );
@@ -94,9 +95,8 @@ export default function ChangeInvoiceDialog({
       dispatch(fetchStoreItems({
         pageNumber: 1,
         rowsPerPage: 100,
-        itemType: ItemType.Product,
         storeId: formData.storeId ?? 0,
-        condition: undefined
+        request: new FilterByTypeRequest({ condition: undefined, types: [ItemType.Product, ItemType.Service] })
       }));
     }
   }, [dispatch, formData.storeId]);

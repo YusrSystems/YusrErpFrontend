@@ -2,6 +2,7 @@ import { SearchableSelect } from "@yusr_systems/ui";
 import debounce from "lodash/debounce";
 import { ScanBarcode, ShoppingCart } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { FilterByTypeRequest } from "../../core/data/filterByTypeRequest";
 import { ItemFilterColumns, ItemType, ItemUnitPricingMethod, type StoreItem } from "../../core/data/item";
 import { clearBarcodeResult, GetItemByBarcode } from "../../core/state/shared/itemBarcodeSlice";
 import { fetchStoreItems } from "../../core/state/shared/storeItemsSlice";
@@ -10,11 +11,11 @@ import { useAppDispatch, useAppSelector } from "../../core/state/store";
 interface StoreItemSelectorProps
 {
   storeId?: number;
-  itemType?: ItemType;
+  itemTypes?: ItemType[];
   onSelect?: (item: StoreItem, selectedIupm?: ItemUnitPricingMethod) => void;
 }
 
-export default function StoreItemSelector({ storeId, itemType, onSelect }: StoreItemSelectorProps)
+export default function StoreItemSelector({ storeId, itemTypes, onSelect }: StoreItemSelectorProps)
 {
   const dispatch = useAppDispatch();
   const [barcode, setBarcode] = useState("");
@@ -34,9 +35,9 @@ export default function StoreItemSelector({ storeId, itemType, onSelect }: Store
 
   const debouncedSearch = useMemo(
     () =>
-      debounce((value, storeId, itemType) =>
+      debounce((value, storeId) =>
       {
-        if (value && storeId && itemType)
+        if (value && storeId)
         {
           dispatch(GetItemByBarcode({ barcode: value, storeId: storeId }));
           setBarcode("");
@@ -54,7 +55,7 @@ export default function StoreItemSelector({ storeId, itemType, onSelect }: Store
   {
     const val = e.target.value;
     setBarcode(val);
-    debouncedSearch(val, storeId, itemType);
+    debouncedSearch(val, storeId);
   };
 
   return (
@@ -86,15 +87,14 @@ export default function StoreItemSelector({ storeId, itemType, onSelect }: Store
           columnsNames={ ItemFilterColumns.columnsNames }
           onSearch={ (condition) =>
           {
-            if (itemType && storeId)
+            if (itemTypes?.length && storeId)
             {
               dispatch(
                 fetchStoreItems({
                   pageNumber: 1,
                   rowsPerPage: 10,
-                  itemType: itemType,
                   storeId: storeId,
-                  condition: condition
+                  request: new FilterByTypeRequest({ condition: condition, types: itemTypes })
                 })
               );
             }

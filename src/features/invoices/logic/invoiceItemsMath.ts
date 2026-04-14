@@ -4,15 +4,25 @@ import type { InvoiceProfitResult } from "../../../core/data/InvoiceProfitResult
 
 export default class InvoiceItemsMath
 {
-  public static GetTaxExclusivePrice(taxIncluded: boolean, price: number, totalTaxesPerc: number): number
+  public static GetPrices(
+    taxIncluded: boolean,
+    price: number,
+    totalTaxesPerc: number
+  ): { taxExclusivePrice: number; taxInclusivePrice: number; }
   {
     if (taxIncluded)
     {
-      return InvoiceItemsMath.CalcTaxExclusivePrice(price, totalTaxesPerc);
+      return {
+        taxExclusivePrice: InvoiceItemsMath.CalcTaxExclusivePrice(price, totalTaxesPerc),
+        taxInclusivePrice: price
+      };
     }
     else
     {
-      return price;
+      return {
+        taxExclusivePrice: price,
+        taxInclusivePrice: InvoiceItemsMath.CalcTaxInclusivePrice(price, totalTaxesPerc)
+      };
     }
   }
 
@@ -67,7 +77,7 @@ export default class InvoiceItemsMath
       (sum, i) =>
         sum
         + InvoiceItemsMath.CalcTaxInclusiveTotalPrice(
-          InvoiceItemsMath.CalcTaxInclusivePrice(i.taxExclusivePrice ?? 0, i.totalTaxesPerc ?? 0),
+          i.taxInclusivePrice ?? 0,
           i.settlement ?? 0,
           i.quantity ?? 0
         ),

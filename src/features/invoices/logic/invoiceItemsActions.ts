@@ -45,12 +45,11 @@ export default class InvoiceItemsActions
     const defaultPricingMethod = storeItem.itemUnitPricingMethods?.find((p) => p.unitId === baseItem.sellUnitId)
       || storeItem.itemUnitPricingMethods?.[0];
 
-    const taxExclusivePrice = InvoiceItemsMath.GetTaxExclusivePrice(
+    const { taxExclusivePrice, taxInclusivePrice } = InvoiceItemsMath.GetPrices(
       baseItem.taxIncluded,
       defaultPricingMethod?.price || 0,
       baseItem.totalTaxes || 0
     );
-    const taxInclusivePrice = InvoiceItemsMath.CalcTaxInclusivePrice(taxExclusivePrice, baseItem.totalTaxes || 0);
 
     state.formData.invoiceItems?.push({
       id: 0,
@@ -97,14 +96,16 @@ export default class InvoiceItemsActions
     const { index, iupmId } = action.payload;
     let row = state.formData.invoiceItems[index];
     const selectedMethod = row.itemUnitPricingMethods?.find((p) => p.id === iupmId);
-    row.itemUnitPricingMethodId = iupmId;
-    row.itemUnitPricingMethodName = selectedMethod?.itemUnitPricingMethodName || "";
-    row.taxExclusivePrice = InvoiceItemsMath.GetTaxExclusivePrice(
+    const { taxExclusivePrice, taxInclusivePrice } = InvoiceItemsMath.GetPrices(
       row.taxIncluded,
       selectedMethod?.price || 0,
       row.totalTaxesPerc || 0
     );
-    row.taxInclusivePrice = InvoiceItemsMath.CalcTaxInclusivePrice(row.taxExclusivePrice, row.totalTaxesPerc);
+
+    row.itemUnitPricingMethodId = iupmId;
+    row.itemUnitPricingMethodName = selectedMethod?.itemUnitPricingMethodName || "";
+    row.taxExclusivePrice = taxExclusivePrice;
+    row.taxInclusivePrice = taxInclusivePrice;
     row.taxExclusiveTotalPrice = InvoiceItemsMath.CalcTaxExclusiveTotalPrice(
       row.taxExclusivePrice,
       row.settlement,

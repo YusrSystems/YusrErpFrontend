@@ -1,5 +1,6 @@
 import { ChangeDialog, type CommonChangeDialogProps, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, FormField, Loading, SearchableSelect, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
+import { FilterByTypeRequest } from "../../core/data/filterByTypeRequest";
 import { ItemType } from "../../core/data/item";
 import ItemTransfer, { ItemTransfersItem, ItemTransferSlice, ItemTransferValidationRules } from "../../core/data/itemTransfer";
 import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
@@ -101,9 +102,8 @@ export default function ChangeItemTransferDialog({
       dispatch(fetchStoreItems({
         pageNumber: 1,
         rowsPerPage: 100,
-        itemType: ItemType.Product,
         storeId: formData.fromStoreId,
-        condition: undefined
+        request: new FilterByTypeRequest({ condition: undefined, types: [ItemType.Product] })
       }));
     }
   }, [dispatch, formData.fromStoreId]);
@@ -249,7 +249,7 @@ export default function ChangeItemTransferDialog({
             <>
               { mode === "create" && (
                 <StoreItemSelector
-                  itemType={ ItemType.Product }
+                  itemTypes={ [ItemType.Product] }
                   storeId={ formData.fromStoreId }
                   onSelect={ (storeItem, selectedIupm) =>
                   {

@@ -168,7 +168,7 @@ export default function StocktakingItemsTable(
         { mode === "create" && (
           <StoreItemSelector
             storeId={ formData.storeId }
-            itemType={ ItemType.Product }
+            itemTypes={ [ItemType.Product] }
             onSelect={ handleStoreItemSelect }
           />
         ) }

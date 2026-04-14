@@ -1,15 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { FilterCondition, FilterResult } from "@yusr_systems/core";
-import type { ItemType, StoreItem } from "../../data/item";
+import type { FilterResult } from "@yusr_systems/core";
+import type { FilterByTypeRequest } from "../../data/filterByTypeRequest";
+import type { StoreItem } from "../../data/item";
 import ItemsApiService from "../../networking/itemApiService";
 
 export interface FetchStoreItemsProps
 {
   pageNumber: number;
   rowsPerPage: number;
-  itemType: ItemType;
   storeId: number;
-  condition?: FilterCondition;
+  request: FilterByTypeRequest;
 }
 export const fetchStoreItems = createAsyncThunk<FilterResult<StoreItem>, FetchStoreItemsProps>(
   "storeItems/fetch",
@@ -20,9 +20,8 @@ export const fetchStoreItems = createAsyncThunk<FilterResult<StoreItem>, FetchSt
     const res = await new ItemsApiService().FilterStoreItems(
       storeItemsProps.pageNumber,
       storeItemsProps.rowsPerPage,
-      storeItemsProps.itemType,
       storeItemsProps.storeId,
-      storeItemsProps.condition
+      storeItemsProps.request
     );
     return res.data ?? { data: [], count: 0 };
   }

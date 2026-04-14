@@ -107,20 +107,6 @@ export default class Item extends BaseEntity
   }
 }
 
-export class DetailedItem
-{
-  public item!: Item;
-  public itemUnitPricingMethods: ItemUnitPricingMethod[] = [];
-  public itemTaxes: ItemTax[] = [];
-  public itemStores: ItemStore[] = [];
-  public itemImages: StorageFile[] = [];
-
-  constructor(init?: Partial<DetailedItem>)
-  {
-    Object.assign(this, init);
-  }
-}
-
 export class StoreItem
 {
   public item!: Item;

@@ -1,6 +1,7 @@
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
 import { ChangeDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, FieldGroup, FieldsSection, Loading, SearchableSelect, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { useEffect, useMemo, useState } from "react";
+import { FilterByTypeRequest } from "../../core/data/filterByTypeRequest";
 import { ItemType } from "../../core/data/item";
 import Stocktaking, { StocktakingItem, StocktakingSlice, StocktakingValidationRules } from "../../core/data/stocktaking";
 import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
@@ -43,9 +44,8 @@ export default function ChangeStocktakingDialog(
       dispatch(fetchStoreItems({
         pageNumber: 1,
         rowsPerPage: 100,
-        itemType: ItemType.Product,
         storeId: formData.storeId,
-        condition: undefined
+        request: new FilterByTypeRequest({ condition: undefined, types: [ItemType.Product] })
       }));
     }
   }, [dispatch, formData.storeId]);
