@@ -38,8 +38,8 @@ export default function RolesPage()
         icon: <Settings2 className="h-4 w-4 text-muted-foreground" />
       }] }
       columnsToFilter={ RoleFilterColumns.columnsNames }
-      tableHeadRows={ [{ rowName: "", rowStyles: "text-left w-12.5" }, { rowName: "رقم الصلاحية", rowStyles: "w-30" }, {
-        rowName: "اسم الصلاحية",
+      tableHeadRows={ [{ rowName: "", rowStyles: "text-left w-12.5" }, { rowName: "رقم الدور", rowStyles: "w-30" }, {
+        rowName: "اسم الدور",
         rowStyles: ""
       }] }
       tableRowMapper={ (

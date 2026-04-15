@@ -7,7 +7,7 @@ type DashboardSectionCardsProps = { data: DashboardData; };
 
 const sumArray = (arr?: number[]) => arr?.reduce((a, b) => a + b, 0) ?? 0;
 
-const formatNumber = (num: number) => new Intl.NumberFormat("ar-SA").format(num);
+const formatNumber = (num: number) => new Intl.NumberFormat("en-US").format(num);
 
 const MiniBarChart = ({ data, colorClass }: { data?: number[]; colorClass: string; }) =>
 {

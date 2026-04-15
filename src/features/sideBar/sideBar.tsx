@@ -7,8 +7,8 @@ import { SystemPermissionsResources } from "../../core/auth/systemPermissionsRes
 import ApplicationLanguages from "../../core/services/language/applicationLanguages";
 import { logout, useAppDispatch, useAppSelector } from "../../core/state/store";
 
-import logoFullDark from "@/assets/yusrBusLogoRTL_Dark.png";
-import logoFullLight from "@/assets/yusrBusLogoRTL_Light.png";
+import logoFullDark from "@/assets/yusrErpLogoRTL_Dark.png";
+import logoFullLight from "@/assets/yusrErpLogoRTL_Light.png";
 import logoOnlyDark from "@/assets/yusrLogoOnly_Dark.png";
 import logoOnlyLight from "@/assets/yusrLogoOnly_Light.png";
 
