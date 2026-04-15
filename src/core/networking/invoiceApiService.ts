@@ -19,6 +19,11 @@ export default class InvoicesApiService extends BaseApiService<Invoice>
     );
   }
 
+  async GetReturnInvoiceInitialDetails(id: number): Promise<RequestResult<Invoice>>
+  {
+    return await YusrApiHelper.Get(`${ApiConstants.baseUrl}/${this.routeName}/GetReturnInvoiceInitialDetails/${id}`);
+  }
+
   async ConvertToSell(
     invoiceId: number,
     ignoreWarnings: boolean,

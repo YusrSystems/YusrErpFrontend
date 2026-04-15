@@ -5,11 +5,11 @@ import { useInvoiceContext } from "../../logic/invoiceContext";
 export default function InvoiceGlobalSettlements()
 {
   const {
+    mode,
     formData,
     dispatch,
     slice,
     disabled,
-    returnDisabled
   } = useInvoiceContext();
 
   return (
@@ -31,7 +31,7 @@ export default function InvoiceGlobalSettlements()
             value={ formData.settlementAmount ?? 0 }
             onChange={ (newValue) =>
               dispatch(slice.formActions.onInvoiceSettlementAmountChange(Number(newValue) ?? 0)) }
-            disabled={ disabled || returnDisabled }
+            disabled={ disabled || mode === "return"}
           />
         </div>
 
@@ -47,7 +47,7 @@ export default function InvoiceGlobalSettlements()
             value={ formData.settlementPercent ?? 0 }
             onChange={ (newValue) =>
               dispatch(slice.formActions.onInvoiceSettlementPercentChange(Number(newValue) ?? 0)) }
-            disabled={ disabled || returnDisabled }
+            disabled={ disabled|| mode === "return" }
           />
         </div>
       </div>

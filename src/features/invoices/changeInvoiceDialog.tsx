@@ -1,6 +1,6 @@
-import type { CommonChangeDialogProps, IEntityState } from "@yusr_systems/ui";
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle, Loading, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
-import { BanknoteArrowDown, BanknoteArrowUp, Box, FolderKanban, Siren } from "lucide-react";
+import type { CommonChangeDialogProps, DialogMode, IEntityState } from "@yusr_systems/ui";
+import { Button, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Loading, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
+import { BanknoteArrowDown, BanknoteArrowUp, Box, CheckCircle2, FolderKanban, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import Account, { type AccountSliceType } from "../../core/data/account";
@@ -23,6 +23,7 @@ import InvoicePaymentsTab from "./presentation/payments/invoicePaymentsTab";
 import InvoicePolicyTab from "./presentation/policy/invoicePolicyTab";
 
 export type InvoiceSliceType = ReturnType<typeof InvoiceSlice.create>;
+export type InvoiceDialogMode = DialogMode | "return";
 
 export default function ChangeInvoiceDialog({
   entity,
@@ -34,7 +35,9 @@ export default function ChangeInvoiceDialog({
   selectFormState,
   accountSlice,
   accountState
-}: CommonChangeDialogProps<Invoice> & {
+}: Omit<CommonChangeDialogProps<Invoice>, "mode" | "onSuccess"> & {
+  mode: InvoiceDialogMode;
+  onSuccess?: (data: Invoice, mode: InvoiceDialogMode) => void;
   slice: InvoiceSliceType;
   stateKey: keyof RootState;
   fixedType?: InvoiceType;
@@ -81,6 +84,7 @@ export default function ChangeInvoiceDialog({
   const [showConfirm, setShowConfirm] = useState(false);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [showWarnings, setShowWarnings] = useState(false);
+  const [fullyReturned, setFullyReturned] = useState(false);
 
   const paymentVouchers = () =>
     formData.invoiceVouchers?.filter((v) => v.invoiceRelationType == InvoiceRelationType.Payment) ?? [];
@@ -113,6 +117,11 @@ export default function ChangeInvoiceDialog({
 
   useEffect(() =>
   {
+    if (paymentVouchers().length > 1 || mode === "update")
+    {
+      return;
+    }
+
     if (paymentVouchers().length === 0)
     {
       dispatch(slice.formActions.resetPaymentVouchers({}));
@@ -127,33 +136,44 @@ export default function ChangeInvoiceDialog({
       };
       dispatch(slice.formActions.updateVoucher(updatedVoucher));
     }
-    dispatch(slice.formActions.updateFormData({ fullAmount: invoiceTaxInclusivePrice() }));
+    dispatch(
+      slice.formActions.updateFormData({
+        fullAmount: invoiceTaxInclusivePrice(),
+        paidAmount: invoiceTaxInclusivePrice()
+      })
+    );
   }, [formData.invoiceItems]);
 
   useEffect(() =>
   {
-    if (mode === "update" && formData?.id != undefined)
+    if ((mode === "update" || mode === "return") && entity?.id != undefined)
     {
       setInitLoading(true);
 
-      const getItem = async () =>
+      const getInvoice = async () =>
       {
-        if (formData.id == undefined)
+        let res = undefined;
+
+        if (mode === "update")
         {
-          return;
+          res = await service.Get(entity.id);
+        }
+        else if (mode === "return")
+        {
+          res = await new InvoicesApiService().GetReturnInvoiceInitialDetails(entity.id);
         }
 
-        const res = await service.Get(formData.id);
-        if (res.data != undefined)
+        if (res?.data != undefined)
         {
-          dispatch(slice.formActions.setInitialData(res.data));
+          dispatch(slice.formActions.updateFormData(res.data));
+          setFullyReturned(res.data.invoiceItems.length === 0);
         }
         setInitLoading(false);
       };
 
-      getItem();
+      getInvoice();
     }
-  }, [formData?.id, mode]);
+  }, [dispatch, entity?.id]);
 
   const createInitialPaymentVoucher = (): InvoiceVoucher =>
   {
@@ -199,13 +219,35 @@ export default function ChangeInvoiceDialog({
     setInitLoading(false);
   };
 
+  const onBeforeSave = async (): Promise<{ handled: boolean; data?: Invoice; }> =>
+  {
+    if (mode === "return")
+    {
+      const res = await new InvoicesApiService().Add({
+        ...formData,
+        type: formData.type === InvoiceType.Sell ? InvoiceType.SellReturn : InvoiceType.PurchaseReturn,
+        originalInvoiceId: formData.id,
+        id: 0
+      } as Invoice);
+      return { handled: true, data: res.data as Invoice ?? undefined };
+    }
+    return { handled: false };
+  };
+
+  const isReturn = formData.type === InvoiceType.SellReturn || fixedType === InvoiceType.PurchaseReturn
+    || mode === "return";
+  const dialogTitle = (mode === "create" ? "إضافة" : "تعديل")
+      + isReturn
+    ? " إضافة مرتجع"
+    : " الفاتورة";
+
   if (initLoading)
   {
     return (
       <DialogContent dir="rtl">
         <DialogHeader>
           <DialogTitle>
-            { mode === "create" ? "إضافة" : "تعديل" } الفاتورة
+            { dialogTitle }
           </DialogTitle>
           <DialogDescription />
         </DialogHeader>
@@ -214,9 +256,35 @@ export default function ChangeInvoiceDialog({
     );
   }
 
-  const disabled = mode === "update"
-    && (formData.type === InvoiceType.Sell || formData.type === InvoiceType.SellReturn);
-  const returnDisabled = formData.type === InvoiceType.PurchaseReturn || formData.type === InvoiceType.SellReturn;
+  if (fullyReturned)
+  {
+    return (
+      <DialogContent dir="rtl">
+        <DialogHeader>
+          <DialogTitle>
+            { dialogTitle }
+          </DialogTitle>
+          <DialogDescription />
+        </DialogHeader>
+
+        <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle2 className="h-8 w-8 text-green-600" />
+          </div>
+          <h3 className="text-lg font-semibold">تم الاسترجاع بالكامل</h3>
+          <p className="text-sm text-muted-foreground">تم استرجاع جميع بنود هذه الفاتورة مسبقاً</p>
+        </div>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">إغلاق</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    );
+  }
+
+  const disabled = mode === "update" && formData.type === InvoiceType.Sell;
 
   return (
     <InvoiceContext.Provider
@@ -230,20 +298,20 @@ export default function ChangeInvoiceDialog({
         authState,
         dispatch,
         disabled,
-        returnDisabled,
         accountSlice,
-        accountState
+        accountState,
       } }
     >
       <ChangeDialogTabbed<Invoice>
         changeDialogProps={ {
-          title: `${mode === "create" ? "إضافة" : "تعديل"} فاتورة`,
+          title: dialogTitle,
           className: "sm:max-w-[90vw]",
           formData,
-          dialogMode: mode,
+          dialogMode: mode as DialogMode,
           service,
           onSuccess: (data) => onSuccess?.(data, mode),
           validate,
+          onBeforeSave: onBeforeSave,
           actionButtons: formData.type === InvoiceType.Quotation && mode === "update"
             ? (
               <AlertConvertDialog
@@ -257,40 +325,32 @@ export default function ChangeInvoiceDialog({
             )
             : undefined
         } }
-        tabs={ [
-          {
-            label: "المعلومات الأساسية",
-            icon: Box,
-            active: true,
-            content: <InvoiceBasicTab />
-          },
-          ...(formData.type === InvoiceType.Sell || formData.type === InvoiceType.Purchase
-            ? [{
-              label: "سندات الدفع",
-              icon: BanknoteArrowDown,
-              active: false,
-              content: <InvoicePaymentsTab />
-            }]
-            : []),
-          {
-            label: "تكاليف الفاتورة",
-            icon: BanknoteArrowUp,
-            active: false,
-            content: <InvoiceCostsTab />
-          },
-          {
-            label: "سياسة الفاتورة",
-            icon: Siren,
-            active: false,
-            content: <InvoicePolicyTab />
-          },
-          {
-            label: "مرفقات الفاتورة",
-            icon: FolderKanban,
-            active: false,
-            content: <InvoiceFilesTab />
-          }
-        ] }
+        tabs={ [{
+          label: "المعلومات الأساسية",
+          icon: Box,
+          active: true,
+          content: <InvoiceBasicTab />
+        }, {
+          label: "سندات الدفع",
+          icon: BanknoteArrowDown,
+          active: false,
+          content: <InvoicePaymentsTab />
+        }, {
+          label: "تكاليف الفاتورة",
+          icon: BanknoteArrowUp,
+          active: false,
+          content: <InvoiceCostsTab />
+        }, {
+          label: "سياسة الفاتورة",
+          icon: Siren,
+          active: false,
+          content: <InvoicePolicyTab />
+        }, {
+          label: "مرفقات الفاتورة",
+          icon: FolderKanban,
+          active: false,
+          content: <InvoiceFilesTab />
+        }] }
       />
     </InvoiceContext.Provider>
   );

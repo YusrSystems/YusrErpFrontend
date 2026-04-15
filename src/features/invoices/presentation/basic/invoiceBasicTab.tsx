@@ -13,18 +13,18 @@ import { InvoiceType } from "../../../../core/data/invoice";
 export default function InvoiceBasicTab()
 {
   const {
+    mode,
     formData,
     slice,
     authState,
     dispatch,
     disabled,
-    returnDisabled
   } = useInvoiceContext();
 
   return (
     <div className="flex flex-col gap-6">
       <InvoiceBasicInfo />
-      { !disabled && !returnDisabled && (
+      { !(disabled || mode === "return") && (
         <StoreItemSelector onSelect={ (item) => dispatch(slice.formActions.addItem(item)) } />
       ) }
       <InvoiceItemsTable />

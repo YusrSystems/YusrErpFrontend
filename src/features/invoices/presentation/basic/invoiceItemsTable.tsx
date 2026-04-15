@@ -13,13 +13,13 @@ import EmptyTable from "./emptyTable";
 export default function InvoiceItemsTable()
 {
   const {
+    mode,
     formData,
     errors,
     slice,
     authState,
     dispatch,
     disabled,
-    returnDisabled
   } = useInvoiceContext();
 
   const getMaxAllowedQuantity = (storeQuantity: number) =>
@@ -110,19 +110,24 @@ export default function InvoiceItemsTable()
                   </td>
 
                   <td className="px-2 pt-2">
-                    <SelectField
-                      label=""
-                      value={ row.itemUnitPricingMethodId?.toString() || "" }
-                      onValueChange={ (val: string) =>
-                        dispatch(slice.formActions.onInvoiceItemIupmChange({ index: index, iupmId: Number(val) })) }
-                      options={ row.itemUnitPricingMethods?.map((m) => ({
-                        label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
-                        value: m.id.toString()
-                      })) || [] }
-                      placeholder="اختر طريقة التسعير"
-                      isInvalid={ !!errors[`${row.id}_method`] }
-                      disabled={ disabled || returnDisabled }
-                    />
+                    { (disabled || mode === "return") && (
+                      <div className="font-semibold text-foreground">{ row.itemUnitPricingMethodName }</div>
+                    ) }
+                    { !(disabled || mode === "return") && (
+                      <SelectField
+                        label=""
+                        value={ row.itemUnitPricingMethodId?.toString() || "" }
+                        onValueChange={ (val: string) =>
+                          dispatch(slice.formActions.onInvoiceItemIupmChange({ index: index, iupmId: Number(val) })) }
+                        options={ row.itemUnitPricingMethods?.map((m) => ({
+                          label: `${m.pricingMethodName || "بدون"} ${m.unitName || "بدون"}`,
+                          value: m.id.toString()
+                        })) || [] }
+                        placeholder="اختر طريقة التسعير"
+                        isInvalid={ !!errors[`${row.id}_method`] }
+                        disabled={ disabled }
+                      />
+                    ) }
                   </td>
 
                   <td className="px-2 pt-2">
@@ -132,12 +137,13 @@ export default function InvoiceItemsTable()
                   <td className="px-2 pt-2">
                     <NumberField
                       label=""
-                      min={ 1 }
+                      min={ 0 }
+                      step={ 0.1 }
                       max={ getMaxAllowedQuantity(row.originalQuantity) }
                       value={ row.quantity ?? 1 }
                       onChange={ (newValue) =>
                         dispatch(slice.formActions.onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
-                      disabled={ disabled }
+                      disabled={ false }
                     />
                   </td>
 
@@ -160,7 +166,7 @@ export default function InvoiceItemsTable()
                       label=""
                       min={ getMinAllowedTaxInclusivePrice(row.originaltaxInclusivePrice) }
                       value={ row.taxInclusivePrice || "0" }
-                      disabled={ disabled || returnDisabled }
+                      disabled={ disabled || mode === "return" }
                       onChange={ (newVal) =>
                         dispatch(
                           slice.formActions.onInvoiceItemTaxInclusivePriceChange({
@@ -180,7 +186,7 @@ export default function InvoiceItemsTable()
                       <NumberField
                         label=""
                         value={ row.settlement || "0" }
-                        disabled={ disabled || returnDisabled }
+                        disabled={ disabled || mode === "return" }
                         onChange={ (newValue) =>
                         {
                           dispatch(
@@ -229,19 +235,20 @@ export default function InvoiceItemsTable()
                   ) }
 
                   <td className="px-2 pt-2">
-                    { !disabled && !returnDisabled && (
-                      <button
-                        type="button"
-                        onClick={ () =>
-                        {
-                          dispatch(slice.formActions.removeItem(index));
-                        } }
-                        className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
-                        aria-label="حذف المادة"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    ) }
+                    { (!disabled)
+                      && (
+                        <button
+                          type="button"
+                          onClick={ () =>
+                          {
+                            dispatch(slice.formActions.removeItem(index));
+                          } }
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-500/10 rounded-md transition-colors"
+                          aria-label="حذف المادة"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      ) }
                   </td>
                 </tr>
                 <tr className="bg-muted/10 border-b">
@@ -250,7 +257,7 @@ export default function InvoiceItemsTable()
                       label=""
                       placeholder="أضف ملاحظات..."
                       value={ row.notes || "" }
-                      disabled={ disabled || returnDisabled }
+                      disabled={ disabled || mode === "return" }
                       onChange={ (val) =>
                       {
                         dispatch(

@@ -4,13 +4,11 @@ import { useInvoiceContext } from "../../logic/invoiceContext";
 export default function InvoicePolicyTab()
 {
   const {
-    mode,
     formData,
     slice,
     dispatch,
     authState,
-    disabled,
-    returnDisabled
+    disabled
   } = useInvoiceContext();
 
   return (
@@ -18,7 +16,7 @@ export default function InvoicePolicyTab()
       label="السياسة / الشروط (تظهر في أسفل الفاتورة)"
       value={ formData.policy || authState.setting?.invoicePolicy || "" }
       onChange={ (e) => dispatch(slice.formActions.updateFormData({ policy: e.target.value })) }
-      disabled={ disabled || returnDisabled }
+      disabled={ disabled }
       className="h-100"
     />
   );

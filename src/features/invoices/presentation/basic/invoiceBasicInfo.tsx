@@ -81,7 +81,7 @@ export default function InvoiceBasicInfo()
           onValueChange={ (val) => dispatch(slice.formActions.updateFormData({ type: Number(val) as InvoiceType })) }
           isInvalid={ isInvalid("type") }
           error={ getError("type") }
-          disabled={ mode === "update" }
+          disabled={ mode === "update" || mode === "return" }
           options={ [{ label: "مبيعات", value: InvoiceType.Sell.toString() }, {
             label: "عرض سعر",
             value: InvoiceType.Quotation.toString()
@@ -89,7 +89,7 @@ export default function InvoiceBasicInfo()
         />
       ) }
 
-      { mode === "update" && (
+      { (mode === "update" || mode === "return") && (
         <TextField
           label="تاريخ الفاتورة"
           required
@@ -119,7 +119,7 @@ export default function InvoiceBasicInfo()
           value={ formData.storeId?.toString() || "" }
           columnsNames={ StoreFilterColumns.columnsNames }
           onSearch={ (condition) => dispatch(StoreSlice.entityActions.filter(condition)) }
-          disabled={ storeState.isLoading || mode === "update" }
+          disabled={ storeState.isLoading || mode === "update" || mode === "return" }
           onValueChange={ (val) =>
           {
             const selected = storeState.entities.data?.find((a) => a.id.toString() === val);
@@ -143,7 +143,7 @@ export default function InvoiceBasicInfo()
           value={ formData.actionAccountId?.toString() || "" }
           columnsNames={ AccountFilterColumns.columnsNames }
           onSearch={ (condition) => dispatch(accountSlice.entityActions.filter(condition)) }
-          disabled={ accountState.isLoading || mode === "update" }
+          disabled={ accountState.isLoading || mode === "update"|| mode === "return" }
           onValueChange={ (val) =>
           {
             const selected = accountState.entities.data?.find((a) => a.id.toString() === val);

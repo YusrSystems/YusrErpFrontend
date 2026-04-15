@@ -1,6 +1,6 @@
-import { CrudPage, type IDialogState, type IEntityState } from "@yusr_systems/ui";
+import { ContextMenuItem, CrudPage, DropdownMenuItem, type IDialogState, type IEntityState } from "@yusr_systems/ui";
 import { FileTextIcon } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type Account from "../../core/data/account";
@@ -16,7 +16,7 @@ export default function InvoicesPage({
   slice,
   stateKey,
   dialogStateKey,
-  fixedType,
+  fixedType: fixedType,
   selectFormState,
   accountSlice,
   accountState
@@ -32,6 +32,7 @@ export default function InvoicesPage({
 })
 {
   const dispatch = useAppDispatch();
+  const [isAddReturn, setIsAddReturn] = useState<boolean>(false);
   const invoiceState = useAppSelector((state) => state[stateKey] as IEntityState<Invoice>);
   const authState = useAppSelector((state) => state.auth);
   const invoiceDialogState = useAppSelector((state) => state[dialogStateKey] as IDialogState<Invoice>);
@@ -165,9 +166,20 @@ export default function InvoicesPage({
       ] }
       actions={ {
         filter: slice.entityActions.filter,
-        openChangeDialog: (entity) => slice.dialogActions.openChangeDialog(entity),
+        openChangeDialog: (entity) =>
+        {
+          setIsAddReturn(false);
+          return dispatch(slice.dialogActions.openChangeDialog(entity));
+        },
         openDeleteDialog: (entity) => slice.dialogActions.openDeleteDialog(entity),
-        setIsChangeDialogOpen: (open) => slice.dialogActions.setIsChangeDialogOpen(open),
+        setIsChangeDialogOpen: (open) =>
+        {
+          if (!open)
+          {
+            setIsAddReturn(false);
+          }
+          return slice.dialogActions.setIsChangeDialogOpen(open);
+        },
         setIsDeleteDialogOpen: (open) => slice.dialogActions.setIsDeleteDialogOpen(open),
         refresh: slice.entityActions.refresh,
         setCurrentPage: (page) => slice.entityActions.setCurrentPage(page)
@@ -175,7 +187,7 @@ export default function InvoicesPage({
       ChangeDialog={ 
         <ChangeInvoiceDialog
           entity={ invoiceDialogState.selectedRow || undefined }
-          mode={ invoiceDialogState.selectedRow ? "update" : "create" }
+          mode={ isAddReturn? "return" : invoiceDialogState.selectedRow ? "update" : "create" }
           service={ service }
           slice={ slice }
           stateKey={ stateKey }
@@ -186,13 +198,41 @@ export default function InvoicesPage({
           onSuccess={ (data, mode) =>
           {
             dispatch(slice.entityActions.refresh({ data: data }));
-            if (mode === "create")
+            if (mode === "create" || mode === "return")
             {
               dispatch(slice.dialogActions.setIsChangeDialogOpen(false));
             }
           } }
         />
        }
+      dorpdownItems={ (entity) =>
+        (entity.type === InvoiceType.Sell || entity.type === InvoiceType.Purchase)
+          ? [
+            <DropdownMenuItem
+              onSelect={ () =>
+              {
+                setIsAddReturn(true);
+                dispatch(slice.dialogActions.openChangeDialog(entity));
+              } }
+            >
+              إرجاع
+            </DropdownMenuItem>
+          ]
+          : [] }
+      contextMenuItems={ (entity) =>
+        (entity.type === InvoiceType.Sell || entity.type === InvoiceType.Purchase)
+          ? [
+            <ContextMenuItem
+              onSelect={ () =>
+              {
+                setIsAddReturn(true);
+                dispatch(slice.dialogActions.openChangeDialog(entity));
+              } }
+            >
+              إرجاع
+            </ContextMenuItem>
+          ]
+          : [] }
     />
   );
 }

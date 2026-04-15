@@ -9,7 +9,6 @@ import { useInvoiceContext } from "../../logic/invoiceContext";
 export default function InvoiceCostsTab()
 {
   const {
-    mode,
     formData,
     authState,
     slice,
