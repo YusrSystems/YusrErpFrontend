@@ -173,6 +173,7 @@ export default function InvoiceBasicInfo()
         <SelectField
           label="فاتورة استيراد"
           required
+          disabled={mode === "return"}
           value={ formData.importExportType?.toString() || "" }
           onValueChange={ (val) =>
             dispatch(slice.formActions.updateFormData({ importExportType: Number(val) as ImportExportType })) }

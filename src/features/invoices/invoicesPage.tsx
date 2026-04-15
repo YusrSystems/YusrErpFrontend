@@ -200,6 +200,7 @@ export default function InvoicesPage({
             dispatch(slice.entityActions.refresh({ data: data }));
             if (mode === "create" || mode === "return")
             {
+              setIsAddReturn(false);
               dispatch(slice.dialogActions.setIsChangeDialogOpen(false));
             }
           } }
