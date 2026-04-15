@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { Scale } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import ItemsSettlement, { ItemsSettlementFilterColumns, ItemsSettlementSlice } from "../../core/data/itemsSettlement";
 import ItemsSettlementsApiService from "../../core/networking/itemsSettlementsApiService";
@@ -11,6 +13,7 @@ import ChangeItemsSettlementDialog from "./changeItemsSettlementDialog";
 export default function ItemsSettlementsPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const itemsSettlementState = useAppSelector((state) => state.itemsSettlement);
   const itemsSettlementDialogState = useAppSelector((state) => state.itemsSettlementDialog);
 
@@ -26,6 +29,11 @@ export default function ItemsSettlementsPage()
       entityName="تسوية"
       addNewItemTitle="إضافة تسوية جديدة"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.ItemsSettlements,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ itemsSettlementState }
       useSlice={ () => itemsSettlementDialogState }
       service={ service }

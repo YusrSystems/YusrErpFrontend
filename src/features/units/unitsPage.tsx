@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { BoxIcon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type Unit from "../../core/data/unit";
 import { UnitFilterColumns, UnitSlice } from "../../core/data/unit";
@@ -12,6 +14,7 @@ import ChangeUnitDialog from "./changeUnitDialog";
 export default function UnitsPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const unitState = useAppSelector((state) => state.unit);
   const unitDialogState = useAppSelector((state) => state.unitDialog);
   const permissions = useAppSelector((state) => selectPermissionsByResource(state, SystemPermissionsResources.Units));
@@ -23,6 +26,11 @@ export default function UnitsPage()
       entityName="الوحدة"
       addNewItemTitle="إضافة وحدة جديدة"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.Units,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ unitState }
       useSlice={ () => unitDialogState }
       service={ service }

@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { ArrowLeftRightIcon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type ItemTransfer from "../../core/data/itemTransfer";
 import { ItemTransferFilterColumns, ItemTransferSlice } from "../../core/data/itemTransfer";
@@ -12,6 +14,7 @@ import ChangeItemTransferDialog from "./changeItemTransferDialog";
 export default function ItemTransfersPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const itemTransferState = useAppSelector((state) => state.itemTransfer);
   const itemTransferDialogState = useAppSelector((state) => state.itemTransferDialog);
 
@@ -28,6 +31,11 @@ export default function ItemTransfersPage()
       entityName="عملية نقل"
       addNewItemTitle="إنشاء عملية نقل مواد جديدة"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.ItemTransfers,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ itemTransferState }
       useSlice={ () => itemTransferDialogState }
       service={ service }

@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { ArrowRightLeft } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import BalanceTransfer, { BalanceTransferFilterColumns, BalanceTransferSlice } from "../../core/data/balanceTransfer";
 import BalanceTransfersApiService from "../../core/networking/balanceTransferApiService";
@@ -11,6 +13,7 @@ import ChangeBalanceTransferDialog from "./changeBalanceTransferDialog";
 export default function BalanceTransfersPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const transferState = useAppSelector((state) => state.balanceTransfer);
   const transferDialogState = useAppSelector((state) => state.balanceTransferDialog);
 
@@ -26,6 +29,11 @@ export default function BalanceTransfersPage()
       entityName="تحويل"
       addNewItemTitle="إضافة تحويل جديد"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.BalanceTransfers,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ transferState }
       useSlice={ () => transferDialogState }
       service={ service }

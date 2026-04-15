@@ -14,7 +14,8 @@ export default function AccountsPage({
   stateKey,
   dialogStateKey,
   fixedType,
-  selectFormState
+  selectFormState,
+  hasPagePermission
 }: {
   title: string;
   slice: ReturnType<typeof AccountSlice.create>;
@@ -22,6 +23,7 @@ export default function AccountsPage({
   dialogStateKey: keyof RootState;
   fixedType?: AccountType;
   selectFormState: (state: any) => { formData: Partial<Account>; errors: Record<string, string>; };
+  hasPagePermission: boolean;
 })
 {
   const dispatch = useAppDispatch();
@@ -40,6 +42,7 @@ export default function AccountsPage({
       entityName="الحساب"
       addNewItemTitle="إضافة حساب جديد"
       permissions={ permissions }
+      hasPagePermission={ hasPagePermission }
       entityState={ accountState }
       useSlice={ () => accountDialogState }
       service={ service }

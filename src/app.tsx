@@ -1,4 +1,4 @@
-import { ProtectedRoute, Skeleton, ThemeProvider, Toaster, TooltipProvider } from "@yusr_systems/ui";
+import { NotFoundPage, ProtectedRoute, Skeleton, ThemeProvider, Toaster, TooltipProvider } from "@yusr_systems/ui";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import AppLayout from "./appLayout";
 import useAppInitialization from "./core/hooks/useAppInitialization";
@@ -18,7 +18,6 @@ import ItemsSettlementsPage from "./features/itemsSettlements/itemsSettlementsPa
 import ItemTransfersPage from "./features/itemTransfers/itemTransfersPage";
 import LandingPage from "./features/landing/landingPage";
 import LoginPage from "./features/login/loginPage";
-import NotFoundPage from "./features/notFound/notFoundPage";
 import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 import PricingMethodsPage from "./features/pricingMethods/pricingMethodsPage";
 import RegisterPage from "./features/register/presentation/registerPage";

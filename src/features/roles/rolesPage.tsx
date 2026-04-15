@@ -1,8 +1,9 @@
-import { Role, RoleFilterColumns, RolesApiService } from "@yusr_systems/core";
+import { Role, RoleFilterColumns, RolesApiService, SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { Settings2 } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import { RoleSlice } from "../../core/data/role";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
@@ -11,6 +12,7 @@ import ChangeRoleDialog from "./changeRoleDialog";
 export default function RolesPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const roleState = useAppSelector((state) => state.role);
   const roleDialogState = useAppSelector((state) => state.roleDialog);
   const permissions = useAppSelector((state) => selectPermissionsByResource(state, SystemPermissionsResources.Roles));
@@ -22,6 +24,11 @@ export default function RolesPage()
       entityName="الدور"
       addNewItemTitle="إضافة دور جديد"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.Roles,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ roleState }
       useSlice={ () => roleDialogState }
       service={ service }

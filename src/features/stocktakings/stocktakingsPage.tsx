@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { ClipboardCheck } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import Stocktaking, { StocktakingFilterColumns, StocktakingSlice } from "../../core/data/stocktaking";
 import StocktakingsApiService from "../../core/networking/stocktakingApiService";
@@ -11,6 +13,7 @@ import ChangeStocktakingDialog from "./changeStocktakingDialog";
 export default function StocktakingsPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const stocktakingState = useAppSelector((state) => state.stocktaking);
   const stocktakingDialogState = useAppSelector((state) => state.stocktakingDialog);
 
@@ -26,6 +29,11 @@ export default function StocktakingsPage()
       entityName="جرد"
       addNewItemTitle="إضافة جرد جديد"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.Stocktakings,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ stocktakingState }
       useSlice={ () => stocktakingDialogState }
       service={ service }

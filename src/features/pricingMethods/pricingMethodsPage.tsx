@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { TagIcon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type PricingMethod from "../../core/data/pricingMethod";
 import { PricingMethodFilterColumns, PricingMethodSlice } from "../../core/data/pricingMethod";
@@ -12,6 +14,7 @@ import ChangePricingMethodDialog from "./changePricingMethodDialog";
 export default function PricingMethodsPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const pricingMethodState = useAppSelector((state) => state.pricingMethod);
   const pricingMethodDialogState = useAppSelector(
     (state) => state.pricingMethodDialog
@@ -33,6 +36,11 @@ export default function PricingMethodsPage()
       entityName="طريقة التسعير"
       addNewItemTitle="إضافة طريقة تسعير جديدة"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.PricingMethods,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ pricingMethodState }
       useSlice={ () => pricingMethodDialogState }
       service={ service }

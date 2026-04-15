@@ -6,7 +6,6 @@ import { SystemPermissionsResources } from "../../core/auth/systemPermissionsRes
 import { ClientsSlice } from "../../core/data/account";
 import { InvoiceType, SalesSlice } from "../../core/data/invoice";
 import { useAppSelector } from "../../core/state/store";
-import UnauthorizedPage from "../unauthorized/unauthorizedPage";
 import InvoicesPage from "./invoicesPage";
 
 export default function SellInvoicesPage()
@@ -24,17 +23,6 @@ export default function SellInvoicesPage()
     }
   }, [invoiceId]);
 
-  if (
-    !SystemPermissions.hasAuth(
-      authState.loggedInUser?.role?.permissions ?? [],
-      SystemPermissionsResources.InvoiceSell,
-      SystemPermissionsActions.Get
-    )
-  )
-  {
-    return <UnauthorizedPage />;
-  }
-
   return (
     <InvoicesPage
       slice={ SalesSlice }
@@ -45,6 +33,11 @@ export default function SellInvoicesPage()
       selectFormState={ (state) => state.salesForm }
       accountSlice={ ClientsSlice }
       accountState={ clientsState }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.InvoiceSell,
+        SystemPermissionsActions.Get
+      ) }
     />
   );
 }

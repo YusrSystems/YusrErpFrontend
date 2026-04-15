@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { Warehouse } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type Store from "../../core/data/store";
 import { StoreFilterColumns, StoreSlice } from "../../core/data/store";
@@ -12,6 +14,7 @@ import ChangeStoreDialog from "./changeStoreDialog";
 export default function StoresPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const storeState = useAppSelector((state) => state.store);
   const storeDialogState = useAppSelector((state) => state.storeDialog);
   const permissions = useAppSelector((state) => selectPermissionsByResource(state, SystemPermissionsResources.Stores));
@@ -23,6 +26,11 @@ export default function StoresPage()
       entityName="المستودع"
       addNewItemTitle="إضافة مستودع جديد"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.Stores,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ storeState }
       useSlice={ () => storeDialogState }
       service={ service }

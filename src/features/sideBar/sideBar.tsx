@@ -82,7 +82,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "/clients",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
-          SystemPermissionsResources.Accounts,
+          SystemPermissionsResources.AccountClient,
           SystemPermissionsActions.Get
         )
       }, {
@@ -90,7 +90,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "/suppliers",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
-          SystemPermissionsResources.Accounts,
+          SystemPermissionsResources.AccountSupplier,
           SystemPermissionsActions.Get
         )
       }, {
@@ -98,7 +98,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "/employees",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
-          SystemPermissionsResources.Accounts,
+          SystemPermissionsResources.AccountEmployee,
           SystemPermissionsActions.Get
         )
       }, {
@@ -106,7 +106,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "/banks",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
-          SystemPermissionsResources.Accounts,
+          SystemPermissionsResources.AccountBank,
           SystemPermissionsActions.Get
         )
       }, {
@@ -114,7 +114,7 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
         url: "/boxes",
         hasAuth: SystemPermissions.hasAuth(
           permissions,
-          SystemPermissionsResources.Accounts,
+          SystemPermissionsResources.AccountBox,
           SystemPermissionsActions.Get
         )
       }, {

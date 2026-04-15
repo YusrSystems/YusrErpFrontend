@@ -38,11 +38,11 @@ export const ArabicLabels: Record<string, string> = {
 
   // Allowed Account Types
   [SystemPermissionsResources.AccountShowBalance]: "عرض الرصيد",
-  [SystemPermissionsResources.AccountCustomer]: "حساب عميل",
+  [SystemPermissionsResources.AccountClient]: "حساب عميل",
   [SystemPermissionsResources.AccountSupplier]: "حساب مورد",
   [SystemPermissionsResources.AccountEmployee]: "حساب موظف",
   [SystemPermissionsResources.AccountBank]: "حساب بنك",
-  [SystemPermissionsResources.AccountCashBox]: "حساب صندوق",
+  [SystemPermissionsResources.AccountBox]: "حساب صندوق",
 
   // Report Permissions
   [SystemPermissionsResources.ReportInvoice]: "تقرير الفاتورة",
@@ -121,11 +121,11 @@ export const PERMISSION_SECTIONS = [{
   icon: <Wallet className="w-5 h-5" />,
   resources: [
     SystemPermissionsResources.AccountShowBalance,
-    SystemPermissionsResources.AccountCustomer,
+    SystemPermissionsResources.AccountClient,
     SystemPermissionsResources.AccountSupplier,
     SystemPermissionsResources.AccountEmployee,
     SystemPermissionsResources.AccountBank,
-    SystemPermissionsResources.AccountCashBox
+    SystemPermissionsResources.AccountBox
   ]
 }, {
   id: "reports",

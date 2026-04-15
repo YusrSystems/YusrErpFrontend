@@ -19,7 +19,8 @@ export default function InvoicesPage({
   fixedType: fixedType,
   selectFormState,
   accountSlice,
-  accountState
+  accountState,
+  hasPagePermission
 }: {
   title: string;
   slice: ReturnType<typeof InvoiceSlice.create>;
@@ -29,6 +30,7 @@ export default function InvoicesPage({
   selectFormState: (state: any) => { formData: Partial<Invoice>; errors: Record<string, string>; };
   accountSlice: AccountSliceType;
   accountState: IEntityState<Account>;
+  hasPagePermission: boolean;
 })
 {
   const dispatch = useAppDispatch();
@@ -102,6 +104,7 @@ export default function InvoicesPage({
       entityName="الفاتورة"
       addNewItemTitle="إنشاء فاتورة جديدة"
       permissions={ permissions }
+      hasPagePermission={ hasPagePermission }
       entityState={ invoiceState }
       useSlice={ () => invoiceDialogState }
       service={ service }
@@ -187,7 +190,7 @@ export default function InvoicesPage({
       ChangeDialog={ 
         <ChangeInvoiceDialog
           entity={ invoiceDialogState.selectedRow || undefined }
-          mode={ isAddReturn? "return" : invoiceDialogState.selectedRow ? "update" : "create" }
+          mode={ isAddReturn ? "return" : invoiceDialogState.selectedRow ? "update" : "create" }
           service={ service }
           slice={ slice }
           stateKey={ stateKey }

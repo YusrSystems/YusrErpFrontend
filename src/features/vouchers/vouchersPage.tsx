@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { FileText } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import Voucher, { VoucherFilterColumns, VoucherSlice, VoucherType } from "../../core/data/voucher";
 import VouchersApiService from "../../core/networking/voucherApiService";
@@ -11,6 +13,7 @@ import ChangeVoucherDialog from "./changeVoucherDialog";
 export default function VouchersPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const voucherState = useAppSelector((state) => state.voucher);
   const voucherDialogState = useAppSelector((state) => state.voucherDialog);
 
@@ -26,6 +29,11 @@ export default function VouchersPage()
       entityName="سند"
       addNewItemTitle="إضافة سند جديد"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.Vouchers,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ voucherState }
       useSlice={ () => voucherDialogState }
       service={ service }

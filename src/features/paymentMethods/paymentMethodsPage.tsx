@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { CreditCardIcon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type PaymentMethod from "../../core/data/paymentMethod";
 import { CommissionType, PaymentMethodFilterColumns, PaymentMethodSlice } from "../../core/data/paymentMethod";
@@ -12,6 +14,7 @@ import ChangePaymentMethodDialog from "./changePaymentMethodDialog";
 export default function PaymentMethodsPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const paymentMethodState = useAppSelector((state) => state.paymentMethod);
   const paymentMethodDialogState = useAppSelector(
     (state) => state.paymentMethodDialog
@@ -32,6 +35,11 @@ export default function PaymentMethodsPage()
       entityName="طريقة الدفع"
       addNewItemTitle="إضافة طريقة دفع جديدة"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.PaymentMethods,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ paymentMethodState }
       useSlice={ () => paymentMethodDialogState }
       service={ service }

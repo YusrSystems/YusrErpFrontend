@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { Package } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import Item, { ItemFilterColumns, ItemSlice, ItemType } from "../../core/data/item";
 import ItemsApiService from "../../core/networking/itemApiService";
@@ -10,6 +12,7 @@ import ChangeItemDialog from "./changeItemDialog";
 export default function ItemsPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const itemState = useAppSelector((state) => state.item);
   const itemDialogState = useAppSelector((state) => state.itemDialog);
 
@@ -23,6 +26,11 @@ export default function ItemsPage()
       entityName="صنف"
       addNewItemTitle="إضافة صنف جديد"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.Items,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ itemState }
       useSlice={ () => itemDialogState }
       service={ service }

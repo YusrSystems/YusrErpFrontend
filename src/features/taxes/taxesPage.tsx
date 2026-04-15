@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { Percent } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import { Tax, TaxFilterColumns, TaxSlice } from "../../core/data/tax";
 import TaxesApiService from "../../core/networking/taxesApiService";
@@ -11,6 +13,7 @@ import ChangeTaxDialog from "./changeTaxDialog";
 export default function TaxesPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const taxState = useAppSelector((state) => state.tax);
   const taxDialogState = useAppSelector((state) => state.taxDialog);
   const permissions = useAppSelector((state) => selectPermissionsByResource(state, SystemPermissionsResources.Taxes));
@@ -22,6 +25,11 @@ export default function TaxesPage()
       entityName="الضريبة"
       addNewItemTitle="إضافة ضريبة جديدة"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.Taxes,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ taxState }
       useSlice={ () => taxDialogState }
       service={ service }

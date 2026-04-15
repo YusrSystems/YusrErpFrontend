@@ -34,11 +34,11 @@ export class SystemPermissionsResources
 
   // Allowed Account Types
   public static AccountShowBalance: string = "AccountShowBalance";
-  public static AccountCustomer: string = "AccountCustomer";
+  public static AccountClient: string = "AccountClient";
   public static AccountSupplier: string = "AccountSupplier";
   public static AccountEmployee: string = "AccountEmployee";
   public static AccountBank: string = "AccountBank";
-  public static AccountCashBox: string = "AccountCashBox";
+  public static AccountBox: string = "AccountBox";
 
   // Report Permissions
   public static ReportInvoice: string = "ReportInvoice";

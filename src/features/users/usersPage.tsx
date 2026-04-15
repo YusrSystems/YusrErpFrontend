@@ -1,8 +1,9 @@
-import { User, UserFilterColumns, UsersApiService } from "@yusr_systems/core";
+import { SystemPermissions, User, UserFilterColumns, UsersApiService } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { User2Icon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import { UserSlice } from "../../core/data/UserLogic";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
@@ -11,6 +12,7 @@ import ChangeUserDialog from "./changeUserDialog";
 export default function UsersPage()
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const userState = useAppSelector((state) => state.user);
   const userDialogState = useAppSelector((state) => state.userDialog);
   const permissions = useAppSelector((state) => selectPermissionsByResource(state, SystemPermissionsResources.Users));
@@ -22,6 +24,11 @@ export default function UsersPage()
       entityName="المستخدم"
       addNewItemTitle="إضافة مستخدم جديد"
       permissions={ permissions }
+      hasPagePermission={ SystemPermissions.hasAuth(
+        authState.loggedInUser?.role?.permissions ?? [],
+        SystemPermissionsResources.Users,
+        SystemPermissionsActions.Get
+      ) }
       entityState={ userState }
       useSlice={ () => userDialogState }
       service={ service }
