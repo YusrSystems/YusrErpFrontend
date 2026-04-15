@@ -35,7 +35,7 @@ export default function InvoiceBasicInfo()
     }
     else
     {
-      return (formData.type === InvoiceType.Purchase && accountCountryId !== settingsCountryId);
+      return ((formData.type === InvoiceType.Purchase || formData.type === InvoiceType.PurchaseReturn) && accountCountryId !== settingsCountryId);
     }
   };
 
@@ -50,7 +50,7 @@ export default function InvoiceBasicInfo()
     }
     else
     {
-      return ((formData.type === InvoiceType.Sell || formData.type === InvoiceType.Quotation)
+      return ((formData.type === InvoiceType.Sell || formData.type === InvoiceType.SellReturn || formData.type === InvoiceType.Quotation)
         && accountCountryId !== settingsCountryId);
     }
   };

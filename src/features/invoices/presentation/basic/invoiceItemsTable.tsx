@@ -19,14 +19,19 @@ export default function InvoiceItemsTable()
     slice,
     authState,
     dispatch,
-    disabled,
+    disabled
   } = useInvoiceContext();
 
-  const getMaxAllowedQuantity = (storeQuantity: number) =>
+  const getMaxAllowedQuantity = (qtn: number) =>
   {
     if (formData.type !== InvoiceType.Sell && formData.type !== InvoiceType.Quotation)
     {
       return Number.MAX_SAFE_INTEGER;
+    }
+
+    if (mode === "return")
+    {
+      return qtn;
     }
 
     return SystemPermissions.hasAuth(
@@ -35,7 +40,7 @@ export default function InvoiceItemsTable()
         SystemPermissionsActions.Get
       )
       ? Number.MAX_SAFE_INTEGER
-      : storeQuantity;
+      : qtn;
   };
 
   const getMinAllowedTaxInclusivePrice = (originaltaxInclusivePrice: number) =>
@@ -143,7 +148,7 @@ export default function InvoiceItemsTable()
                       value={ row.quantity ?? 1 }
                       onChange={ (newValue) =>
                         dispatch(slice.formActions.onInvoiceItemQuantityChange({ index: index, newQtn: newValue })) }
-                      disabled={ false }
+                      disabled={ mode === "return"? false : disabled }
                     />
                   </td>
 

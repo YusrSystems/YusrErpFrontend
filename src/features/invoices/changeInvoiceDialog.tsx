@@ -2,11 +2,12 @@ import type { CommonChangeDialogProps, DialogMode, IEntityState } from "@yusr_sy
 import { Button, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Loading, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { BanknoteArrowDown, BanknoteArrowUp, Box, CheckCircle2, FolderKanban, Siren } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import ChangeDialogTabbed from "../../core/components/changeDialogTabbed";
 import Account, { type AccountSliceType } from "../../core/data/account";
 import { FilterByTypeRequest } from "../../core/data/filterByTypeRequest";
 import type Invoice from "../../core/data/invoice";
-import { InvoiceRelationType, InvoiceSlice, InvoiceStatus, InvoiceType, InvoiceValidationRules, InvoiceVoucher } from "../../core/data/invoice";
+import { InvoiceRelationType, InvoiceReturnStatus, InvoiceSlice, InvoiceStatus, InvoiceType, InvoiceValidationRules, InvoiceVoucher } from "../../core/data/invoice";
 import { ItemType } from "../../core/data/item";
 import { PaymentMethodSlice } from "../../core/data/paymentMethod";
 import { StoreSlice } from "../../core/data/store";
@@ -231,15 +232,24 @@ export default function ChangeInvoiceDialog({
       } as Invoice);
       return { handled: true, data: res.data as Invoice ?? undefined };
     }
+
+    if (mode === "update" && formData.returnStatusId !== InvoiceReturnStatus.NotReturned)
+    {
+      toast.warning("لا يمكن تعديل الفاتورة", {
+        description: "تم استرجاع بعض بنود هذه الفاتورة، لا يمكن التعديل بعد الإرجاع",
+        duration: 3000
+      });
+      return { handled: true, data: formData as Invoice ?? undefined };
+    }
+
     return { handled: false };
   };
 
-  const isReturn = formData.type === InvoiceType.SellReturn || fixedType === InvoiceType.PurchaseReturn
-    || mode === "return";
-  const dialogTitle = (mode === "create" ? "إضافة" : "تعديل")
-      + isReturn
-    ? " إضافة مرتجع"
-    : " الفاتورة";
+  const isReturn = formData.type === InvoiceType.SellReturn || formData.type === InvoiceType.PurchaseReturn;
+
+  const dialogTitle = mode === "return"
+    ? "إضافة مرتجع فاتورة"
+    : ((mode === "create" ? "إضافة" : "تعديل") + (isReturn ? " مرتجع فاتورة" : " الفاتورة"));
 
   if (initLoading)
   {
@@ -284,7 +294,9 @@ export default function ChangeInvoiceDialog({
     );
   }
 
-  const disabled = mode === "update" && formData.type === InvoiceType.Sell;
+  const disabled = mode === "update"
+    && (formData.type === InvoiceType.Sell || formData.type === InvoiceType.SellReturn
+      || formData.type === InvoiceType.PurchaseReturn);
 
   return (
     <InvoiceContext.Provider
@@ -299,7 +311,7 @@ export default function ChangeInvoiceDialog({
         dispatch,
         disabled,
         accountSlice,
-        accountState,
+        accountState
       } }
     >
       <ChangeDialogTabbed<Invoice>

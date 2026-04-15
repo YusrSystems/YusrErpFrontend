@@ -23,7 +23,7 @@ export default function AlertConvertDialog({
       { /* Confirm Dialog */ }
       <AlertDialog open={ showConfirm } onOpenChange={ setShowConfirm }>
         <AlertDialogTrigger asChild>
-          <Button variant="destructive">تحويل لفاتورة بيع</Button>
+          <Button className="ml-10" variant="destructive">تحويل لفاتورة بيع</Button>
         </AlertDialogTrigger>
         <AlertDialogContent dir="rtl">
           <AlertDialogHeader>
