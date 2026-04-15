@@ -1,8 +1,10 @@
-import { CityFilterColumns } from "@yusr_systems/core";
+import { CityFilterColumns, SystemPermissions } from "@yusr_systems/core";
 import type { CommonChangeDialogProps, IEntityState } from "@yusr_systems/ui";
 import { Button, ChangeDialog, FieldGroup, FieldsSection, Input, NumberField, SearchableSelect, TextAreaField, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
+import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import Account, { AccountContact, AccountFilterColumns, type AccountSliceType, AccountType, AccountValidationRules } from "../../core/data/account";
 import { TaxSlice } from "../../core/data/tax";
 import { filterCities } from "../../core/state/shared/citySlice";
@@ -26,6 +28,7 @@ export default function ChangeAccountDialog({
 {
   const dispatch = useAppDispatch();
   const cityState = useAppSelector((state) => state.city);
+  const authState = useAppSelector((state) => state.auth);
   const accountState = useAppSelector((state) => state[stateKey] as IEntityState<Account>);
 
   const initialValues = useMemo(
@@ -103,6 +106,12 @@ export default function ChangeAccountDialog({
     }
   };
 
+  const canShowBalance = SystemPermissions.hasAuth(
+    authState.loggedInUser?.role?.permissions ?? [],
+    SystemPermissionsResources.AccountShowBalance,
+    SystemPermissionsActions.Get
+  );
+
   return (
     <ChangeDialog<Account>
       title={ `${mode === "create" ? "إضافة" : "تعديل"} حساب ${getTypeName()}` }
@@ -147,12 +156,6 @@ export default function ChangeAccountDialog({
             /> */
             }
 
-            <NumberField
-              label="الرصيد الافتتاحي"
-              value={ formData.initialBalance || "" }
-              onChange={ (val) => dispatch(slice.formActions.updateFormData({ initialBalance: val })) }
-            />
-
             <div className="flex flex-col gap-1.5 w-full">
               <label className="text-sm font-medium">الحساب الأب</label>
               <SearchableSelect
@@ -175,6 +178,19 @@ export default function ChangeAccountDialog({
                 } }
               />
             </div>
+
+            <NumberField
+              label="الرصيد الافتتاحي"
+              value={ canShowBalance ? (formData.initialBalance || "") : "" }
+              onChange={ (val) => dispatch(slice.formActions.updateFormData({ initialBalance: val })) }
+            />
+
+            <NumberField
+              label="الرصيد"
+              disabled
+              value={ canShowBalance ? (formData.balance || "") : "" }
+              onChange={ (val) => dispatch(slice.formActions.updateFormData({ initialBalance: val })) }
+            />
           </FieldsSection>
 
           { (requiresTaxInfo || isBank) && (

@@ -1,7 +1,9 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { CrudPage, type IDialogState, type IEntityState } from "@yusr_systems/ui";
 import { WalletIcon } from "lucide-react";
 import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import Account, { AccountFilterColumns, AccountSlice, AccountType } from "../../core/data/account";
 import AccountsApiService from "../../core/networking/accountApiService";
@@ -27,6 +29,7 @@ export default function AccountsPage({
 })
 {
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const accountState = useAppSelector((state) => state[stateKey] as IEntityState<Account>);
   const accountDialogState = useAppSelector((state) => state[dialogStateKey] as IDialogState<Account>);
 
@@ -35,6 +38,12 @@ export default function AccountsPage({
   );
 
   const service = useMemo(() => new AccountsApiService(), []);
+
+  const canShowBalance = SystemPermissions.hasAuth(
+    authState.loggedInUser?.role?.permissions ?? [],
+    SystemPermissionsResources.AccountShowBalance,
+    SystemPermissionsActions.Get
+  );
 
   return (
     <CrudPage<Account>
@@ -59,7 +68,7 @@ export default function AccountsPage({
           rowName: "اسم الحساب",
           rowStyles: "w-40"
         },
-        { rowName: "الرصيد", rowStyles: "w-32" },
+        ...(canShowBalance ? [{ rowName: "الرصيد", rowStyles: "w-32" }] : []),
         { rowName: "", rowStyles: "w-32" }
       ] }
       tableRowMapper={ (
@@ -71,13 +80,22 @@ export default function AccountsPage({
         const label = isCredit ? "دائن" : "مدين";
         const colorStyle = isCredit ? "text-green-600" : "text-red-600";
 
-        return [{ rowName: `#${account.id}`, rowStyles: "" }, { rowName: account.name, rowStyles: "font-semibold" }, {
-          rowName: Math.abs(account.balance ?? 0).toLocaleString(),
-          rowStyles: `font-mono ${colorStyle}`
-        }, {
-          rowName: label,
-          rowStyles: `font-semibold ${colorStyle}`
-        }];
+        return [
+          { rowName: `#${account.id}`, rowStyles: "" },
+          { rowName: account.name, rowStyles: "font-semibold" },
+          ...(canShowBalance
+            ? [{
+              rowName: Math.abs(account.balance ?? 0).toLocaleString("en-US", {
+                style: "currency",
+                currency: authState.setting?.currency?.code
+              }),
+              rowStyles: `font-mono ${colorStyle}`
+            }, {
+              rowName: label,
+              rowStyles: `font-semibold ${colorStyle}`
+            }]
+            : [])
+        ];
       } }
       actions={ {
         filter: slice.entityActions.filter,
