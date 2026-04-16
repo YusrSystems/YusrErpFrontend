@@ -5,7 +5,6 @@ import LandingFooter from "./landingFooter";
 import LandingHeader from "./landingHeader";
 import LandingHero from "./landingHero";
 import LandingPricing from "./landingPricing";
-import LandingSystemPreview from "./landingSystemPreview";
 import LandingWhyUs from "./landingWhyUs";
 
 const PH = (name: string) => `/assets/${name}`;
@@ -125,7 +124,7 @@ const pricingFeatures: { index: number; label: string; type: "title" | "check" |
 
 const Landing = () =>
 {
-  const { lightbox, openLightbox, closeLightbox } = useLightBox();
+  const { lightbox, closeLightbox } = useLightBox();
 
   return (
     <div dir="rtl" className="relative min-h-svh text-foreground">
