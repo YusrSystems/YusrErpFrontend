@@ -1,13 +1,16 @@
-import { SystemPermissions } from "@yusr_systems/core";
+import { FilterCondition, SystemPermissions } from "@yusr_systems/core";
 import { CrudPage, type IDialogState, type IEntityState } from "@yusr_systems/ui";
 import { WalletIcon } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import Account, { AccountFilterColumns, AccountSlice, AccountType } from "../../core/data/account";
+import ReportConstants from "../../core/data/report/reportConstants";
 import AccountsApiService from "../../core/networking/accountApiService";
 import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
+import AccountStatementButton from "../reports/accountStatementDialog";
+import ReportButton from "../reports/reportButton";
 import ChangeAccountDialog from "./changeAccountDialog";
 
 export default function AccountsPage({
@@ -28,6 +31,7 @@ export default function AccountsPage({
   hasPagePermission: boolean;
 })
 {
+  const [condition, setCondition] = useState<FilterCondition | undefined>(undefined);
   const dispatch = useAppDispatch();
   const authState = useAppSelector((state) => state.auth);
   const accountState = useAppSelector((state) => state[stateKey] as IEntityState<Account>);
@@ -50,6 +54,19 @@ export default function AccountsPage({
       title={ title }
       entityName="الحساب"
       addNewItemTitle="إضافة حساب جديد"
+      onConditionChange={ setCondition }
+      actionButtons={ SystemPermissions.hasAuth(
+          authState.loggedInUser?.role?.permissions ?? [],
+          SystemPermissionsResources.ReportAccountList,
+          SystemPermissionsActions.Get
+        )
+        ? [
+          <ReportButton
+            reportName={ ReportConstants.AccountsList }
+            request={ { type: fixedType, condition: condition } }
+          />
+        ]
+        : [] }
       permissions={ permissions }
       hasPagePermission={ hasPagePermission }
       entityState={ accountState }
@@ -69,6 +86,13 @@ export default function AccountsPage({
           rowStyles: "w-40"
         },
         ...(canShowBalance ? [{ rowName: "الرصيد", rowStyles: "w-32" }] : []),
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportAccountStatement,
+            SystemPermissionsActions.Get
+          )
+          ? [{ rowName: "", rowStyles: "w-32" }]
+          : []),
         { rowName: "", rowStyles: "w-32" }
       ] }
       tableRowMapper={ (
@@ -93,6 +117,16 @@ export default function AccountsPage({
             }, {
               rowName: label,
               rowStyles: `font-semibold ${colorStyle}`
+            }]
+            : []),
+          ...(SystemPermissions.hasAuth(
+              authState.loggedInUser?.role?.permissions ?? [],
+              SystemPermissionsResources.ReportAccountStatement,
+              SystemPermissionsActions.Get
+            )
+            ? [{
+              rowName: <AccountStatementButton account={ account } />,
+              rowStyles: "w-32"
             }]
             : [])
         ];

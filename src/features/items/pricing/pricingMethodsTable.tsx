@@ -1,8 +1,13 @@
+import { SystemPermissions } from "@yusr_systems/core";
 import { Button, FormField, NumberField, SearchableSelect, TextField } from "@yusr_systems/ui";
 import { Plus, Trash2 } from "lucide-react";
-import { ItemType } from "../../../core/data/item";
+import { SystemPermissionsActions } from "../../../core/auth/systemPermissionsActions";
+import { SystemPermissionsResources } from "../../../core/auth/systemPermissionsResources";
+import Item, { ItemType } from "../../../core/data/item";
 import { PricingMethodFilterColumns, PricingMethodSlice } from "../../../core/data/pricingMethod";
 import { UnitFilterColumns, UnitSlice } from "../../../core/data/unit";
+import { useAppSelector } from "../../../core/state/store";
+import ItemBarcodeButton from "../../reports/itemBarcodeDialog";
 import usePricingMethodsTable from "./usePricingMethodsTable";
 
 export default function PricingMethodsTable()
@@ -21,6 +26,7 @@ export default function PricingMethodsTable()
 
   const hasError = isInvalid("itemUnitPricingMethods");
   const errorMessage = getError("itemUnitPricingMethods");
+  const authState = useAppSelector((state) => state.auth);
   const isService = formData.type === ItemType.Service;
 
   return (
@@ -47,6 +53,11 @@ export default function PricingMethodsTable()
               <th className="p-3 w-32">سعر البيع</th>
               <th className="p-3 w-40">الباركود</th>
               <th className="p-3 w-40">الاسم</th>
+              { SystemPermissions.hasAuth(
+                authState.loggedInUser?.role?.permissions ?? [],
+                SystemPermissionsResources.ReportItemBarcode,
+                SystemPermissionsActions.Get
+              ) && <th className="p-3 w-12 text-center"></th> }
               <th className="p-3 w-12 text-center"></th>
             </tr>
           </thead>
@@ -141,6 +152,17 @@ export default function PricingMethodsTable()
                     onChange={ (e) => updatePricingMethod(index, { itemUnitPricingMethodName: e.target.value }) }
                   />
                 </td>
+
+                { SystemPermissions.hasAuth(
+                  authState.loggedInUser?.role?.permissions ?? [],
+                  SystemPermissionsResources.ReportItemBarcode,
+                  SystemPermissionsActions.Get
+                ) && (
+                  <td className="p-3 text-center">
+                    <ItemBarcodeButton item={ formData as Item } iupm={ method } />
+                  </td>
+                ) }
+
                 <td className="p-3 text-center">
                   <Button
                     type="button"

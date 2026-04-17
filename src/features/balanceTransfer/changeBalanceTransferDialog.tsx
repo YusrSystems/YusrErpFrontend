@@ -1,6 +1,7 @@
+import { NumbertoWordsService } from "@yusr_systems/core";
 import type { CommonChangeDialogProps } from "@yusr_systems/ui";
-import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, TextAreaField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
-import { useEffect, useMemo } from "react";
+import { ChangeDialog, DateField, FieldGroup, FieldsSection, NumberField, SearchableSelect, TextAreaField, TextField, useFormErrors, useFormInit, useValidate } from "@yusr_systems/ui";
+import { useEffect, useMemo, useState } from "react";
 import { AccountFilterColumns, BanksAndBoxesSlice } from "../../core/data/account";
 import type BalanceTransfer from "../../core/data/balanceTransfer";
 import { BalanceTransferSlice, BalanceTransferValidationRules } from "../../core/data/balanceTransfer";
@@ -10,7 +11,9 @@ export default function ChangeBalanceTransferDialog(
   { entity, mode, service, onSuccess }: CommonChangeDialogProps<BalanceTransfer>
 )
 {
+  const [amountToWords, setAmountToWords] = useState("");
   const dispatch = useAppDispatch();
+  const authState = useAppSelector((state) => state.auth);
   const accountState = useAppSelector((state) => state.banksAndBoxes);
 
   const initialValues = useMemo(() => ({
@@ -32,6 +35,14 @@ export default function ChangeBalanceTransferDialog(
   {
     dispatch(BanksAndBoxesSlice.entityActions.filter(undefined));
   }, [dispatch]);
+
+  useEffect(() =>
+  {
+    if (formData.amount !== undefined && authState.setting?.currency)
+    {
+      setAmountToWords(NumbertoWordsService.ConvertAmount(formData.amount, authState.setting.currency));
+    }
+  }, [formData.amount, authState.setting?.currency]);
 
   const availableFromAccounts = useMemo(() =>
   {
@@ -74,6 +85,13 @@ export default function ChangeBalanceTransferDialog(
               isInvalid={ isInvalid("amount") }
               error={ getError("amount") }
             />
+            <div className="col-span-full">
+              <TextField
+                label={ "التفقيط" }
+                value={ amountToWords }
+                onChange={ () => undefined }
+              />
+            </div>
           </FieldsSection>
 
           <FieldsSection title="أطراف التحويل" columns={ 2 }>

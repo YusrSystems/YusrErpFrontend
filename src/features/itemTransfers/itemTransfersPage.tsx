@@ -7,8 +7,10 @@ import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActio
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type ItemTransfer from "../../core/data/itemTransfer";
 import { ItemTransferFilterColumns, ItemTransferSlice } from "../../core/data/itemTransfer";
+import ReportConstants from "../../core/data/report/reportConstants";
 import ItemTransferApiService from "../../core/networking/itemTransferApiService";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import ReportButton from "../reports/reportButton";
 import ChangeItemTransferDialog from "./changeItemTransferDialog";
 
 export default function ItemTransfersPage()
@@ -51,7 +53,14 @@ export default function ItemTransfersPage()
         { rowName: "التاريخ", rowStyles: "w-32" },
         { rowName: "من مستودع", rowStyles: "w-48" },
         { rowName: "إلى مستودع", rowStyles: "w-48" },
-        { rowName: "الوصف", rowStyles: "" }
+        { rowName: "الوصف", rowStyles: "" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportItemTransfer,
+            SystemPermissionsActions.Get
+          )
+          ? [{ rowName: "", rowStyles: "w-32" }]
+          : [])
       ] }
       tableRowMapper={ (
         transfer: ItemTransfer
@@ -60,7 +69,22 @@ export default function ItemTransfersPage()
         { rowName: new Date(transfer.transferDate).toLocaleDateString("ar-SA"), rowStyles: "" },
         { rowName: transfer.fromStoreName, rowStyles: "font-semibold" },
         { rowName: transfer.toStoreName, rowStyles: "font-semibold" },
-        { rowName: transfer.description || "-", rowStyles: "text-muted-foreground" }
+        { rowName: transfer.description || "-", rowStyles: "text-muted-foreground" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportItemTransfer,
+            SystemPermissionsActions.Get
+          )
+          ? [{
+            rowName: (
+              <ReportButton
+                reportName={ ReportConstants.ItemTransfer }
+                request={ { itemTransferId: transfer.id } }
+              />
+            ),
+            rowStyles: "w-32"
+          }]
+          : [])
       ] }
       actions={ {
         filter: ItemTransferSlice.entityActions.filter,

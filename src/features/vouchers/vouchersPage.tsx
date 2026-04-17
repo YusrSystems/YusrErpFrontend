@@ -1,13 +1,15 @@
-import { SystemPermissions } from "@yusr_systems/core";
+import { FilterCondition, NumbertoWordsService, SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { FileText } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import ReportConstants from "../../core/data/report/reportConstants";
 import Voucher, { VoucherFilterColumns, VoucherSlice, VoucherType } from "../../core/data/voucher";
 import VouchersApiService from "../../core/networking/voucherApiService";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import ReportButton from "../reports/reportButton";
 import ChangeVoucherDialog from "./changeVoucherDialog";
 
 export default function VouchersPage()
@@ -22,12 +24,28 @@ export default function VouchersPage()
   );
 
   const service = useMemo(() => new VouchersApiService(), []);
+  const [condition, setCondition] = useState<FilterCondition | undefined>(undefined);
 
   return (
     <CrudPage<Voucher>
       title="السندات المالية"
       entityName="سند"
       addNewItemTitle="إضافة سند جديد"
+      onConditionChange={ setCondition }
+      actionButtons={ SystemPermissions.hasAuth(
+          authState.loggedInUser?.role?.permissions ?? [],
+          SystemPermissionsResources.ReportVoucherList,
+          SystemPermissionsActions.Get
+        )
+        ? [
+          <ReportButton
+            reportName={ ReportConstants.VouchersList }
+            request={ {
+              condition: condition
+            } }
+          />
+        ]
+        : [] }
       permissions={ permissions }
       hasPagePermission={ SystemPermissions.hasAuth(
         authState.loggedInUser?.role?.permissions ?? [],
@@ -50,7 +68,14 @@ export default function VouchersPage()
         { rowName: "التاريخ", rowStyles: "w-24" },
         { rowName: "الحساب", rowStyles: "w-40" },
         { rowName: "المبلغ", rowStyles: "w-32" },
-        { rowName: "طريقة الدفع", rowStyles: "w-32" }
+        { rowName: "طريقة الدفع", rowStyles: "w-32" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportVoucher,
+            SystemPermissionsActions.Get
+          )
+          ? [{ rowName: "", rowStyles: "w-32" }]
+          : [])
       ] }
       tableRowMapper={ (voucher: Voucher) => [
         { rowName: `#${voucher.id}`, rowStyles: "" },
@@ -63,7 +88,27 @@ export default function VouchersPage()
         { rowName: new Date(voucher.date).toLocaleDateString("ar-SA"), rowStyles: "" },
         { rowName: voucher.accountName ?? "-", rowStyles: "font-semibold" },
         { rowName: voucher.amount?.toLocaleString() ?? "0", rowStyles: "font-mono font-bold" },
-        { rowName: voucher.paymentMethod?.name ?? "-", rowStyles: "text-sm text-gray-600" }
+        { rowName: voucher.paymentMethod?.name ?? "-", rowStyles: "text-sm text-gray-600" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportVoucher,
+            SystemPermissionsActions.Get
+          )
+          ? [{
+            rowName: (
+              <ReportButton
+                reportName={ ReportConstants.Voucher }
+                request={ {
+                  voucherId: voucher.id,
+                  tafqit: authState.setting?.currency
+                    ? NumbertoWordsService.ConvertAmount(voucher.amount, authState.setting.currency)
+                    : NumbertoWordsService.Convert(voucher.amount)
+                } }
+              />
+            ),
+            rowStyles: "w-32"
+          }]
+          : [])
       ] }
       actions={ {
         filter: VoucherSlice.entityActions.filter,

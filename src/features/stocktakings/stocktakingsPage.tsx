@@ -5,9 +5,11 @@ import { useMemo } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
+import ReportConstants from "../../core/data/report/reportConstants";
 import Stocktaking, { StocktakingFilterColumns, StocktakingSlice } from "../../core/data/stocktaking";
 import StocktakingsApiService from "../../core/networking/stocktakingApiService";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import ReportButton from "../reports/reportButton";
 import ChangeStocktakingDialog from "./changeStocktakingDialog";
 
 export default function StocktakingsPage()
@@ -48,7 +50,14 @@ export default function StocktakingsPage()
         { rowName: "رقم الجرد", rowStyles: "w-32" },
         { rowName: "التاريخ", rowStyles: "w-32" },
         { rowName: "المستودع", rowStyles: "w-48" },
-        { rowName: "الوصف", rowStyles: "" }
+        { rowName: "الوصف", rowStyles: "" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportStocktaking,
+            SystemPermissionsActions.Get
+          )
+          ? [{ rowName: "", rowStyles: "w-32" }]
+          : [])
       ] }
       tableRowMapper={ (
         stocktaking: Stocktaking
@@ -56,7 +65,22 @@ export default function StocktakingsPage()
         { rowName: `#${stocktaking.id}`, rowStyles: "" },
         { rowName: new Date(stocktaking.date).toLocaleDateString("ar-SA"), rowStyles: "font-mono" },
         { rowName: stocktaking.storeName, rowStyles: "font-semibold" },
-        { rowName: stocktaking.description ?? "-", rowStyles: "text-sm text-gray-500" }
+        { rowName: stocktaking.description ?? "-", rowStyles: "text-sm text-gray-500" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportStocktaking,
+            SystemPermissionsActions.Get
+          )
+          ? [{
+            rowName: (
+              <ReportButton
+                reportName={ ReportConstants.StockTaking }
+                request={ { stocktakingId: stocktaking.id } }
+              />
+            ),
+            rowStyles: "w-32"
+          }]
+          : [])
       ] }
       actions={ {
         filter: StocktakingSlice.entityActions.filter,

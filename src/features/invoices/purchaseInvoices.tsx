@@ -23,7 +23,7 @@ export default function PurchaseInvoicesPage()
       accountState={ suppliersState }
       hasPagePermission={ SystemPermissions.hasAuth(
         authState.loggedInUser?.role?.permissions ?? [],
-        SystemPermissionsResources.InvoiceSell,
+        SystemPermissionsResources.InvoicePurchase,
         SystemPermissionsActions.Get
       ) }
     />

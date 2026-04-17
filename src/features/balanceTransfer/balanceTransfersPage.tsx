@@ -1,4 +1,4 @@
-import { SystemPermissions } from "@yusr_systems/core";
+import { NumbertoWordsService, SystemPermissions } from "@yusr_systems/core";
 import { CrudPage } from "@yusr_systems/ui";
 import { ArrowRightLeft } from "lucide-react";
 import { useMemo } from "react";
@@ -6,8 +6,10 @@ import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import BalanceTransfer, { BalanceTransferFilterColumns, BalanceTransferSlice } from "../../core/data/balanceTransfer";
+import ReportConstants from "../../core/data/report/reportConstants";
 import BalanceTransfersApiService from "../../core/networking/balanceTransferApiService";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import ReportButton from "../reports/reportButton";
 import ChangeBalanceTransferDialog from "./changeBalanceTransferDialog";
 
 export default function BalanceTransfersPage()
@@ -50,7 +52,14 @@ export default function BalanceTransfersPage()
         { rowName: "من حساب", rowStyles: "w-40" },
         { rowName: "إلى حساب", rowStyles: "w-40" },
         { rowName: "المبلغ", rowStyles: "w-32" },
-        { rowName: "البيان", rowStyles: "w-48" }
+        { rowName: "البيان", rowStyles: "w-48" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportBalanceTransfer,
+            SystemPermissionsActions.Get
+          )
+          ? [{ rowName: "", rowStyles: "w-32" }]
+          : [])
       ] }
       tableRowMapper={ (
         transfer: BalanceTransfer
@@ -60,7 +69,27 @@ export default function BalanceTransfersPage()
         { rowName: transfer.fromAccountName ?? "-", rowStyles: "font-semibold text-red-600" },
         { rowName: transfer.toAccountName ?? "-", rowStyles: "font-semibold text-green-600" },
         { rowName: transfer.amount?.toLocaleString() ?? "0", rowStyles: "font-mono font-bold" },
-        { rowName: transfer.description ?? "-", rowStyles: "text-sm text-gray-500 truncate max-w-[200px]" }
+        { rowName: transfer.description ?? "-", rowStyles: "text-sm text-gray-500 truncate max-w-[200px]" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportBalanceTransfer,
+            SystemPermissionsActions.Get
+          )
+          ? [{
+            rowName: (
+              <ReportButton
+                reportName={ ReportConstants.BalanceTransfer }
+                request={ {
+                  balanceTransferId: transfer.id,
+                  tafqit: authState.setting?.currency
+                    ? NumbertoWordsService.ConvertAmount(transfer.amount, authState.setting.currency)
+                    : NumbertoWordsService.Convert(transfer.amount)
+                } }
+              />
+            ),
+            rowStyles: "w-32"
+          }]
+          : [])
       ] }
       actions={ {
         filter: BalanceTransferSlice.entityActions.filter,

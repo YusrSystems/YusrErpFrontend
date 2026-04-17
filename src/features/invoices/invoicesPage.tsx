@@ -1,14 +1,19 @@
+import { FilterCondition, SystemPermissions } from "@yusr_systems/core";
 import { ContextMenuItem, CrudPage, DropdownMenuItem, type IDialogState, type IEntityState } from "@yusr_systems/ui";
 import { FileTextIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { selectPermissionsByResource } from "../../core/auth/authSelectors";
+import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import type Account from "../../core/data/account";
 import type { AccountSliceType } from "../../core/data/account";
 import Invoice, { EInvoiceStatus, InvoiceFilterColumns, InvoiceSlice, InvoiceStatus, InvoiceType } from "../../core/data/invoice";
+import { InvoicesListReportType } from "../../core/data/report/invoicesListReportType";
+import ReportConstants from "../../core/data/report/reportConstants";
 import { EInvoicingEnvironmentType } from "../../core/data/setting";
 import InvoicesApiService from "../../core/networking/invoiceApiService";
 import { type RootState, useAppDispatch, useAppSelector } from "../../core/state/store";
+import ReportButton from "../reports/reportButton";
 import ChangeInvoiceDialog from "./changeInvoiceDialog";
 
 export default function InvoicesPage({
@@ -34,6 +39,7 @@ export default function InvoicesPage({
 })
 {
   const dispatch = useAppDispatch();
+  const [condition, setCondition] = useState<FilterCondition | undefined>(undefined);
   const [isAddReturn, setIsAddReturn] = useState<boolean>(false);
   const invoiceState = useAppSelector((state) => state[stateKey] as IEntityState<Invoice>);
   const authState = useAppSelector((state) => state.auth);
@@ -103,6 +109,25 @@ export default function InvoicesPage({
       title={ title }
       entityName="الفاتورة"
       addNewItemTitle="إنشاء فاتورة جديدة"
+      onConditionChange={ setCondition }
+      actionButtons={ SystemPermissions.hasAuth(
+          authState.loggedInUser?.role?.permissions ?? [],
+          SystemPermissionsResources.ReportInvoiceList,
+          SystemPermissionsActions.Get
+        )
+        ? [
+          <ReportButton
+            reportName={ ReportConstants.InvoicesList }
+            request={ {
+              types: fixedType === InvoiceType.Sell
+                ? [InvoiceType.Sell, InvoiceType.SellReturn, InvoiceType.Quotation]
+                : [InvoiceType.Purchase, InvoiceType.PurchaseReturn],
+              condition: condition,
+              reportType: InvoicesListReportType.InvoicesList
+            } }
+          />
+        ]
+        : [] }
       permissions={ permissions }
       hasPagePermission={ hasPagePermission }
       entityState={ invoiceState }
@@ -126,6 +151,13 @@ export default function InvoicesPage({
         { rowName: "", rowStyles: "w-32" },
         ...(authState.setting?.eInvoicingEnvironmentType !== EInvoicingEnvironmentType.NotRegistered
           ? [{ rowName: "حالة الفاتورة الإلكترونية", rowStyles: "w-32" }]
+          : []),
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportInvoice,
+            SystemPermissionsActions.Get
+          )
+          ? [{ rowName: "", rowStyles: "w-32" }]
           : [])
       ] }
       tableRowMapper={ (invoice: Invoice) => [
@@ -164,6 +196,16 @@ export default function InvoicesPage({
             rowStyles: `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
               getEInvoiceStatus(invoice).styles
             }`
+          }]
+          : []),
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportAccountStatement,
+            SystemPermissionsActions.Get
+          ) && invoice.statusId === InvoiceStatus.Valid
+          ? [{
+            rowName: <ReportButton reportName={ ReportConstants.Invoice } request={ { invoiceId: invoice.id } } />,
+            rowStyles: "w-32"
           }]
           : [])
       ] }

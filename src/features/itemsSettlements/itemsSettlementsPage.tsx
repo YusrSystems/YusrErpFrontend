@@ -6,8 +6,10 @@ import { selectPermissionsByResource } from "../../core/auth/authSelectors";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
 import ItemsSettlement, { ItemsSettlementFilterColumns, ItemsSettlementSlice } from "../../core/data/itemsSettlement";
+import ReportConstants from "../../core/data/report/reportConstants";
 import ItemsSettlementsApiService from "../../core/networking/itemsSettlementsApiService";
 import { useAppDispatch, useAppSelector } from "../../core/state/store";
+import ReportButton from "../reports/reportButton";
 import ChangeItemsSettlementDialog from "./changeItemsSettlementDialog";
 
 export default function ItemsSettlementsPage()
@@ -48,7 +50,14 @@ export default function ItemsSettlementsPage()
         { rowName: "رقم التسوية", rowStyles: "w-32" },
         { rowName: "التاريخ", rowStyles: "w-32" },
         { rowName: "المستودع", rowStyles: "w-48" },
-        { rowName: "الوصف", rowStyles: "" }
+        { rowName: "الوصف", rowStyles: "" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportItemSettlement,
+            SystemPermissionsActions.Get
+          )
+          ? [{ rowName: "", rowStyles: "w-32" }]
+          : [])
       ] }
       tableRowMapper={ (
         settlement: ItemsSettlement
@@ -56,7 +65,22 @@ export default function ItemsSettlementsPage()
         { rowName: `#${settlement.id}`, rowStyles: "" },
         { rowName: new Date(settlement.date).toLocaleDateString("ar-SA"), rowStyles: "font-mono" },
         { rowName: settlement.storeName, rowStyles: "font-semibold" },
-        { rowName: settlement.description ?? "-", rowStyles: "text-sm text-gray-500" }
+        { rowName: settlement.description ?? "-", rowStyles: "text-sm text-gray-500" },
+        ...(SystemPermissions.hasAuth(
+            authState.loggedInUser?.role?.permissions ?? [],
+            SystemPermissionsResources.ReportItemSettlement,
+            SystemPermissionsActions.Get
+          )
+          ? [{
+            rowName: (
+              <ReportButton
+                reportName={ ReportConstants.ItemSettlement }
+                request={ { itemSettlementId: settlement.id } }
+              />
+            ),
+            rowStyles: "w-32"
+          }]
+          : [])
       ] }
       actions={ {
         filter: ItemsSettlementSlice.entityActions.filter,
