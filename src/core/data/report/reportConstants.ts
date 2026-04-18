@@ -13,4 +13,8 @@ export default class ReportConstants
   public static ItemBarcode = "ItemBarcode";
   public static Voucher = "Voucher";
   public static VouchersList = "VouchersList";
+  public static BalanceSheet = "BalanceSheet";
+  public static TaxReturn = "TaxReturn";
+  public static ItemTaxStatement = "ItemTaxStatement";
+  public static ItemsMovement = "ItemsMovement";
 }

@@ -21,6 +21,7 @@ import LoginPage from "./features/login/loginPage";
 import PaymentMethodsPage from "./features/paymentMethods/paymentMethodsPage";
 import PricingMethodsPage from "./features/pricingMethods/pricingMethodsPage";
 import RegisterPage from "./features/register/presentation/registerPage";
+import ReportsPage from "./features/reports/reportsPage";
 import RolesPage from "./features/roles/rolesPage";
 import SettingPage from "./features/setting/settingPage";
 import StocktakingsPage from "./features/stocktakings/stocktakingsPage";
@@ -101,6 +102,7 @@ function AppRoutes()
             <Route path="/itemTransfers" element={ <ItemTransfersPage /> } />
             <Route path="/stocktakings" element={ <StocktakingsPage /> } />
             <Route path="/itemsSettlements" element={ <ItemsSettlementsPage /> } />
+            <Route path="/reports" element={ <ReportsPage /> } />
           </Route>
         </Route>
 

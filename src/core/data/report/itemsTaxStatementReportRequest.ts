@@ -1,15 +1,21 @@
 import type { BaseReportRequest } from "./baseReportRequest";
 
+export const ItemsTaxStatementReportType = {
+  Sales: 0,
+  Purchases: 1
+} as const;
+
+export type ItemsTaxStatementReportType = typeof ItemsTaxStatementReportType[keyof typeof ItemsTaxStatementReportType];
+
 export class ItemsTaxStatementReportRequest implements BaseReportRequest
 {
-  reportType: number;
+  type!: ItemsTaxStatementReportType;
   fromDate?: Date | null;
   toDate?: Date | null;
   itemId?: number | null;
 
   constructor(init?: Partial<ItemsTaxStatementReportRequest>)
   {
-    this.reportType = 0;
     Object.assign(this, init);
   }
 }

@@ -1,6 +1,6 @@
 import { ApiConstants, SystemPermissions, YusrApiHelper } from "@yusr_systems/core";
 import { Sidebar, SideBarCompanyData, SidebarContent, SidebarFooter, SidebarHeader, SidebarLogo, SideBarMainMenu, SidebarMenu, SidebarMenuItem, SideBarSecondaryMenu, SideBarUserData } from "@yusr_systems/ui";
-import { Building2, LayoutDashboardIcon, Package, ReceiptText, ScrollText, SettingsIcon, UsersIcon, WalletCards } from "lucide-react";
+import { Building2, FileChartColumnIncreasing, LayoutDashboardIcon, Package, ReceiptText, ScrollText, SettingsIcon, UsersIcon, WalletCards } from "lucide-react";
 import * as React from "react";
 import { SystemPermissionsActions } from "../../core/auth/systemPermissionsActions";
 import { SystemPermissionsResources } from "../../core/auth/systemPermissionsResources";
@@ -235,6 +235,15 @@ export function SideBar({ ...props }: React.ComponentProps<typeof Sidebar>)
           SystemPermissionsActions.Get
         )
       }]
+    }, {
+      title: appLangSections.reports,
+      url: "/reports",
+      icon: <FileChartColumnIncreasing />,
+      hasAuth: SystemPermissions.hasAuth(
+        permissions,
+        SystemPermissionsResources.Stores,
+        SystemPermissionsActions.Get
+      )
     }],
     navSecondary: [{
       title: appLangSections.settings,
